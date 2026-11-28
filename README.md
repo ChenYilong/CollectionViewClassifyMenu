@@ -139,7 +139,7 @@ filter.selectedIndexPaths = [IndexPath(item: 0, section: 0)]
 | `menu(_:didChangeSelectedItems:)` | 每次点击改变选择后回调一次，用于刷新筛选结果 |
 | `CYLMenuStyle.foldChevronImage` | 底部折叠箭头图片，展开时旋转 180° |
 | `CYLMenuStyle` | 标题字体与颜色、图标颜色（按状态）、图标与文字间距、图标大小、位置偏移、`layoutCentered`、间距、高度、折叠文案；Dynamic Type |
-| `CYLTagAppearance` | 每种状态的背景、文字颜色、字体、图标颜色、圆角（0 为胶囊）、边框、margin（参照 `CYLBadgeAppearance`） |
+| `CYLTagAppearance` | 每种状态的背景、文字颜色、字体、图标颜色、圆角（0 为直角，1000 为胶囊）、边框、margin（参照 `CYLBadgeAppearance`） |
 | `CYLTagButton` | 单个标签视图（横向的 `CYLFlatDesignTabBarButton`），也是唯一的“图标 + 标题 + 动效图标”组件，可单独使用：`init(title:image:)` / `init(title:image:animationURL:)`，按内容自适应大小（`intrinsicContentSize`）；角标 `badgeValue`（`nil` 隐藏、空字符串为小红点、其他文字为胶囊）与 `badgeColor`（默认 `systemRed`），位于图标（无图标时为标题）右上角，VoiceOver 读作标签的值；`CYLMenuStyle.imagePlacement = .top` / `.bottom` 使图标位于标题上方 / 下方；`height(forTitle:iconSize:style:traitCollection:)` 测量高度。Android、HarmonyOS、微信小程序（`cyl-tag-button`）提供同名 API |
 | `menuSelectedImageForItem(at:)` | 选中态图标 |
 | `menuAnimationURLForItem(at:)`, `CYLTagButton.animationURL` | Lottie / PAG / Rive / SVGA / GIF 动效图标（CYLTabBarController 动效引擎） |
@@ -178,6 +178,22 @@ filter.selectedIndexPaths = [IndexPath(item: 0, section: 0)]
 | `contentHeight`, `heightThatFitsWidth(_:)`, `intrinsicContentSize`, `isScrollEnabled` | Embed in a table header, a stack view or Auto Layout |
 | `numberOfRows(inSection:)`, `numberOfVisibleItems(inSection:)` | Query the layout result |
 
+#### 分组卡片外观（iOS） / Section card look (iOS)
+
+| 中文 | English |
+|:---|:---|
+| 默认外观：每个分组的标签都放在圆角卡片里（UITableView 的 inset grouped 样式），列表背景为分组背景（浅色 #F2F2F7，深色黑色），分组标题在卡片上方。表头分割线默认关闭（`headerSeparatorStyle = .none`），表头底色默认关闭，卡片背景默认纯色（`sectionBackgroundStyle = .flat`）。不想要卡片时关闭它：`style.sectionStyle = .plain`，或在配置中写 `"sectionStyle": "plain"`（`tagCloud()`、`tagContainer()`、`gridStyle(itemsPerRow:)`、`wordPicker()` 等预设已自行设为 `.plain`）。可选项：`sectionBackgroundColor`、`sectionCornerRadius`、`sectionContentInsets`（卡片）；`headerBackgroundColor`（表头底色）；`headerSeparatorStyle = .line`（分割线）；`sectionBackgroundStyle = .liquidGlass`（玻璃卡片，系统不支持时回退为纯色）；`tintColor`（标题、图标、更多/收起控件的颜色，默认按背后背景的亮度取黑或白）。 | Default look: each section's tags sit inside a rounded card (UITableView's inset grouped look) on the grouped list background (#F2F2F7 in light mode, black in dark mode), the section title above the card. The header divider is off by default (`headerSeparatorStyle = .none`), so is the header band, and the card is a flat color (`sectionBackgroundStyle = .flat`). To opt out of the card set `style.sectionStyle = .plain`, or `"sectionStyle": "plain"` in a configuration (the presets `tagCloud()`, `tagContainer()`, `gridStyle(itemsPerRow:)`, `wordPicker()` and the others that are a complete look already set `.plain`). Options: `sectionBackgroundColor`, `sectionCornerRadius`, `sectionContentInsets` (the card); `headerBackgroundColor` (header band); `headerSeparatorStyle = .line` (divider); `sectionBackgroundStyle = .liquidGlass` (glass card, flat where the system draws no glass); `tintColor` (title, icon and More / Less controls; unset it is black or white by the luminance of what is behind it). |
+
+```swift
+let style = CYLMenuStyle()
+style.sectionStyle = .plain                       // opt out of the default card
+// or keep the card and dress it:
+style.sectionBackgroundStyle = .liquidGlass       // glass card
+style.headerBackgroundColor = CYLSectionStyleColors.headerBand   // header band
+style.headerSeparatorStyle = .line                // header divider
+style.tintColor = .systemTeal                     // title, icon, More / Less
+```
+
 #### 折叠控件与标题 / Fold control and title
 
 | 中文 | English |
@@ -195,14 +211,14 @@ let menu = CYLTagListView(foldControl: CYLMenuFoldControl(position: .headerTrail
 | 参数 | 取值 |
 | --- | --- |
 | `CYLMenuFoldControlPosition` | `.none`、`.footer`（分区 footer，位于下方居中，淘宝评价）、`.headerTrailing`（分区 header 的尾部，即右上角，原分类菜单；从右到左的语言中在左侧）、`.headerLeading`（分区 header 的首部，标题之前）、`.tail`（标签的最后一项：折叠时是最后一个可见标签，隐藏的标签为它让出位置；展开后跟在最后一个标签之后；点击即展开/折叠，内置行为。仅图标时是与标签同款描边的圆形，箭头复用核心 bundle 的 `cyl_fold_chevron`，由 `CYLTagFoldCell` 绘制） |
-| `CYLMenuFoldControlContent` | `.iconAndTitle`（「更多 ⌄」）、`.title`（「更多」）、`.icon`（「⌄」）。展开后带图标的样式只保留箭头并旋转 180°，仅文字的样式显示「收起」 |
+| `CYLMenuFoldControlContent` | `.iconAndTitle`（「更多 ⌄」）、`.title`（「更多」）、`.icon`（「⌄」）。展开后带图标的样式只保留箭头并旋转 180°，仅文字的样式显示「收起」。`.titleAndIcon`（原始值 3，配置文件中写 `"titleAndIconAlways"`；`"titleAndIcon"` 仍是 `.iconAndTitle` 的别名）折叠时「更多 ⌄」、展开后「收起 ⌃」，两种状态都有文字和图标。分区 header 中的控件（`.headerTrailing`、`.headerLeading`）只出现在能折叠的分区，不能折叠的分区没有控件也不占位；它的字体不超过 `.large` 内容大小类别下的 footnote，宽度不超过 header 的 40%（分区标题在尾部省略） |
 | `CYLMenuFoldControl` 属性 | `title` / `collapseTitle`（默认为本地化的“更多”“收起”）、`image`（默认为核心 bundle 中的 `cyl_fold_chevron`）、`color`、`font`、`rotatesImageWhenExpanded` |
 | `title`、`titleImage`、`titlePosition`、`titleStyle` | 整个列表上方的标题：`.topLeading`（左上角）或 `.topCenter`（居中）。标题由 `titleView` 绘制，与标签复用同一个视图（`CYLTagButton`，横向布局），可以只显示图标、只显示文字或两者都显示；`titleStyle` 是一个 `CYLMenuStyle`（字体、文字与图标颜色、图标大小与位置……），默认 `defaultTitleStyle` 为加粗的 headline 字体；`titleView` 的全部公开 API（如动效图标 `animationURL`）都可使用 |
 
 | Parameter | Values |
 | --- | --- |
 | `CYLMenuFoldControlPosition` | `.none`, `.footer` (the section footer, centered below; Taobao reviews), `.headerTrailing` (the trailing end of the section header, i.e. the top right; the original classify menu; on the left in right-to-left languages), `.headerLeading` (the leading end of the section header, before the title) and `.tail` (the last item among the tags: when folded it is the last visible tag and the hidden tags make room for it; when expanded it follows the last tag; tapping it expands or collapses, which is built in. With an icon only it is a circle with the same outline as the tags; the arrow reuses `cyl_fold_chevron` from the core bundle and is drawn by `CYLTagFoldCell`) |
-| `CYLMenuFoldControlContent` | `.iconAndTitle` ("More ⌄"), `.title` ("More") and `.icon` ("⌄"). When expanded, the styles with an icon keep only the arrow and rotate it 180°, while the text-only style shows "Collapse" |
+| `CYLMenuFoldControlContent` | `.iconAndTitle` ("More ⌄"), `.title` ("More") and `.icon` ("⌄"). When expanded, the styles with an icon keep only the arrow and rotate it 180°, while the text-only style shows "Collapse". `.titleAndIcon` (raw value 3; `"titleAndIconAlways"` in configuration files, while `"titleAndIcon"` stays an alias of `.iconAndTitle`) shows "More ⌄" folded and "Less ⌃" expanded, the title and the icon in both states. A control in the section header (`.headerTrailing`, `.headerLeading`) appears only in sections that can fold; a section that cannot fold has no control and no space for it. Its font is capped at the footnote size of the `.large` content size category and its width at 40% of the header (the section title truncates at the tail) |
 | `CYLMenuFoldControl` properties | `title` / `collapseTitle` (default to the localized "More" and "Collapse"), `image` (defaults to `cyl_fold_chevron` in the core bundle), `color`, `font`, `rotatesImageWhenExpanded` |
 | `title`、`titleImage`、`titlePosition`、`titleStyle` | The title above the whole list: `.topLeading` (top left) or `.topCenter` (centered). The title is drawn by `titleView`, which reuses the same view as the tags (`CYLTagButton`, laid out horizontally) and can show only an icon, only text, or both; `titleStyle` is a `CYLMenuStyle` (font, text and icon colors, icon size and position, ...), and the default `defaultTitleStyle` uses a bold headline font; all public APIs of `titleView` (such as the animated icon `animationURL`) are available |
 
@@ -272,7 +288,7 @@ style.layoutCentered = true                            // 只有图标或只有�
 // 背景、边框、圆角（CYLBadgeView）
 style.normalAppearance.borderColor = .systemGray4
 style.normalAppearance.borderWidth = 1
-style.normalAppearance.cornerRadius = 0                // 0 = 自动胶囊
+style.normalAppearance.cornerRadius = 1000             // 圆角半径（点）：0 = 方角，≥ 高度一半 = 胶囊
 style.normalAppearance.margin = 12
 style.selectedAppearance.backgroundColor = .systemBlue
 ```
@@ -329,7 +345,7 @@ tag.animationURL = iconsURL.cylAddingAnimationOptions(["artboard": "CHAT",
 let tags = CYLTagListView(configuration: [
     CYLTagListKey.selectionMode: "multiple",
     CYLTagListKey.foldStyle: "footerChevron",
-    CYLTagListKey.style: [CYLMenuStyleKey.normal: [CYLTagAppearanceKey.cornerRadius: 0]],
+    CYLTagListKey.style: [CYLMenuStyleKey.normal: [CYLTagAppearanceKey.cornerRadius: 1000]],
     CYLTagListKey.sections: [[CYLTagSectionKey.title: "Tabs",
                               CYLTagSectionKey.items: [[CYLTagItemKey.title: "Home",
                                                         CYLTagItemKey.image: "system:house",
@@ -445,6 +461,62 @@ tagListView.tagDeleteHandler = { index, tag in print("deleted", index, tag.title
 | --- | :---: |
 | Tag cloud in code and from a dictionary | <img src="assets/test-tag-cloud-android-api.png" width="280" alt="标签云"> |
 | A deletable tag | <img src="assets/test-tag-cloud-deletable.png" width="280" alt="可删除"> |
+
+#### 分区卡片的默认外观 / Default look: the section card
+
+| 中文 | English |
+|:---|:---|
+| **默认外观已改变：**标签列表现在默认把每个分区的标签放在圆角卡片上（`sectionStyle = insetGrouped`）；如果你从未设置 `backgroundColor`，列表背景会变成分组背景（#F2F2F7，深色模式为黑色）。要去掉卡片，请设置 `sectionStyle` 为 `plain`。分区标题的分隔线默认**关闭**，需要时把 `headerSeparatorStyle` 设为 `line`。 | **The default look changed:** a tag list now shows each section's tags on a rounded card by default (`sectionStyle = insetGrouped`); if you never set `backgroundColor`, the list background becomes the grouped background (#F2F2F7; black in dark mode). To remove the card, set `sectionStyle` to `plain`. The header divider is **off** by default; to show it, set `headerSeparatorStyle` to `line`. |
+| 可选项（都是 `CYLMenuStyle` 的属性，也是配置文件 `style` 中的同名键）：`sectionBackgroundColor`、`sectionCornerRadius`（默认 10）、`sectionContentInsets`（卡片内边距，默认 12）；分区标题背景条 `headerBackgroundColor`（默认无）、`headerCornerRadius`、`headerContentInsets`；分隔线 `headerSeparatorColor`、`headerSeparatorThickness`（默认 0.5）、`headerSeparatorInsets`（默认 0，与卡片和标题背景条左右边缘一致）。 | Options (all are `CYLMenuStyle` properties and the same-named keys of a configuration's `style`): `sectionBackgroundColor`, `sectionCornerRadius` (default 10), `sectionContentInsets` (the card's padding, default 12); the optional header band `headerBackgroundColor` (none by default), `headerCornerRadius`, `headerContentInsets`; the divider's `headerSeparatorColor`, `headerSeparatorThickness` (default 0.5) and `headerSeparatorInsets` (default 0: the same left and right edges as the card and the band). |
+| `sectionBackgroundStyle` 为 `flat`（默认，纯色卡片）或 `liquidGlass`（液态玻璃卡片；平台不支持时回退为 `flat`）。`tintColor` 是内置的分区标题、图标和更多 / 收起控件的唯一颜色；默认会按其背后的背景自动选择清晰的黑色或白色。所有新增颜色都会自动适应浅色 / 深色模式，你设置的颜色在两种模式下都生效。 | `sectionBackgroundStyle` is `flat` (the default, a solid card) or `liquidGlass` (a Liquid Glass card; it falls back to `flat` where the platform cannot draw glass). `tintColor` is the one color of the built-in section title, icon and More / Less control; by default it is black or white, whichever is legible on the background behind it. Every new color adapts to light and dark mode by itself, and a color you set wins in both modes. |
+| **迁移：默认外观改变（破坏性的视觉变更）。**升级后未做任何设置的列表会出现圆角卡片和分组背景。要恢复旧外观，请设置 `sectionStyle` 为 `plain`（Swift：`style.sectionStyle = .plain`；Kotlin：`style.sectionStyle = CYLSectionStyle.CYLSectionStylePlain`；ArkTS：`style.sectionStyle = CYLSectionStyle.plain`；配置：`"sectionStyle": "plain"`）。依赖像素位置的截图或界面测试需要更新。 | **Migration: the default look changed (a breaking visual change).** After the upgrade a list that sets nothing shows the rounded card and the grouped background. To get the old look back, set `sectionStyle` to `plain` (Swift: `style.sectionStyle = .plain`; Kotlin: `style.sectionStyle = CYLSectionStyle.CYLSectionStylePlain`; ArkTS: `style.sectionStyle = CYLSectionStyle.plain`; configuration: `"sectionStyle": "plain"`). Screenshots and UI tests that depend on pixel positions need updating. |
+
+```swift
+// Swift (iOS): the card is the default; opt out, or add the divider, band, glass card and tint.
+let style = CYLMenuStyle()
+style.sectionStyle = .plain                    // remove the rounded card (the old look)
+style.headerSeparatorStyle = .line             // show the header divider (off by default)
+style.headerSeparatorColor = .separator        // optional; thickness, insets: headerSeparatorThickness / headerSeparatorInsets
+style.headerBackgroundColor = .systemGray5     // optional header band (none by default)
+style.sectionBackgroundStyle = .liquidGlass    // glass card, flat where unsupported
+style.tintColor = .systemBlue                  // header title, icon and More / Less
+```
+
+```kotlin
+// Kotlin (Android)
+val style = CYLMenuStyle()
+style.sectionStyle = CYLSectionStyle.CYLSectionStylePlain                       // remove the card
+style.headerSeparatorStyle = CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleLine // show the divider
+style.headerBackgroundColor = 0xFFEFEFF4.toInt()                                // optional band
+style.sectionBackgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
+style.tintColor = 0xFF007AFF.toInt()
+```
+
+```ts
+// ArkTS (HarmonyOS)
+const style: CYLMenuStyle = new CYLMenuStyle();
+style.sectionStyle = CYLSectionStyle.plain;                       // remove the card
+style.headerSeparatorStyle = CYLHeaderSeparatorStyle.line;        // show the divider
+style.headerBackgroundColor = '#FFEFEFF4';                        // optional band
+style.sectionBackgroundStyle = CYLTagBackgroundStyle.liquidGlass;
+style.tintColor = '#FF007AFF';
+```
+
+```json
+{
+  "style": {
+    "sectionStyle": "plain",
+    "headerSeparatorStyle": "line",
+    "headerBackgroundColor": "#EFEFF4",
+    "sectionBackgroundStyle": "liquidGlass",
+    "tintColor": "#007AFF"
+  }
+}
+```
+
+| 中文 | English |
+|:---|:---|
+| 同一份配置也适用于微信小程序、Flutter（`configuration` 的 `style`）和 React Native（有类型的 `CylSectionStyle`、`CylHeaderSeparatorStyle`、`CylSectionBackgroundStyle`，见各自的 README）。 | The same configuration works in the WeChat Mini Program, Flutter (the `style` of `configuration`) and React Native (typed `CylSectionStyle`, `CylHeaderSeparatorStyle` and `CylSectionBackgroundStyle`; see each README). |
 
 ### Android 版（Kotlin） / Android version (Kotlin)
 
@@ -778,7 +850,7 @@ open CYLTagEditorExample.xcworkspace
 
 | 中文 | English |
 |:---|:---|
-| 两个示例的测试（`Example/CYLMenuExampleTests`：115 个，`Example-Swift/CYLTagEditorExampleTests`：22 个）按**面向协议**组织：每个功能一个测试类、一个文件，测试之间共享的能力是带默认实现的协议，放在 `Example-Shared/TestSupport/`，同时编译进两个测试 target。 | The tests of the two examples (`Example/CYLMenuExampleTests`: 115, `Example-Swift/CYLTagEditorExampleTests`: 22) are organized around protocols: one test case class and one file per feature, and the capabilities they share are protocols with default implementations in `Example-Shared/TestSupport/`, compiled into both test targets. |
+| 两个示例的测试（`Example/CYLMenuExampleTests`：118 个，`Example-Swift/CYLTagEditorExampleTests`：23 个）按**面向协议**组织：每个功能一个测试类、一个文件，测试之间共享的能力是带默认实现的协议，放在 `Example-Shared/TestSupport/`，同时编译进两个测试 target。 | The tests of the two examples (`Example/CYLMenuExampleTests`: 118, `Example-Swift/CYLTagEditorExampleTests`: 23) are organized around protocols: one test case class and one file per feature, and the capabilities they share are protocols with default implementations in `Example-Shared/TestSupport/`, compiled into both test targets. |
 
 | 协议 | 作用 |
 | --- | --- |
@@ -830,8 +902,8 @@ open CYLTagEditorExample.xcworkspace
 | `CYLTagStoreTests` · `CYLTagEditorTests` · `CYLFoldStylesTests` · `CYLTagEditorAccessibilityTests` | The Swift example: tag data, tag editing, fold styles, accessibility |
 
 ```sh
-scripts/unit-tests.sh example   # 115 tests; screenshots in build/test-screenshots/example/
-scripts/unit-tests.sh swift     # 22 tests; screenshots in build/test-screenshots/swift/
+scripts/unit-tests.sh example   # 118 tests; screenshots in build/test-screenshots/example/
+scripts/unit-tests.sh swift     # 23 tests; screenshots in build/test-screenshots/swift/
 ```
 
 | 中文 | English |

@@ -9,7 +9,9 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import java.util.IdentityHashMap
+import kotlin.math.ceil
 import kotlin.math.max
+import kotlin.math.min
 
 /** `CYLTagUseListValue`: a tag length that uses the list's style (-1). */
 const val CYLTagUseListValue: Float = -1f
@@ -28,6 +30,9 @@ class CYLTag(
     /** The title; null becomes "". */
     var title: String = title
         set(value) { field = value }
+
+    /** A longer description, shown in a callout on a long press (`CYLTagLongPressActions.callout`). */
+    var subtitle: String? = null
 
     var image: Drawable? = null
     var selectedImage: Drawable? = null
@@ -152,25 +157,78 @@ class CYLTag(
         @JvmStatic
         fun tagWithTitle(title: String) = CYLTag(title)
 
+        /** The diameter of a badge dot, dp: 8, as `CYLTagButton`'s dot and iOS `CYLTag.badgeDotDiameter`. */
+        const val BADGE_DOT_DIAMETER = 8f
+
+        /** The side padding of a badge image's text, dp: 4, as `CYLTagButton`'s corner badge and iOS `CYLTag.badgeImageTextPadding`. */
+        const val BADGE_IMAGE_TEXT_PADDING = 4f
+
+        /** The default colour of a badge dot: system red (iOS `.systemRed`). */
+        private val BADGE_DOT_DEFAULT_COLOR = Color.rgb(255, 59, 48)
+
+        /** The default colour of a text badge: system blue, when neither the badge nor the title colour is set. */
+        private val BADGE_DEFAULT_COLOR = Color.rgb(0, 122, 255)
+
+        /** The text size of a badge image, as a fraction of its diameter (iOS: bold, 0.6 of the diameter). */
+        private const val BADGE_TEXT_SIZE_RATIO = 0.6f
+
+        private fun badgeTextPaint(sidePx: Float): Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.WHITE
+            isFakeBoldText = true
+            textSize = sidePx * BADGE_TEXT_SIZE_RATIO
+            textAlign = Paint.Align.CENTER
+        }
+
         /**
-         * `+badgeImageWithText:color:diameter:`: a filled circle (`color`, else system blue) of `diameter` dp with `text`
-         * in white bold; its `contentDescription`-like label is the text (see `CYLBadgeDrawable.accessibilityLabel`).
+         * `CYLTag.badgeImageWidth(text:diameter:)`: the width (dp) of a badge image: the diameter (a circle) for a short text, or the
+         * text's width and [BADGE_IMAGE_TEXT_PADDING] on both sides when that is more (a capsule, as `CYLTagButton`'s corner badge).
+         * One character (a digit, a letter, a CJK character such as "热") always keeps the circle, as on iOS.
+         */
+        @JvmStatic
+        fun badgeImageWidth(text: String, diameter: Float): Float {
+            val density = Resources.getSystem().displayMetrics.density
+            val side = max(1f, diameter)
+            if (text.codePointCount(0, text.length) <= 1) {
+                return side
+            }
+            val textWidth = ceil(badgeTextPaint(side * density).measureText(text) / density)
+            return max(side, textWidth + 2 * BADGE_IMAGE_TEXT_PADDING)
+        }
+
+        /**
+         * `CYLTag.badgeDotImage(color:canvas:)`: a filled [color] circle [BADGE_DOT_DIAMETER] dp wide (at most [canvas]), centred in a
+         * [canvas] dp square so the tag's icon slot keeps its size. Its accessibility label is the localized dot text.
+         */
+        @JvmStatic
+        fun badgeDotImage(color: Int?, canvas: Float): Drawable {
+            val density = Resources.getSystem().displayMetrics.density
+            val side = max(1, (max(1f, canvas) * density).toInt())
+            val dot = min(BADGE_DOT_DIAMETER * density, side.toFloat())
+            val bitmap = Bitmap.createBitmap(side, side, Bitmap.Config.ARGB_8888)
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+            paint.color = color ?: BADGE_DOT_DEFAULT_COLOR
+            Canvas(bitmap).drawOval((side - dot) / 2, (side - dot) / 2, (side + dot) / 2, (side + dot) / 2, paint)
+            return CYLBadgeDrawable(Resources.getSystem(), bitmap, CYLMenuLocalizedString("CYLTagBadgeDot", "A badge shown as a dot"))
+        }
+
+        /**
+         * `+badgeImageWithText:color:diameter:`: a filled capsule (`color`, else system blue) `diameter` dp high with `text` in white
+         * bold, as wide as [badgeImageWidth] says (a circle for a short text); its `contentDescription`-like label is the text (see
+         * `CYLBadgeDrawable.accessibilityLabel`).
          */
         @JvmStatic
         fun badgeImageWithText(text: String, color: Int?, diameter: Float): Drawable {
             val density = Resources.getSystem().displayMetrics.density
-            val side = max(1, (max(1f, diameter) * density).toInt())
-            val bitmap = Bitmap.createBitmap(side, side, Bitmap.Config.ARGB_8888)
+            val height = max(1, (max(1f, diameter) * density).toInt())
+            val width = max(height, (badgeImageWidth(text, diameter) * density).toInt())
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
-            val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-            paint.color = color ?: Color.rgb(0, 122, 255)
-            canvas.drawOval(0f, 0f, side.toFloat(), side.toFloat(), paint)
-            paint.color = Color.WHITE
-            paint.isFakeBoldText = true
-            paint.textSize = side * 0.6f
-            paint.textAlign = Paint.Align.CENTER
+            val fill = Paint(Paint.ANTI_ALIAS_FLAG)
+            fill.color = color ?: BADGE_DEFAULT_COLOR
+            canvas.drawRoundRect(0f, 0f, width.toFloat(), height.toFloat(), height / 2f, height / 2f, fill)
+            val paint = badgeTextPaint(height.toFloat())
             val metrics = paint.fontMetrics
-            canvas.drawText(text, side / 2f, side / 2f - (metrics.ascent + metrics.descent) / 2, paint)
+            canvas.drawText(text, width / 2f, height / 2f - (metrics.ascent + metrics.descent) / 2, paint)
             return CYLBadgeDrawable(Resources.getSystem(), bitmap, text)
         }
     }
@@ -267,13 +325,21 @@ class CYLTagDataSource @JvmOverloads constructor(tags: List<CYLTag>? = null) : C
 
     override fun menuTitleForItemAtIndexPath(indexPath: CYLIndexPath): String = tagAt(indexPath)?.title.orEmpty()
 
+    override fun menuSubtitleForItemAtIndexPath(indexPath: CYLIndexPath): String? = tagAt(indexPath)?.subtitle
+
     override fun menuImageForItemAtIndexPath(indexPath: CYLIndexPath): Drawable? {
         val tag = tagAt(indexPath) ?: return null
         val badge = tag.badgeText
-        if (tag.image == null && !badge.isNullOrEmpty()) {
+        // "" (not null) is a dot, as `CYLTagButton.tagBadgeValue` "".
+        if (tag.image == null && badge != null) {
             val size = baseStyle!!.imageSize
             val side = max(size.width, size.height)
-            val image = CYLTag.badgeImageWithText(badge, tag.badgeColor ?: tag.textColor, if (side > 0) side else 16f)
+            val canvas = if (side > 0) side else 16f
+            val image = if (badge.isEmpty()) {
+                CYLTag.badgeDotImage(tag.badgeColor, canvas)
+            } else {
+                CYLTag.badgeImageWithText(badge, tag.badgeColor ?: tag.textColor, canvas)
+            }
             tag.badgeAccessibilityLabel?.takeIf { it.isNotEmpty() }?.let { (image as CYLBadgeDrawable).accessibilityLabel = it }
             tag.image = image
         }

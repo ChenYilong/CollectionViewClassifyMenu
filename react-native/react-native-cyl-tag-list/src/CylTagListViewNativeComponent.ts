@@ -28,6 +28,8 @@ export interface NativeProps extends ViewProps {
   animationSpeed?: CodegenTypes.WithDefault<CodegenTypes.Float, 0>;
   animationLoops?: CodegenTypes.WithDefault<boolean, false>;
   onTagTap?: CodegenTypes.DirectEventHandler<TagEvent>;
+  /** A long press that the list reports (the built-in `report` action, or a `handler` action). */
+  onTagLongPress?: CodegenTypes.DirectEventHandler<TagEvent>;
   onSelectionChange?: CodegenTypes.DirectEventHandler<SelectionEvent>;
   onContentHeightChange?: CodegenTypes.DirectEventHandler<ContentHeightEvent>;
 }

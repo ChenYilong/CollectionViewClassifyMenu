@@ -15,6 +15,8 @@
 
 /** The iOS colors the samples use, as UIKit's light-mode values. */
 const { iconImage } = require('./editing-icons.js');
+const { cylAnimatedItemCornerRadiusCapsule, cylAnimatedItemBackground } = require('../cyl-animated-item/cyl_animated_item_model');
+
 const NAMED_COLORS = {
   clear: 'rgba(0, 0, 0, 0)',
   white: '#FFFFFF',
@@ -72,9 +74,6 @@ function withAlpha(css, alpha) {
   return `rgba(${match[1]}, ${match[2]}, ${match[3]}, ${round(alpha)})`;
 }
 
-/** `CYLTagCornerRadiusSquare`: square corners (0 is a capsule). */
-const CORNER_RADIUS_SQUARE = 0.001;
-
 /** The hairline of `CYLMenuStyle()`'s borders: 1 / screen scale. */
 const HAIRLINE = 0.5;
 
@@ -85,7 +84,7 @@ function appearance() {
     textColor: white(0.25),
     fontSize: 14,
     iconColor: null,
-    cornerRadius: 3,
+    cornerRadius: cylAnimatedItemCornerRadiusCapsule,
     borderColor: null,
     borderWidth: 0,
     contentInsets: { top: 5, left: 10, bottom: 5, right: 10 },
@@ -103,6 +102,8 @@ function defaultStyle() {
     selected: { ...appearance(), backgroundColor: tint, textColor: '#FFFFFF', borderColor: tint, borderWidth: HAIRLINE },
     disabled: { ...appearance(), textColor: white(0.7), borderColor: white(0.88), borderWidth: HAIRLINE },
     highlightedBackgroundColor: null,
+    // 'flat' (default) or 'liquidGlass' (cyl-animated-item's glass where its rule is active): the same key as cyl-tag-list and the native cores.
+    backgroundStyle: 'flat',
     deleteIndicatorTitle: '×',
     deleteIndicatorColor: null,
     deleteIndicatorFontSize: null,
@@ -180,7 +181,7 @@ function tagCloudStyle() {
     a.textColor = '#FFFFFF';
     a.borderWidth = 0;
     a.borderColor = '#FFFFFF';
-    a.cornerRadius = 0;
+    a.cornerRadius = cylAnimatedItemCornerRadiusCapsule;
     a.fontSize = 14;
   });
   style.disabled.backgroundColor = withAlpha(blue, 0.4);
@@ -337,6 +338,9 @@ function styleFromConfiguration(dictionary, base = defaultStyle()) {
     if (insets) setTagContentInsets(style, insets);
   }
   if (dictionary.backgroundColor != null) style.backgroundColor = color(dictionary.backgroundColor);
+  const backgroundStyle = String(dictionary.backgroundStyle || '').toLowerCase();
+  if (['liquidglass', '1'].includes(backgroundStyle)) style.backgroundStyle = 'liquidGlass';
+  if (['flat', '0'].includes(backgroundStyle)) style.backgroundStyle = 'flat';
   return style;
 }
 
@@ -514,10 +518,9 @@ function tagHeight(style) {
   }, style.itemHeight || 0);
 }
 
-/** The layer's corner radius: 0 is a capsule, `CYLTagCornerRadiusSquare` square, else at most half the height. */
+/** The layer's corner radius in points: 0 is square, at most half the height (half the height or more is a capsule). */
 function cornerRadius(radius, height) {
-  if (radius > 0) return radius <= CORNER_RADIUS_SQUARE ? 0 : Math.min(radius, height / 2);
-  return height / 2;
+  return Math.min(Number.isFinite(radius) && radius > 0 ? radius : 0, height / 2);
 }
 
 /** The cap height of a font (about 0.7 of its size). */
@@ -633,12 +636,14 @@ function renderTag(tag, index, context) {
   const background = isPressed ? style.highlightedBackgroundColor : a.backgroundColor;
   const borderWidth = a.borderColor ? a.borderWidth : 0;
   const radius = cornerRadius(a.cornerRadius, height);
+  // Liquid Glass is cyl-animated-item's (the same call as cyl-tag-list): its CSS replaces the flat radius and color; a flat tag keeps its own.
+  const glass = style.backgroundStyle === 'liquidGlass'
+    ? cylAnimatedItemBackground('liquidGlass', background, a.cornerRadius, 0, '', false, state === 'selected' ? 1 : -1) : null;
   const parts = [
     // A wrapping title (`titleWraps`) lets the tag grow taller than one line.
     style.titleWraps ? `min-height: ${px(height)}; height: auto` : `height: ${px(height)}`,
     `padding: ${px(insets.top)} ${px(insets.right)} ${px(insets.bottom)} ${px(insets.left)}`,
-    `border-radius: ${px(radius)}`,
-    `background-color: ${background || 'transparent'}`,
+    glass && glass.glass ? glass.css : `border-radius: ${px(radius)}; background-color: ${background || 'transparent'}`,
   ];
   if (style.numberOfItemsPerRow > 0) {
     // Equal cells (iOS `numberOfItemsPerRow`): the row's width less the spaces, shared out.
@@ -842,8 +847,8 @@ function renderList(listStyle, options = {}) {
 }
 
 module.exports = {
+  cylAnimatedItemCornerRadiusCapsule,
   NAMED_COLORS,
-  CORNER_RADIUS_SQUARE,
   PALETTE,
   color,
   white,

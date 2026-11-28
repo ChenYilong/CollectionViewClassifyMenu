@@ -85,6 +85,7 @@ class CYLTagListRenamingTest {
     private fun makeList(source: CYLRenamableTagSource): CYLTagListView {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
         val list = CYLTagListView(activity)
+        list.usePlainSections()
         list.menuDataSource = source
         list.menuDelegate = source
         list.selectionMode = CYLMenuSelectionMode.CYLMenuSelectionModeMultiple
@@ -243,7 +244,8 @@ class CYLTagListRenamingTest {
         collect(list)
         assertEquals("only the first section shows it", 1, buttons.size)
         val clear = buttons.first()
-        assertTrue(clear.width > 0 && clear.width == clear.height)
+        assertTrue("the clear button has a width", clear.width > 0)
+        assertEquals("the clear button is a square", clear.width, clear.height)
         assertEquals("read with the section title", "Clear Recent", clear.contentDescription)
         clear.performClick()
         assertEquals("clear 0", source.events.last())

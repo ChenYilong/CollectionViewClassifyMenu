@@ -32,3 +32,15 @@ owner's approval. If plan 1 fails, plan 2: forward the tests to the macOS (arm64
 
 AGENTS.md stays at 200 lines or fewer, every rule under a visible `## [<tag>] <title>` heading; overflow goes into
 `docs/instructions/<tag>.md`, linked by relative path. Details: `.agents/skills/cyl-instructions/SKILL.md`.
+
+## [sessions] Read the simulator rules before you run a simulator
+
+Before you run a simulator, read [docs/instructions/sessions.md](docs/instructions/sessions.md#simulators-and-emulators-stop-them-when-the-work-is-done) ("Simulators and emulators: stop them when the work is done"), or this
+text: after running a simulator and finishing the test or screenshots, immediately kill the app and the simulator
+process (your own devices only: `xcrun simctl terminate <udid> <bundle id>`, `xcrun simctl shutdown <udid>`); start them again when
+needed. Do not leave the app or the simulator running after the task is done.
+
+## [memory] Read before running learn-codebase
+
+Before running `/claude-mem:learn-codebase`, read [docs/learn-codebase/README.md](docs/learn-codebase/README.md) in
+full, every line. Full rule: [docs/instructions/memory.md](docs/instructions/memory.md).

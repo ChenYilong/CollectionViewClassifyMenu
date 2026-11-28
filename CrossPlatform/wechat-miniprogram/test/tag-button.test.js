@@ -98,7 +98,7 @@ test('allowsTransparentBackground keeps a transparent tag (a search bar item); a
   const view = model.tagButtonView({
     title: 'Search', tagStyle: { allowsTransparentBackground: 'true', normal: { backgroundColor: 'transparent', borderWidth: 0 } },
   }, null, 2);
-  assert.match(view.cellStyle, /background-color: transparent/);
+  assert.match(view.cellStyle, /background-color:transparent/);
 });
 
 test('accessibilityLabel replaces the title in what the screen reader reads (an icon-only search bar item)', () => {

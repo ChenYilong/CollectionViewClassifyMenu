@@ -9,6 +9,7 @@
 import XCTest
 import UIKit
 import CollectionViewClassifyMenu
+import CYLAnimatedItem
 @testable import CYLMenuExample
 
 final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
@@ -47,7 +48,7 @@ final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
         let view = showTagList(source, width: 320)
         let style = CYLMenuStyle()
         style.itemHeight = 40
-        style.normalAppearance.cornerRadius = 0  // automatic capsule
+        style.normalAppearance.cornerRadius = cylAnimatedItemCornerRadiusCapsule
         view.style = style
         view.layoutIfNeeded()
         XCTAssertEqual(view.probe.itemFrame(at: ip(0, 0))?.height ?? 0, 40, accuracy: 0.5)
@@ -141,5 +142,68 @@ final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
         XCTAssertEqual(alone.titleLabel.frame.minX, 0, accuracy: 0.5)
         // The default stays centered.
         XCTAssertEqual(CYLMenuStyle().contentAlignment, .center)
+    }
+
+    // MARK: Three lines, the fold control's states, accessibility sizes
+
+    func testATitleLimitedToThreeLinesShowsThreeLinesInANarrowList() {
+        let title = String(repeating: "wrapping words ", count: 30)
+        let source = CYLExampleMenuSource(sections: [CYLExampleMenuSection(title: "", titles: [title, "短"])])
+        let view = showTagList(source, width: 200)
+        let style = CYLMenuStyle()
+        style.sectionStyle = .plain
+        style.titleMaxLines = 3
+        view.style = style
+        view.showsSectionHeaders = false
+        view.reloadMenuData()
+        view.layoutIfNeeded()
+        view.probe.layOut()
+        guard let button = view.probe.tagButton(at: ip(0, 0)) else { return XCTFail("no tag") }
+        button.layoutIfNeeded()
+        XCTAssertEqual(button.titleLabel.numberOfLines, 3)
+        let line = button.titleLabel.font.lineHeight
+        let lines = (button.titleLabel.bounds.height / line).rounded()
+        XCTAssertEqual(lines, 3, "The tag is tall enough for three lines, not two (label \(button.titleLabel.bounds.height) pt, line \(line) pt)")
+        // The text needs more than three lines, so the third is the last one drawn, truncated.
+        let needed = (title as NSString).boundingRect(with: CGSize(width: button.titleLabel.bounds.width, height: .greatestFiniteMagnitude),
+                                                      options: .usesLineFragmentOrigin, attributes: [.font: button.titleLabel.font],
+                                                      context: nil).height
+        XCTAssertGreaterThan(needed, 3 * line)
+        let fits = button.titleLabel.sizeThatFits(CGSize(width: button.titleLabel.bounds.width, height: .greatestFiniteMagnitude))
+        XCTAssertEqual(fits.height, button.titleLabel.bounds.height, accuracy: 1.5, "The label frame is the three lines it needs")
+        XCTAssertGreaterThanOrEqual(view.probe.itemFrame(at: ip(0, 0))?.height ?? 0, 3 * line)
+        withExtendedLifetime(source) {}
+    }
+
+    func testTheFoldControlWithTitleAndIconShowsLessWhenExpanded() {
+        // Merge: `.iconAndTitle` keeps only the icon when expanded (the titleAndIcon line); the always-title content is
+        // `.titleAndIcon` (the section line's assertion).
+        let control = CYLMenuFoldControl(position: .footer, content: .titleAndIcon)
+        let button = CYLTagFoldButton(frame: CGRect(x: 0, y: 0, width: 120, height: 40))
+        button.applyFoldControl(control, color: .label, expanded: false, animated: false)
+        XCTAssertEqual(button.titleLabel.text, control.title)
+        button.applyFoldControl(control, color: .label, expanded: true, animated: false)
+        button.layoutIfNeeded()
+        XCTAssertEqual(button.titleLabel.text, control.collapseTitle, "Expanded: the collapse title (Less)")
+        XCTAssertNotNil(button.imageView.image, "and the icon")
+        XCTAssertFalse(button.titleLabel.frame.isEmpty)
+        XCTAssertFalse(button.imageView.transform.isIdentity, "turned")
+        let iconOnly = CYLTagFoldButton(frame: button.frame)
+        iconOnly.applyFoldControl(CYLMenuFoldControl(position: .footer, content: .icon), color: .label, expanded: true, animated: false)
+        XCTAssertTrue(iconOnly.titleLabel.text?.isEmpty ?? true)
+    }
+
+    func testTheFoldControlTitleStopsGrowingAtTheAccessibilityCap() {
+        // The uncapped control (the footer's) scales up to `maximumUncappedContentSizeCategory`; the size-capped ones (the
+        // header controls, `.titleAndIcon`) stop at `maximumContentSizeCategory` (`.large`, see CYLTitleAndIconFoldControlTests).
+        let control = CYLMenuFoldControl(position: .footer, content: .iconAndTitle)
+        func size(_ category: UIContentSizeCategory) -> CGSize {
+            CYLTagFoldButton.size(for: control, expanded: false,
+                                  traitCollection: UITraitCollection(preferredContentSizeCategory: category))
+        }
+        let large = size(.large), capped = size(CYLTagFoldButton.maximumUncappedContentSizeCategory)
+        XCTAssertGreaterThan(capped.width, large.width, "It still grows up to the cap")
+        XCTAssertEqual(size(.accessibilityExtraExtraExtraLarge).width, capped.width, accuracy: 0.5, "and not past it")
+        XCTAssertEqual(size(.accessibilityExtraExtraExtraLarge).height, capped.height, accuracy: 0.5)
     }
 }

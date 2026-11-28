@@ -7,8 +7,8 @@ import { CYLUIContext } from '@cyl/classifymenu';
  */
 import { common, Want } from '@kit.AbilityKit';
 import {
-  CYLColor, CYLEdgeInsets, CYLFont, CYLMenuStyle, CYLSize, CYLTag, CYLTagAppearance, CYLTagCornerRadiusSquare,
-  CYLTagListState, CYLTagListView
+  CYLColor, CYLEdgeInsets, CYLFont, CYLMenuStyle, CYLSize, CYLTag, CYLTagAppearance,
+  CYLSectionStyle, CYLTagBackgroundStyle, CYLTagListState, CYLTagListView
 } from '@cyl/classifymenu';
 import { CYLDemoBar, CYLDemoNav } from '../DemoNav';
 import { CYLSampleButton, SYSTEM_ORANGE, SYSTEM_TEAL, cylFormat, cylToast } from './SampleSupport';
@@ -43,7 +43,7 @@ export class CYLTagCloudSampleData {
       tag.borderColor = borderColors[i];
       tags.push(tag);
     });
-    const radii: number[] = [CYLTagCornerRadiusSquare, 20 / 3, 60 / 3];
+    const radii: number[] = [0, 20 / 3, 60 / 3];
     radii.forEach((radius: number) => {
       const tag = new CYLTag(0, CYLExampleLocalizedString('圆角'));
       tag.cornerRadius = radius;
@@ -74,6 +74,7 @@ export class CYLTagCloudSampleData {
   static cellList(tags: CYLTag[]): CYLTagListState {
     const list = new CYLTagListState();
     list.style = CYLMenuStyle.tagCloud();
+    list.style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
     list.lineSpacing = 5;
     list.interitemSpacing = 3;
     list.tagContentInsets = new CYLEdgeInsets(3, 10, 3, 10);
@@ -102,6 +103,7 @@ export struct CYLTagCloudSamplePage {
     // activity_main.xml: lineMargin 5dp, tagMargin 3dp, textPadding 10dp × 3dp.
     const list = this.list;
     list.style = CYLMenuStyle.tagCloud();
+    list.style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
     list.lineSpacing = 5;
     list.interitemSpacing = 3;
     list.tagContentInsets = new CYLEdgeInsets(3, 10, 3, 10);
@@ -334,13 +336,15 @@ export struct CYLHotSearchPage {
 
   static hotStyle(): CYLMenuStyle {
     const style = new CYLMenuStyle();
+    style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
+    style.sectionStyle = CYLSectionStyle.plain;
     const appearances: CYLTagAppearance[] = [style.normalAppearance, style.selectedAppearance];
     appearances.forEach((appearance: CYLTagAppearance) => {
       appearance.backgroundColor = CYLColor.WHITE;
       appearance.borderColor = CYLColor.white(0.88);
       appearance.borderWidth = 1;
       appearance.textColor = CYLColor.white(0.13);
-      appearance.cornerRadius = CYLTagCornerRadiusSquare;
+      appearance.cornerRadius = 0;
       appearance.font = CYLFont.systemFont(16);
     });
     style.tagContentInsets = new CYLEdgeInsets(9, 16, 9, 16);

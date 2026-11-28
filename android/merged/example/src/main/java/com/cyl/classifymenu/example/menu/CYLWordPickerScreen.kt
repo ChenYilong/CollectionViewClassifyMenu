@@ -17,6 +17,7 @@ import com.cyl.classifymenu.CYLIndexPath
 import com.cyl.classifymenu.CYLMenuDelegate
 import com.cyl.classifymenu.CYLMenuSelectionMode
 import com.cyl.classifymenu.CYLMenuStyle
+import com.cyl.classifymenu.CYLTagBackgroundStyle
 import com.cyl.classifymenu.CYLTagListView
 import com.cyl.classifymenu.cyl_accessibilityIdentifier
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -111,7 +112,7 @@ class CYLWordPickerSheet(context: Context, message: String, private val onFill: 
     private val d = context.resources.displayMetrics.density
 
     val tagListView = CYLTagListView(context).apply {
-        style = CYLMenuStyle.wordPicker()
+        style = CYLMenuStyle.wordPicker().apply { backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass }
         selectionMode = CYLMenuSelectionMode.CYLMenuSelectionModeMultiple
         allowsSmearSelection = true
         isScrollEnabled = false

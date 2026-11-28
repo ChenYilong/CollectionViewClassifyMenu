@@ -12,7 +12,7 @@ tags: [android, kotlin, api-parity, score]
 | 满分是没有 `TODO` 行，全部是 `TODO` 则为 0。循环（AGENTS.md「Parity tables and the score loop」）：把现有的 Android 代码对应到 `TODO` 行，评分，先在核心库中实现缺失的 Android API（逻辑和名称与 iOS 相同），再在 Android 示例中展示，重新评分，直到 100。评分历史见 [android.md](android.md)。 | Full marks when no row is `TODO`; 0 when every row is. Loop (AGENTS.md "Parity tables and the score loop"): match existing Android code to the `TODO` rows, score, implement the missing Android APIs in the core first (same logic and names as iOS), show them in the Android example, score again, until 100. The score history is in [android.md](android.md). |
 
 <!-- bilingual:keep -->
-**Score: 895 / 895 with an Android counterpart = 100.0 / 100.** 评分：895 / 895 个符号有 Android 对应项 = 100.0 / 100。
+**Score: 996 / 999 with an Android counterpart = 99.7 / 100.** 评分：996 / 999 个符号有 Android 对应项 = 99.7 / 100。
 
 <!-- bilingual:keep -->
 | iOS API | 说明 / Description | Android API |
@@ -254,6 +254,7 @@ tags: [android, kotlin, api-parity, score]
 | `CYLMenuDataSource -menuImageForItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuImageForItemAtIndexPath` |
 | `CYLMenuDataSource -menuSelectedImageForItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuSelectedImageForItemAtIndexPath` |
 | `CYLMenuDataSource -menuAnimationURLForItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuAnimationURLForItemAtIndexPath` |
+| `CYLMenuDataSource -menuSubtitleForItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuSubtitleForItemAtIndexPath (same name in the Android core)` |
 | `CYLMenuDataSource -menuAnimationRestingProgressForItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuAnimationRestingProgressForItemAtIndexPath` |
 | `CYLMenuDataSource -menuStyleForSection:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuStyleForSection` |
 | `CYLMenuDataSource -menuStyleForItemAtIndexPath:` | method, `CYLMenuDataSource.swift` | `CYLMenuDataSource.menuStyleForItemAtIndexPath` |
@@ -350,6 +351,9 @@ tags: [android, kotlin, api-parity, score]
 | `CYLTagContentAlignment` | enum, `CYLMenuStyle.swift` | `com.cyl.classifymenu.CYLTagContentAlignment` |
 | `CYLTagContentAlignmentCenter` | enum value, `CYLMenuStyle.swift` | `CYLTagContentAlignmentCenter` |
 | `CYLTagContentAlignmentLeading` | enum value, `CYLMenuStyle.swift` | `CYLTagContentAlignmentLeading` |
+| `CYLTagBackgroundStyle` | enum, `CYLMenuStyle.swift` | `CYLTagBackgroundStyle (same name in the Android core)` |
+| `CYLTagBackgroundStyleFlat` | enum value, `CYLMenuStyle.swift` | `CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat` |
+| `CYLTagBackgroundStyleLiquidGlass` | enum value, `CYLMenuStyle.swift` | `CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass` |
 | `CYLTagRowAlignment` | enum, `CYLMenuStyle.swift` | `com.cyl.classifymenu.CYLTagRowAlignment` |
 | `CYLTagRowAlignmentLeading` | enum value, `CYLMenuStyle.swift` | `CYLTagRowAlignmentLeading` |
 | `CYLTagRowAlignmentCenter` | enum value, `CYLMenuStyle.swift` | `CYLTagRowAlignmentCenter` |
@@ -390,11 +394,15 @@ tags: [android, kotlin, api-parity, score]
 | `CYLMenuStyle.imagePositionAdjustment` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.imagePositionAdjustment` |
 | `CYLMenuStyle.imagePlacement` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.imagePlacement` |
 | `CYLMenuStyle.imageFillsTagHeight` | property, `CYLMenuStyle.swift` | `co.lujun.androidtagview.TagView.setImage (always drawn as a circle the tag's height at its leading edge)` |
+| `CYLMenuStyle.titleMaxLines` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.titleMaxLines (same name in the Android core)` |
 | `CYLMenuStyle.titleWraps` | property, `CYLMenuStyle.swift` | `co.lujun.androidtagview.TagContainerLayout.setTagTextWrap (tag_text_wrap)` |
 | `CYLMenuStyle.elevation` | property, `CYLMenuStyle.swift` | `co.lujun.androidtagview.TagContainerLayout tag_elevation (TagView.elevation)` |
 | `CYLMenuStyle.deleteIndicatorImage` | property, `CYLMenuStyle.swift` | `co.lujun.androidtagview.TagContainerLayout.setCrossDrawable (tag_cross drawable)` |
 | `CYLMenuStyle.layoutCentered` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.layoutCentered` |
 | `CYLMenuStyle.contentAlignment` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.contentAlignment` |
+| `CYLMenuStyle.backgroundStyle` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.backgroundStyle (same name in the Android core)` |
+| `CYLMenuStyle.resolvedBackgroundStyle` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.resolvedBackgroundStyle (same name in the Android core)` |
+| `CYLMenuStyle.minimumTagSize` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.minimumTagSize (same name in the Android core)` |
 | `CYLMenuStyle.animationSize` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.animationSize` |
 | `CYLMenuStyle.animationSpeed` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.animationSpeed` |
 | `CYLMenuStyle.adjustsFontForContentSizeCategory` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.adjustsFontForContentSizeCategory` |
@@ -404,7 +412,25 @@ tags: [android, kotlin, api-parity, score]
 | `CYLMenuStyle.lineSpacing` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.lineSpacing` |
 | `CYLMenuStyle.sectionInsets` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.sectionInsets` |
 | `CYLMenuStyle.backgroundColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.backgroundColor` |
+| `CYLMenuStyle.sectionStyle` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.sectionStyle (same name in the Android core)` |
+| `CYLMenuStyle.sectionBackgroundColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.sectionBackgroundColor (same name in the Android core)` |
+| `CYLMenuStyle.sectionBackgroundStyle` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.sectionBackgroundStyle (same name in the Android core)` |
+| `CYLMenuStyle.resolvedSectionBackgroundStyle` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.resolvedSectionBackgroundStyle (same name in the Android core)` |
+| `CYLMenuStyle.sectionCornerRadius` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.sectionCornerRadius (same name in the Android core)` |
+| `CYLMenuStyle.sectionContentInsets` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.sectionContentInsets (same name in the Android core)` |
+| `CYLMenuStyle.headerBackgroundColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerBackgroundColor (same name in the Android core)` |
+| `CYLMenuStyle.headerCornerRadius` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerCornerRadius (same name in the Android core)` |
+| `CYLMenuStyle.headerContentInsets` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerContentInsets (same name in the Android core)` |
+| `CYLMenuStyle.headerSeparatorStyle` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerSeparatorStyle (same name in the Android core)` |
+| `CYLMenuStyle.headerSeparatorColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerSeparatorColor (same name in the Android core)` |
+| `CYLMenuStyle.headerSeparatorThickness` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerSeparatorThickness (same name in the Android core)` |
+| `CYLMenuStyle.headerSeparatorInsets` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerSeparatorInsets (same name in the Android core)` |
+| `CYLMenuStyle.isInsetGrouped` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.isInsetGrouped (same name in the Android core)` |
+| `CYLMenuStyle.resolvedBackgroundColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.resolvedBackgroundColor (same name in the Android core)` |
+| `CYLMenuStyle.resolvedSectionBackgroundColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.resolvedSectionBackgroundColor (same name in the Android core)` |
+| `CYLMenuStyle.resolvedHeaderSeparatorColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.resolvedHeaderSeparatorColor (same name in the Android core)` |
 | `CYLMenuStyle.headerHeight` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerHeight` |
+| `CYLMenuStyle.headerMaxLines` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerMaxLines (same name in the Android core)` |
 | `CYLMenuStyle.headerFont` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerFont` |
 | `CYLMenuStyle.headerTextColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerTextColor` |
 | `CYLMenuStyle.headerHorizontalInset` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.headerHorizontalInset` |
@@ -414,6 +440,12 @@ tags: [android, kotlin, api-parity, score]
 | `CYLMenuStyle.collapseTitle` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.collapseTitle` |
 | `CYLMenuStyle.moreButtonImage` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.moreButtonImage` |
 | `CYLMenuStyle.moreButtonColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.moreButtonColor` |
+| `CYLMenuStyle.tintColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.tintColor (same name in the Android core)` |
+| `CYLMenuStyle -resolvedTintColorOnHeaderBand:` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.resolvedTintColor (onBand = true)` |
+| `CYLMenuStyle.resolvedHeaderTextColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.resolvedHeaderTextColor (same name in the Android core)` |
+| `CYLMenuStyle -resolvedFoldControlColorInHeader:` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.resolvedFoldControlColor (onBand = true when the control is in the header)` |
+| `CYLMenuStyle.resolvedMoreButtonColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.resolvedMoreButtonColor (same name in the Android core)` |
+| `CYLMenuStyle.resolvedClearButtonColor` | property, `CYLMenuStyle.swift` | `CYLMenuStyle.resolvedClearButtonColor (same name in the Android core)` |
 | `CYLMenuStyle +tagCloud` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.tagCloudStyle` |
 | `CYLMenuStyle +tagContainer` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.tagContainerStyle` |
 | `CYLMenuStyle +gridStyleWithItemsPerRow:` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.gridStyleWithNumberOfItemsPerRow` |
@@ -432,9 +464,35 @@ tags: [android, kotlin, api-parity, score]
 | `CYLMenuStyle -headerFontFor:` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.headerFontForTraitCollection` |
 | `CYLMenuStyle -copyWith:` | method, `CYLMenuStyle.swift` | `CYLMenuStyle.copy` |
 | `UIColor.cylAppTint` | property, `CYLMenuStyle.swift` | `CYLColor.APP_TINT` |
+| `CYLSectionStyle` | enum, `CYLMenuStyle.swift` | `CYLSectionStyle (same name in the Android core)` |
+| `CYLSectionStylePlain` | enum value, `CYLMenuStyle.swift` | `CYLSectionStyle.CYLSectionStylePlain` |
+| `CYLSectionStyleInsetGrouped` | enum value, `CYLMenuStyle.swift` | `CYLSectionStyle.CYLSectionStyleInsetGrouped` |
+| `CYLHeaderSeparatorStyle` | enum, `CYLMenuStyle.swift` | `CYLHeaderSeparatorStyle (same name in the Android core)` |
+| `CYLHeaderSeparatorStyleNone` | enum value, `CYLMenuStyle.swift` | `CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleNone` |
+| `CYLHeaderSeparatorStyleLine` | enum value, `CYLMenuStyle.swift` | `CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleLine` |
+| `CYLTintContrast` | enum, `CYLMenuStyle.swift` | `CYLMenuColorLuminance (the contrast rule of the default tint; both platforms compare the WCAG relative luminance)` |
+| `CYLTintContrast.luminanceThreshold` | property, `CYLMenuStyle.swift` | `CYLTintLuminanceThreshold (the light/dark cut-off of the default tint: 0.179 on the WCAG relative luminance scale, the same on both platforms)` |
+| `CYLTintContrast +relativeLuminanceWithRed:green:blue:` | method, `CYLMenuStyle.swift` | `CYLMenuColorLuminance (the WCAG relative luminance of an opaque sRGB color; iOS takes the red, green and blue components in 0...1, Android takes the color as an Int and returns null for a translucent one)` |
+| `CYLSectionStyleMetrics` | enum, `CYLMenuStyle.swift` | `CYLSectionStyleMetrics (same name in the Android core)` |
+| `CYLSectionStyleMetrics.cardCornerRadius` | property, `CYLMenuStyle.swift` | `CYLSectionStyleMetrics.CARD_CORNER_RADIUS` |
+| `CYLSectionStyleMetrics.cardPadding` | property, `CYLMenuStyle.swift` | `CYLSectionStyleMetrics.CARD_PADDING` |
+| `CYLSectionStyleMetrics.headerBandPadding` | property, `CYLMenuStyle.swift` | `CYLSectionStyleMetrics.HEADER_BAND_PADDING` |
+| `CYLSectionStyleMetrics.separatorThickness` | property, `CYLMenuStyle.swift` | `CYLSectionStyleMetrics.SEPARATOR_THICKNESS` |
+| `CYLSectionStyleColors` | enum, `CYLMenuStyle.swift` | `CYLSectionStyleColors (same name in the Android core)` |
+| `CYLSectionStyleColors.card` | property, `CYLMenuStyle.swift` | `CYLSectionStyleColors.card (same name in the Android core)` |
+| `CYLSectionStyleColors.headerBand` | property, `CYLMenuStyle.swift` | `CYLSectionStyleColors.headerBand (same name in the Android core)` |
+| `CYLSectionStyleColors.groupedBackground` | property, `CYLMenuStyle.swift` | `CYLSectionStyleColors.groupedBackground (same name in the Android core)` |
+| `CYLSectionStyleColors.separator` | property, `CYLMenuStyle.swift` | `CYLSectionStyleColors.separator (same name in the Android core)` |
+| `CYLTagTitleMaxLines` | enum, `CYLMenuStyle.swift` | `CYLTagTitleMaxLines (same name in the Android core)` |
+| `CYLTagTitleMaxLines.single` | property, `CYLMenuStyle.swift` | `CYLTagTitleMaxLines.SINGLE` |
+| `CYLTagTitleMaxLines.unlimited` | property, `CYLMenuStyle.swift` | `CYLTagTitleMaxLines.UNLIMITED` |
+| `CYLHeaderTitleMaxLines` | enum, `CYLMenuStyle.swift` | `CYLHeaderTitleMaxLines (same name in the Android core)` |
+| `CYLHeaderTitleMaxLines.single` | property, `CYLMenuStyle.swift` | TODO |
+| `CYLHeaderTitleMaxLines.unlimited` | property, `CYLMenuStyle.swift` | TODO |
 | `CYLTag` | class, `CYLTag.swift` | `com.cyl.classifymenu.CYLTag` |
 | `CYLTag.identifier` | property, `CYLTag.swift` | `CYLTag.identifier` |
 | `CYLTag.title` | property, `CYLTag.swift` | `CYLTag.title` |
+| `CYLTag.subtitle` | property, `CYLTag.swift` | `CYLTag.subtitle (same name in the Android core)` |
 | `CYLTag.image` | property, `CYLTag.swift` | `CYLTag.image` |
 | `CYLTag.selectedImage` | property, `CYLTag.swift` | `CYLTag.selectedImage` |
 | `CYLTag.animationURL` | property, `CYLTag.swift` | `CYLTag.animationURL` |
@@ -480,6 +538,7 @@ tags: [android, kotlin, api-parity, score]
 | `CYLTagDataSource -moveTagAt:to:` | method, `CYLTag.swift` | `CYLTagDataSource.moveTagAtIndex` |
 | `CYLTagDataSource -invalidateStyles` | method, `CYLTag.swift` | `CYLTagDataSource.invalidateStyles` |
 | `CYLTagDataSource -menuTitleForItemAt:` | method, `CYLTag.swift` | `CYLTagDataSource.menuTitleForItemAtIndexPath` |
+| `CYLTagDataSource -menuSubtitleForItemAt:` | method, `CYLTag.swift` | `CYLTagDataSource.menuSubtitleForItemAtIndexPath` |
 | `CYLTagDataSource -menuImageForItemAt:` | method, `CYLTag.swift` | `CYLTagDataSource.menuImageForItemAtIndexPath` |
 | `CYLTagDataSource -menuSelectedImageForItemAt:` | method, `CYLTag.swift` | `CYLTagDataSource.menuSelectedImageForItemAtIndexPath` |
 | `CYLTagDataSource -menuAnimationURLForItemAt:` | method, `CYLTag.swift` | `CYLTagDataSource.menuAnimationURLForItemAtIndexPath` |
@@ -488,7 +547,6 @@ tags: [android, kotlin, api-parity, score]
 | `CYLTagDataSource -menuRemoveItemAt:` | method, `CYLTag.swift` | `CYLTagDataSource.menuRemoveItemAtIndexPath` |
 | `CYLTagDataSource -menuMoveItemAt:to:` | method, `CYLTag.swift` | `CYLTagDataSource.menuMoveItemAtIndexPath` |
 | `CYLTagDataSource -menuStyleForItemAt:` | method, `CYLTag.swift` | `CYLTagDataSource.menuStyleForItemAtIndexPath` |
-| `CYLTagCornerRadiusSquare` | constant, `CYLTagAppearance.swift` | `CYLTagCornerRadiusSquare` |
 | `CYLTagAppearance` | class, `CYLTagAppearance.swift` | `com.cyl.classifymenu.CYLTagAppearance` |
 | `CYLTagAppearance.defaultBackgroundColor` | property, `CYLTagAppearance.swift` | `CYLTagAppearance.resetBackgroundColor (the default it resets to)` |
 | `CYLTagAppearance.defaultTextColor` | property, `CYLTagAppearance.swift` | `CYLTagAppearance.resetTextColor (the default it resets to)` |
@@ -521,6 +579,7 @@ tags: [android, kotlin, api-parity, score]
 | `CYLTagButton.editingIndicatorsView` | property, `CYLTagButton.swift` | `CYLTagButton.editingIndicatorsView (same name in the Android core)` |
 | `CYLTagButton.style` | property, `CYLTagButton.swift` | `CYLTagButton.style` |
 | `CYLTagButton.isAnimationEngineAvailable` | property, `CYLTagButton.swift` | `CYLTagButton.isAnimationEngineAvailable` |
+| `CYLTagButton.liquidGlassView` | property, `CYLTagButton.swift` | `CYLTagButton.liquidGlassView (same name in the Android core)` |
 | `CYLTagButton -initWithTitle:image:` | method, `CYLTagButton.swift` | `CYLTagButton(context, title, image)` |
 | `CYLTagButton -initWithTitle:image:animationURL:` | method, `CYLTagButton.swift` | `CYLTagButton(context, title, image, animationURL)` |
 | `CYLTagButton -resetAnimationSpeed` | method, `CYLTagButton.swift` | `CYLTagButton.resetAnimationSpeed (same name in the Android core)` |
@@ -551,6 +610,7 @@ tags: [android, kotlin, api-parity, score]
 | `CYLTagCreateCell +outlinedStyleFrom:` | method, `CYLTagCreateCell.swift` | `CYLTagCreateCell.styleWithStyle` |
 | `CYLTagCreateCell -configureWithName:style:isEnabled:` | method, `CYLTagCreateCell.swift` | `CYLTagCreateCell.configureWithName (same name in the Android core)` |
 | `CYLTagFoldButton` | class, `CYLTagFoldButton.swift` | `com.cyl.classifymenu.CYLTagFoldButton` |
+| `CYLTagFoldButton.maximumContentSizeCategory` | property, `CYLTagFoldButton.swift` | `CYL_FOLD_CONTROL_MAX_FONT_SCALE (the largest size the fold / More control scales to; iOS caps by content size category (accessibilityMedium), Android by a font scale factor (1.3))` |
 | `CYLTagFoldButton.foldControl` | property, `CYLTagFoldButton.swift` | `CYLTagFoldButton.foldControl` |
 | `CYLTagFoldButton.isExpanded` | property, `CYLTagFoldButton.swift` | `CYLTagFoldButton.isExpanded` |
 | `CYLTagFoldButton -applyFoldControl:color:expanded:animated:` | method, `CYLTagFoldButton.swift` | `CYLTagFoldButton.applyFoldControl` |
@@ -627,6 +687,7 @@ tags: [android, kotlin, api-parity, score]
 | `CYLTagListKey.foldStyle` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListViewFoldStyle` |
 | `CYLTagListKey.allowsEmptySelection` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListViewAllowsEmptySelection` |
 | `CYLTagListKey.showsSectionHeaders` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListViewShowsSectionHeaders` |
+| `CYLTagListKey.longPressAction` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListViewLongPressAction` |
 | `CYLTagListKey.scrollEnabled` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListViewScrollEnabled` |
 | `CYLTagListKey.defaultVisibleRows` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListViewDefaultVisibleRows` |
 | `CYLTagListKey.selectedItems` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLTagListViewSelectedItems` |
@@ -652,6 +713,7 @@ tags: [android, kotlin, api-parity, score]
 | `CYLTagSectionKey.style` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLTagSectionStyle` |
 | `CYLTagItemKey` | enum, `CYLTagListView+CYLConfiguration.swift` | `CYLTagItem* configuration keys` |
 | `CYLTagItemKey.title` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLTagItemTitle` |
+| `CYLTagItemKey.subtitle` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLTagItemSubtitle` |
 | `CYLTagItemKey.image` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLTagItemImage` |
 | `CYLTagItemKey.selectedImage` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLTagItemSelectedImage` |
 | `CYLTagItemKey.animation` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLTagItemAnimation` |
@@ -669,23 +731,40 @@ tags: [android, kotlin, api-parity, score]
 | `CYLMenuStyleKey.disabled` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleDisabled` |
 | `CYLMenuStyleKey.imageTitleSpacing` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleImageTitleSpacing` |
 | `CYLMenuStyleKey.itemHeight` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleItemHeight` |
+| `CYLMenuStyleKey.titleMaxLines` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleTitleMaxLines` |
 | `CYLMenuStyleKey.numberOfItemsPerRow` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleNumberOfItemsPerRow` |
 | `CYLMenuStyleKey.interitemSpacing` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleInteritemSpacing` |
 | `CYLMenuStyleKey.lineSpacing` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleLineSpacing` |
 | `CYLMenuStyleKey.headerHeight` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleHeaderHeight` |
+| `CYLMenuStyleKey.headerMaxLines` | property, `CYLTagListView+CYLConfiguration.swift` | TODO |
 | `CYLMenuStyleKey.animationSpeed` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleAnimationSpeed` |
 | `CYLMenuStyleKey.imageSize` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleImageSize` |
 | `CYLMenuStyleKey.animationSize` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleAnimationSize` |
 | `CYLMenuStyleKey.imageInsets` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleImageInsets` |
 | `CYLMenuStyleKey.sectionInsets` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleSectionInsets` |
+| `CYLMenuStyleKey.sectionStyle` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleSectionStyle` |
+| `CYLMenuStyleKey.sectionBackgroundColor` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleSectionBackgroundColor` |
+| `CYLMenuStyleKey.sectionBackgroundStyle` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleSectionBackgroundStyle` |
+| `CYLMenuStyleKey.sectionCornerRadius` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleSectionCornerRadius` |
+| `CYLMenuStyleKey.sectionContentInsets` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleSectionContentInsets` |
+| `CYLMenuStyleKey.headerBackgroundColor` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleHeaderBackgroundColor` |
+| `CYLMenuStyleKey.headerCornerRadius` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleHeaderCornerRadius` |
+| `CYLMenuStyleKey.headerContentInsets` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleHeaderContentInsets` |
+| `CYLMenuStyleKey.headerSeparatorStyle` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleHeaderSeparatorStyle` |
+| `CYLMenuStyleKey.headerSeparatorColor` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleHeaderSeparatorColor` |
+| `CYLMenuStyleKey.headerSeparatorThickness` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleHeaderSeparatorThickness` |
+| `CYLMenuStyleKey.headerSeparatorInsets` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleHeaderSeparatorInsets` |
 | `CYLMenuStyleKey.titlePositionAdjustment` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleTitlePositionAdjustment` |
 | `CYLMenuStyleKey.imagePositionAdjustment` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleImagePositionAdjustment` |
 | `CYLMenuStyleKey.layoutCentered` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleLayoutCentered` |
 | `CYLMenuStyleKey.imagePlacement` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleImagePlacement` |
 | `CYLMenuStyleKey.contentAlignment` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleContentAlignment` |
+| `CYLMenuStyleKey.backgroundStyle` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleBackgroundStyle` |
+| `CYLMenuStyleKey.minimumTagSize` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleMinimumTagSize` |
 | `CYLMenuStyleKey.adjustsFontForContentSizeCategory` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleAdjustsFontForContentSizeCategory` |
 | `CYLMenuStyleKey.backgroundColor` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleBackgroundColor` |
 | `CYLMenuStyleKey.headerTextColor` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleHeaderTextColor` |
+| `CYLMenuStyleKey.tintColor` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleTintColor` |
 | `CYLMenuStyleKey.foldControlColor` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleFoldControlColor` |
 | `CYLMenuStyleKey.headerFont` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleHeaderFont` |
 | `CYLMenuStyleKey.highlightedBackgroundColor` | property, `CYLTagListView+CYLConfiguration.swift` | `CYLMenuStyleHighlightedBackgroundColor` |
@@ -783,6 +862,7 @@ tags: [android, kotlin, api-parity, score]
 | `CYLTagListView.allowsTapping` | property, `CYLTagListView.swift` | `CYLTagListView.allowsTapping` |
 | `CYLTagListView.defaultTagImage` | property, `CYLTagListView.swift` | `CYLTagListView.defaultTagImage` |
 | `CYLTagListView.removesItemsOnDelete` | property, `CYLTagListView.swift` | `CYLTagListView.removesItemsOnDelete` |
+| `CYLTagListView.longPressAction` | property, `CYLTagListView.swift` | `CYLTagListView.longPressAction (same name in the Android core)` |
 | `CYLTagListView.tagLongPressHandler` | property, `CYLTagListView.swift` | `CYLTagListView.tagLongPressHandler` |
 | `CYLTagListView.longPressAccessibilityActionName` | property, `CYLTagListView.swift` | `CYLTagListView.longPressAccessibilityActionName` |
 | `CYLTagListView.allowsReordering` | property, `CYLTagListView.swift` | `CYLTagListView.allowsReordering` |
@@ -819,6 +899,8 @@ tags: [android, kotlin, api-parity, score]
 | `CYLTagListView -initWithFoldPosition:content:` | method, `CYLTagListView.swift` | `CYLTagListView.tagListViewWithFoldPosition` |
 | `CYLTagListView -reloadMenuData` | method, `CYLTagListView.swift` | `CYLTagListView.reloadMenuData` |
 | `CYLTagListView -heightThatFitsWidth:` | method, `CYLTagListView.swift` | `CYLTagListView.heightThatFitsWidth` |
+| `CYLTagListView -contentColumnInSection:` | method, `CYLTagListView.swift` | `CYLTagListView.contentColumn` |
+| `CYLTagListView -tagColumnInSection:` | method, `CYLTagListView.swift` | `CYLTagListView.tagColumn` |
 | `CYLTagListView.tagDataSource` | property, `CYLTagListView.swift` | `CYLTagListView.tagDataSource` |
 | `CYLTagListView.tags` | property, `CYLTagListView.swift` | `CYLTagListView.tags` |
 | `CYLTagListView -addTag:` | method, `CYLTagListView.swift` | `CYLTagListView.addTag` |
@@ -852,6 +934,28 @@ tags: [android, kotlin, api-parity, score]
 | `CYLTagListView -setTagsWithCharactersOfText:` | method, `CYLTagListView.swift` | `CYLTagListView.setTagsWithCharactersOfText (same name in the Android core)` |
 | `CYLTagListView.selectedText` | property, `CYLTagListView.swift` | `CYLTagListView.selectedText (same name in the Android core)` |
 | `CYLTagListView -selectItemsFromIndexPath:throughIndexPath:` | method, `CYLTagListView.swift` | `CYLTagListView.selectItemsFromIndexPath (same name in the Android core)` |
+| `CYLTagLongPressHost` | protocol, `CYLTagLongPressAction.swift` | `CYLTagLongPressHost (same name in the Android core)` |
+| `CYLTagLongPressHost -subtitleForItemAt:` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressHost.subtitleForItem` |
+| `CYLTagLongPressHost -showCallout:at:` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressHost.showCallout (same name in the Android core)` |
+| `CYLTagLongPressHost -dismissCallout` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressHost.dismissCallout (same name in the Android core)` |
+| `CYLTagLongPressHost -canReorderItemAt:` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressHost.canReorderItem` |
+| `CYLTagLongPressHost -beginReorderingAt:` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressHost.beginReordering (returns Unit on Android, Bool on iOS)` |
+| `CYLTagLongPressHost -endReorderingWithDestination:moved:` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressHost.endReordering` |
+| `CYLTagLongPressHost -cancelReordering` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressHost.cancelReordering (same name in the Android core)` |
+| `CYLTagLongPressHost -reportLongPressAt:` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressHost.reportLongPress` |
+| `CYLTagLongPressAction` | protocol, `CYLTagLongPressAction.swift` | `CYLTagLongPressAction (same name in the Android core)` |
+| `CYLTagLongPressAction -canBeginWithHost:at:` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressAction.canBegin` |
+| `CYLTagLongPressAction -beginWithHost:at:` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressAction.begin` |
+| `CYLTagLongPressAction -endWithHost:destination:moved:` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressAction.end` |
+| `CYLTagLongPressAction -cancelWithHost:` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressAction.cancel` |
+| `CYLTagLongPressActions` | enum, `CYLTagLongPressAction.swift` | `CYLTagLongPressActions (same name in the Android core)` |
+| `CYLTagLongPressActions.reorder` | property, `CYLTagLongPressAction.swift` | `CYLTagLongPressActions.reorder (same name in the Android core)` |
+| `CYLTagLongPressActions.report` | property, `CYLTagLongPressAction.swift` | `CYLTagLongPressActions.report (same name in the Android core)` |
+| `CYLTagLongPressActions.callout` | property, `CYLTagLongPressAction.swift` | `CYLTagLongPressActions.callout (same name in the Android core)` |
+| `CYLTagLongPressActions.none` | property, `CYLTagLongPressAction.swift` | `CYLTagLongPressActions.none (same name in the Android core)` |
+| `CYLTagLongPressActions +handler:` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressActions.handler (same name in the Android core)` |
+| `CYLTagLongPressActions +first:` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressActions.first (same name in the Android core)` |
+| `CYLTagLongPressActions +makeDefault` | method, `CYLTagLongPressAction.swift` | `CYLTagLongPressActions.makeDefault (same name in the Android core)` |
 | `CYLTagView` | class, `CYLTagView.swift` | `com.cyl.classifymenu.CYLTagView` |
 | `CYLTagView.sectionInset` | property, `CYLTagView.swift` | `kTagCollectionViewToTopMargin / ToLeftMargin / ToBottomtMargin / ToRightMargin` |
 | `CYLTagView.cellSpacing` | property, `CYLTagView.swift` | `kTagCollectionViewCellsHorizonMargin` |

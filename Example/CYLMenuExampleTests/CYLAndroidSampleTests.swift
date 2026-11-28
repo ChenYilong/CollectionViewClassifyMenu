@@ -250,7 +250,7 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         XCTAssertEqual(row.midX, fourth.bounds.width / 2, accuracy: 1)
         XCTAssertEqual(fourth.style.rippleDuration, 2)
         let fifth = containers[4]
-        XCTAssertEqual(fifth.tagButton(at: ip(0, 0))?.layer.backgroundColor, UIColor.cylMenuColor(from: "#ff0000")?.cgColor)
+        XCTAssertEqual(CYLMenuFixtures.fillRGB(of: fifth.tagButton(at: ip(0, 0))), CYLMenuFixtures.rgb(UIColor.cylMenuColor(from: "#ff0000")))
         XCTAssertFalse(fifth.allowsTapping)
 
         // tagcontainerLayout6: a star, a wrapping title, elevation, a cross image, no cross on the last tag.
@@ -284,10 +284,10 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         list.colorTheme = .pureTeal
         list.probe.layOut()
         let teal = CYLTagColors(theme: .pureTeal, seed: 0)
-        XCTAssertEqual(list.tagButton(at: ip(0, 0))?.layer.backgroundColor, teal?.backgroundColor?.cgColor)
+        XCTAssertEqual(CYLMenuFixtures.fillRGB(of: list.tagButton(at: ip(0, 0))), CYLMenuFixtures.rgb(teal?.backgroundColor))
         list.colorTheme = .random
         list.probe.layOut()
-        XCTAssertEqual(list.tagButton(at: ip(1, 0))?.layer.backgroundColor, CYLTagColors(theme: .random, seed: 1)?.backgroundColor?.cgColor)
+        XCTAssertEqual(CYLMenuFixtures.fillRGB(of: list.tagButton(at: ip(1, 0))), CYLMenuFixtures.rgb(CYLTagColors(theme: .random, seed: 1)?.backgroundColor))
         XCTAssertEqual(CYLTagColors.paletteHexByName["TEAL"], "009688")
         XCTAssertNil(CYLTagColors(theme: .none, seed: 0))
 
@@ -336,7 +336,7 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         XCTAssertEqual(list.layer.cornerRadius, 6)
         list.defaultTagImage = UIImage(systemName: "person.circle")
         let square = CYLTag(title: "Square")
-        square.cornerRadius = CYLTagCornerRadiusSquare
+        square.cornerRadius = 0
         square.isDeletable = true
         list.insertTag(square, at: 0)
         list.probe.layOut()
@@ -368,6 +368,49 @@ final class CYLAndroidSampleTests: CYLMenuExampleTestCase {
         style.maximumTitleLength = 0
         XCTAssertEqual(style.displayedTitle(forTitle: "你好"), "好你")
         XCTAssertEqual(CYLTag.badgeImage(text: "热", color: .red, diameter: 16).size, CGSize(width: 16, height: 16))
+    }
+
+    /// An empty badge text draws a dot (as `CYLTagButton.badgeValue` ""), nil draws nothing, text keeps the round badge.
+    func testAnEmptyBadgeTextDrawsADotAndNilDrawsNothing() {
+        let dotTag = CYLTag(title: "Messages")
+        dotTag.badgeText = ""
+        let textTag = CYLTag(title: "Hot")
+        textTag.badgeText = "热"
+        let plainTag = CYLTag(title: "Plain")
+        let dataSource = CYLTagDataSource(tags: [dotTag, textTag, plainTag])
+        let dot = dataSource.menuImageForItem(at: IndexPath(item: 0, section: 0))
+        XCTAssertNotNil(dot)
+        XCTAssertEqual(CYLTag.badgeDotDiameter, 8)
+        XCTAssertEqual(CYLTag.badgeDotImage(color: .systemRed, canvas: 4).size, CGSize(width: 4, height: 4), "the dot never exceeds its canvas")
+        XCTAssertNotNil(dataSource.menuImageForItem(at: IndexPath(item: 1, section: 0)))
+        XCTAssertNil(dataSource.menuImageForItem(at: IndexPath(item: 2, section: 0)))
+    }
+
+    /// A multi-character badge text grows the round image into a capsule: as high as the diameter, wide enough for the
+    /// whole text; a single digit stays square; the dot is unchanged; the tag's icon slot follows the width.
+    func testBadgeImageGrowsIntoACapsuleForLongText() {
+        let diameter: CGFloat = 18
+        let font = UIFont.boldSystemFont(ofSize: diameter * 0.6)
+        for text in ["new", "NEW", "hot", "99+", "9+"] {
+            let image = CYLTag.badgeImage(text: text, color: .systemRed, diameter: diameter)
+            let textWidth = (text as NSString).size(withAttributes: [.font: font]).width
+            XCTAssertEqual(image.size.height, diameter, text)
+            XCTAssertGreaterThan(image.size.width, image.size.height, text)
+            XCTAssertLessThanOrEqual(textWidth + 2 * CYLTag.badgeImageTextPadding, image.size.width, text)
+            XCTAssertEqual(image.accessibilityLabel, text)
+        }
+        let digit = CYLTag.badgeImage(text: "9", color: .systemRed, diameter: diameter)
+        XCTAssertEqual(digit.size, CGSize(width: diameter, height: diameter))
+        XCTAssertEqual(CYLTag.badgeDotImage(color: .systemRed, canvas: diameter).size, CGSize(width: diameter, height: diameter))
+
+        let style = CYLMenuStyle()
+        style.imageSize = CGSize(width: diameter, height: diameter)
+        let wide = CYLTag.badgeImage(text: "99+", color: .systemRed, diameter: diameter)
+        XCTAssertEqual(CYLTagButton.iconSize(for: wide, animated: false, style: style),
+                       CGSize(width: wide.size.width, height: diameter))
+        XCTAssertEqual(CYLTagButton.iconSize(for: digit, animated: false, style: style), CGSize(width: diameter, height: diameter))
+        XCTAssertGreaterThan(CYLTagButton.width(forTitle: "Hot", image: wide, style: style, traitCollection: nil),
+                             CYLTagButton.width(forTitle: "Hot", image: digit, style: style, traitCollection: nil))
     }
 
     // MARK: Word picker (选词填入)

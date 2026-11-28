@@ -24,10 +24,14 @@ final class CYLFoldStylesTests: CYLTagEditorTestCase {
         // Every position and content.
         let made = styles.tagListViews.prefix(demos.count)
         XCTAssertEqual(made.map { $0.foldControl.position }, demos.map { $0.foldControl.position })
-        XCTAssertEqual(Set(made.map { $0.foldControl.position }), [.footer, .headerTrailing, .headerLeading])
+        XCTAssertEqual(Set(made.map { $0.foldControl.position }), [.tail, .footer, .headerTrailing, .headerLeading])
         XCTAssertEqual(Set(made.map { $0.foldControl.content }), [.icon, .iconAndTitle, .title])
-        XCTAssertEqual(made.first?.foldStyle, .footerChevron, "foldControl sets foldStyle")
-        XCTAssertEqual(made.first?.title, "底部箭头（淘宝评价筛选）")
+        // The first entry follows the example rule: the tail control, icon only (the others demo the variants).
+        XCTAssertEqual(made.first?.foldControl.position, .tail)
+        XCTAssertEqual(made.first?.foldControl.content, .icon)
+        XCTAssertEqual(made.first?.title, "尾部：仅箭头（示例默认）")
+        XCTAssertEqual(made[1].foldStyle, .footerChevron, "foldControl sets foldStyle")
+        XCTAssertEqual(made[1].title, "底部箭头（淘宝评价筛选）")
         XCTAssertTrue(made.allSatisfy { $0.title != nil || $0.titleImage != nil }, "Every demo sets the encapsulated title")
         // From the files: JSON, plist, YAML and XML.
         let files = Array(styles.tagListViews.suffix(4))
@@ -90,7 +94,7 @@ final class CYLFoldStylesTests: CYLTagEditorTestCase {
     func testFoldControlTurnsItsChevronAndKeepsOnlyTheIconWhenExpanded() throws {
         let styles = try showFoldStyles()
         // "底部：文字 + 箭头": "更多 ⌄", then only the chevron, turned 180°.
-        let list = styles.tagListViews[1]
+        let list = styles.tagListViews[2]
         let tags = list.probe
         XCTAssertTrue(list.canFoldSection(0))
         tags.layOut()
@@ -106,11 +110,13 @@ final class CYLFoldStylesTests: CYLTagEditorTestCase {
         XCTAssertTrue(list.isSectionExpanded(0))
         XCTAssertGreaterThan(list.contentHeight, heightBefore)
         fold = tags.footerFoldButton(inSection: 0)
-        XCTAssertNil(fold?.title, "Expanded: only the chevron")
+        // Merge of the section line (title in both states) and the titleAndIcon line: `.iconAndTitle` keeps only the icon when
+        // expanded (as on Android, HarmonyOS and the mini program); the always-title variant is `.titleAndIcon`.
+        XCTAssertNil(fold?.title, "Expanded: only the turned chevron")
         XCTAssertEqual(fold?.imageView.transform.a ?? 0, -1, accuracy: 0.01, "Turned 180°")
 
         // "左上角": the control before the section title.
-        let leading = styles.tagListViews[5].probe
+        let leading = styles.tagListViews[6].probe
         leading.layOut()
         let headerFold = leading.headerFoldButton(inSection: 0)
         XCTAssertNotNil(headerFold)
@@ -126,6 +132,10 @@ final class CYLFoldStylesTests: CYLTagEditorTestCase {
         XCTAssertNotNil(CYLMenuResources.image(named: "cyl_fold_chevron"), "The chevron is in the core bundle")
         XCTAssertEqual(control.title(whenExpanded: false), "更多")
         XCTAssertNil(control.title(whenExpanded: true), "Icon and title: only the icon when expanded")
+        XCTAssertEqual(CYLMenuFoldControl(position: .footer, content: .titleAndIcon).title(whenExpanded: true), "收起",
+                       "Title and icon: the collapse title (Less) when expanded too")
+        XCTAssertTrue(control.showsImage(whenExpanded: true))
+        XCTAssertNil(CYLMenuFoldControl(position: .footer, content: .icon).title(whenExpanded: true))
         XCTAssertEqual(CYLMenuFoldControl(position: .headerTrailing, content: .title).title(whenExpanded: true), "收起")
         XCTAssertEqual(CYLTagCreateCell.title(forName: ""), "新建标签")
         XCTAssertEqual(CYLTagCreateCell.title(forName: "ios"), "新建标签：ios")

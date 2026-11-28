@@ -37,6 +37,7 @@ verify the behavior and update the applicable documentation.
 | `accessibility` | accessibility everywhere | [accessibility.md](docs/instructions/accessibility.md) |
 | `docs` | documentation assets, bilingual documents | [docs.md](docs/instructions/docs.md) |
 | `git` | branches, pull requests, repository hygiene | [git.md](docs/instructions/git.md) |
+| `memory` | claude-mem: learn-codebase exports, watch roots, privacy before commit | [memory.md](docs/instructions/memory.md) |
 
 ## [workflow] Tasks and workflow
 
@@ -55,6 +56,10 @@ verify the behavior and update the applicable documentation.
 - Emulators and simulators are shared: tell the other sessions before restarting a hung one and when it is back; an
   emulator that will not boot is restarted without asking.
 - Run scripts with bash (`bash script.sh`, `bash <<'EOF'`), never in the interactive zsh.
+- **Before you run a simulator, read [Simulators and emulators: stop them when the work is done](docs/instructions/sessions.md#simulators-and-emulators-stop-them-when-the-work-is-done), or this text:** after running a
+  simulator and finishing the test or screenshots, immediately kill the app and the simulator process (your own devices
+  only: `xcrun simctl terminate <udid> <bundle id>`, `xcrun simctl shutdown <udid>`; never `shutdown all` or a broad `pkill`);
+  start them again when needed. Do not leave the app or the simulator running after the task is done.
 - Sections: [Session roles by name: Mac for iOS, Win for the other platforms](docs/instructions/sessions.md#session-roles-by-name-mac-for-ios-win-for-the-other-platforms) · [Shared emulators and simulators](docs/instructions/sessions.md#shared-emulators-and-simulators) · [Running scripts](docs/instructions/sessions.md#running-scripts).
 
 ## [windows] Windows-only scenarios
@@ -123,9 +128,10 @@ verify the behavior and update the applicable documentation.
 ## [examples] Example demo rules
 
 - Animation screens on every platform offer Play all, a speed slider and a loop switch (`docs/example-demo-rules.md`).
+- A demo screen that needs a sectioned list uses the tag list (titles + icons, a tail fold control (the last tag, icon only, itself a Liquid Glass tag), a colourful page behind the list (set in one shared place; the library draws one Liquid Glass card per section, the example draws no plate; long headers use headerMaxLines 2, icon colours are static template colours through menuStyleForItem + setIconColor, never .alwaysOriginal), tap = cell tap, long press = subtitle callout, `titleMaxLines`), then re-tests contact-list reordering.
 - A search bar never covers any view. Tab bars are always at the bottom; pushed screens hide the bottom bar; set
   `navigationItem.title`, not the tab root's `title`.
-- Sections: [Example demo rules](docs/instructions/examples.md#example-demo-rules) · [Search bars](docs/instructions/examples.md#search-bars) · [Tab bars](docs/instructions/examples.md#tab-bars).
+- Sections: [Example demo rules](docs/instructions/examples.md#example-demo-rules) · [Sectioned lists use the tag list](docs/instructions/examples.md#sectioned-lists-in-demos-use-the-tag-list) · [Search bars](docs/instructions/examples.md#search-bars) · [Tab bars](docs/instructions/examples.md#tab-bars).
 
 ## [i18n] Internationalization and localization
 
@@ -158,3 +164,10 @@ verify the behavior and update the applicable documentation.
 - At the end of every answer on a branch other than `master` / `main`, commit and push.
 - Never commit `._*`, `.DS_Store` or doubled-dot copies; never rewrite published history without approval.
 - Sections: [Branches and pull requests](docs/instructions/git.md#branches-and-pull-requests) · [Repository hygiene](docs/instructions/git.md#repository-hygiene).
+
+## [memory] Memory: learn-codebase exports and claude-mem
+
+- **Before running `/claude-mem:learn-codebase`, read [docs/learn-codebase/README.md](docs/learn-codebase/README.md) in
+  full**: where the export goes, how to set `CLAUDE_MEM_MEMORY_WATCH_ROOTS` on a computer, and how to remove private
+  data before committing it.
+- Sections: [Read before running learn-codebase](docs/instructions/memory.md#read-before-running-learn-codebase).

@@ -19,9 +19,11 @@ import com.cyl.classifymenu.CYLIndexPath
 import com.cyl.classifymenu.CYLMenuAnimationURLWithOptions
 import com.cyl.classifymenu.CYLMenuSelectionMode
 import com.cyl.classifymenu.CYLMenuStyle
+import com.cyl.classifymenu.CYLTagBackgroundStyle
 import com.cyl.classifymenu.CYLOffset
 import com.cyl.classifymenu.CYLSize
 import com.cyl.classifymenu.CYLTagListView
+import com.cyl.classifymenu.example.plainSections
 import com.cyl.classifymenu.example.R
 
 /**
@@ -53,11 +55,12 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
         private val palette = listOf(Color.rgb(255, 149, 0), Color.rgb(175, 82, 222), Color.rgb(48, 176, 199), Color.rgb(255, 45, 85), Color.rgb(88, 86, 214), Color.rgb(52, 199, 89))
         private val systemBlue = Color.rgb(0, 122, 255)
 
-        fun demoStyle() = CYLMenuStyle().apply {
+        fun demoStyle() = CYLMenuStyle().plainSections().apply {
             setIconColor(systemBlue, CYLControlState.NORMAL)
             setIconColor(Color.WHITE, CYLControlState.SELECTED)
             selectedAppearance.backgroundColor = systemBlue
             selectedAppearance.borderColor = systemBlue
+            backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
             imageSize = CYLSize(16f, 16f)
             imageTitleSpacing = 4f
             itemHeight = 34f
@@ -74,7 +77,7 @@ class CYLTagStyleScreen(private val context: Context, private val navigator: CYL
             "layoutCentered" to "切换 layoutCentered（只有 icon 或 title 时居中）", "selectedImage" to "切换选中图片 selectedImage",
             "backgroundColor.normal" to "设置背景色 backgroundColor（normal）", "backgroundColor.selected" to "设置背景色 backgroundColor（selected）",
             "borderColor" to "设置边框颜色 borderColor", "borderWidth" to "设置边框宽度 borderWidth",
-            "cornerRadius" to "设置圆角 cornerRadius（0 为胶囊）", "margin" to "设置内边距 margin",
+            "cornerRadius" to "设置圆角 cornerRadius（0 为直角，1000 为胶囊）", "margin" to "设置内边距 margin",
             "animation.lottie" to "Lottie 动效图标", "animation.pag" to "PAG 动效图标", "animation.rive" to "Rive 动效图标", "animation.svga" to "SVGA 动效图标",
             "animation.gif" to "GIF 动效图标", "animation.off" to "关闭动效（静态图标）", "animationSpeed" to "设置动效速度 animationSpeed",
             "configuration" to "配置文件 / 字典（map）初始化", "tagCloud" to "标签云：android-tagview 的初始化方式",

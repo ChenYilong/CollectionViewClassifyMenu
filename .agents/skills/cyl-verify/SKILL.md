@@ -141,3 +141,11 @@ unverified, with the reason.
 ## Animation examples: playback controls (iOS and Android done 2026-11-14)
 
 Every example page that shows animations, on every platform, offers "Play all" (each animation restarts from progress 0), a speed slider and a loop switch, combined into one playback strategy applied live (accessibility labels and values included); verify all three on the page. Change the core when an example needs it. Rule, pages and status: [docs/example-demo-rules.md](../../../docs/example-demo-rules.md).
+
+## Stop the simulator when the run is done
+
+Before you run a simulator, read "Simulators and emulators: stop them when the work is done" in
+`docs/instructions/sessions.md`. After the tests or screenshots, immediately terminate the app and shut the simulator down:
+your own devices only (`xcrun simctl terminate <udid> <bundle id>`, `xcrun simctl shutdown <udid>`), by UDID, never
+`shutdown all` or a broad `pkill`; boot again for the next run. Report "stopped: <udids>".
+

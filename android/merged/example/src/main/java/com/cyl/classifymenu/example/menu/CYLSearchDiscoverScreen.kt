@@ -36,8 +36,10 @@ import com.cyl.classifymenu.CYLMenuFoldControlContent
 import com.cyl.classifymenu.CYLMenuFoldControlPosition
 import com.cyl.classifymenu.CYLMenuSelectionMode
 import com.cyl.classifymenu.CYLMenuStyle
+import com.cyl.classifymenu.CYLTagBackgroundStyle
 import com.cyl.classifymenu.CYLSize
 import com.cyl.classifymenu.CYLTagListView
+import com.cyl.classifymenu.example.plainSections
 import com.cyl.classifymenu.cyl_imageWithRenderingModeAlwaysOriginal
 import com.cyl.classifymenu.example.R
 import org.json.JSONObject
@@ -179,7 +181,8 @@ class CYLSearchDiscoverScreen(private val context: Context, private val navigato
             style.headerHorizontalInset = 16f
         }
 
-        fun recentStyle() = CYLMenuStyle().apply {
+        fun recentStyle() = CYLMenuStyle().plainSections().apply {
+            backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
             for (state in listOf(CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED)) {
                 appearanceForState(state).apply {
                     backgroundColor = Color.WHITE
@@ -202,6 +205,7 @@ class CYLSearchDiscoverScreen(private val context: Context, private val navigato
             for (state in listOf(CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED)) {
                 appearanceForState(state).font = CYLFont(17f, android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL))
             }
+            backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
             imageSize = CYLSize.ZERO
             itemHeight = 36f
             lineSpacing = 16f

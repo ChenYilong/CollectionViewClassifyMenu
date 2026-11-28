@@ -1,5 +1,6 @@
 package com.cyl.classifymenu
 
+import com.cyl.animateditem.CYLAnimatedItemCornerRadiusCapsule
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -20,8 +21,63 @@ enum class CYLTagImagePlacement {
 /** `CYLTagContentAlignment`: the icon and title centered in the tag, or at its leading edge. */
 enum class CYLTagContentAlignment { CYLTagContentAlignmentCenter, CYLTagContentAlignmentLeading }
 
+/** `CYLTagBackgroundStyle`: a tag's flat color, or a Liquid Glass background where the device draws one (`CYLLiquidGlass.isActive()`). */
+enum class CYLTagBackgroundStyle { CYLTagBackgroundStyleFlat, CYLTagBackgroundStyleLiquidGlass }
+
 /** `CYLTagRowAlignment`: where a row of tags sits in the list's width. */
 enum class CYLTagRowAlignment { CYLTagRowAlignmentLeading, CYLTagRowAlignmentCenter, CYLTagRowAlignmentTrailing }
+
+/**
+ * `CYLSectionStyle`: how a section's tags sit in the list: `insetGrouped` (the default) inside a rounded card (UITableView's
+ * inset grouped look), the header above it; `plain` on the list's background (the opt-out: the look before the default
+ * changed).
+ */
+enum class CYLSectionStyle { CYLSectionStylePlain, CYLSectionStyleInsetGrouped }
+
+/** `CYLHeaderSeparatorStyle`: the line at the bottom of a section header: `none` (the default) or a `line`. */
+enum class CYLHeaderSeparatorStyle { CYLHeaderSeparatorStyleNone, CYLHeaderSeparatorStyleLine }
+
+/** The named lengths of the section style, dp. */
+object CYLSectionStyleMetrics {
+    /** The corner radius of a section card. */
+    const val CARD_CORNER_RADIUS: Float = 10f
+    /** The padding between a section card and its tags. */
+    const val CARD_PADDING: Float = 12f
+    /** The padding between a header band and its title, leading and trailing. */
+    const val HEADER_BAND_PADDING: Float = 12f
+    /** The thickness of the header divider: one hairline. */
+    const val SEPARATOR_THICKNESS: Float = 0.5f
+    /** The default size of a section header title (the table header look; its weight is [CYLFont.WEIGHT_SEMIBOLD]). */
+    const val HEADER_FONT_SIZE: Float = 17f
+}
+
+/**
+ * The colors of the section style, each following the color mode (as `CYLSystemColors`): a style whose color is null
+ * resolves to them; an app can also set one itself, for example [HEADER_BAND] on `headerBackgroundColor`.
+ */
+object CYLSectionStyleColors {
+    /** The section card in light mode: white. */
+    const val CARD: Int = Color.WHITE
+    /** The section card in dark mode: #1C1C1E (the secondary system background). */
+    const val CARD_DARK: Int = CYLSystemColors.SECONDARY_BACKGROUND_DARK
+    /** The header band in light mode: #EFEFF4 (the TagCollectionView header). */
+    const val HEADER_BAND: Int = 0xFFEFEFF4.toInt()
+    /** The header band in dark mode: #2C2C2E. */
+    const val HEADER_BAND_DARK: Int = 0xFF2C2C2E.toInt()
+    /** The list background under `insetGrouped` in light mode: #F2F2F7. */
+    const val GROUPED_BACKGROUND: Int = 0xFFF2F2F7.toInt()
+    /** The list background under `insetGrouped` in dark mode: black. */
+    const val GROUPED_BACKGROUND_DARK: Int = Color.BLACK
+    /** The header divider in light mode: the system separator (#3C3C43 at 29 %). */
+    const val SEPARATOR: Int = 0x4A3C3C43
+    /** The header divider in dark mode: the system separator (#545458 at 60 %). */
+    const val SEPARATOR_DARK: Int = 0x99545458.toInt()
+
+    fun card(context: android.content.Context): Int = if (CYLSystemColors.isNight(context)) CARD_DARK else CARD
+    fun headerBand(context: android.content.Context): Int = if (CYLSystemColors.isNight(context)) HEADER_BAND_DARK else HEADER_BAND
+    fun groupedBackground(context: android.content.Context): Int = if (CYLSystemColors.isNight(context)) GROUPED_BACKGROUND_DARK else GROUPED_BACKGROUND
+    fun separator(context: android.content.Context): Int = if (CYLSystemColors.isNight(context)) SEPARATOR_DARK else SEPARATOR
+}
 
 /** `CYLTagDeleteIndicatorPlacement`: the delete indicator after or before the title. */
 enum class CYLTagDeleteIndicatorPlacement { CYLTagDeleteIndicatorPlacementTrailing, CYLTagDeleteIndicatorPlacementLeading }
@@ -97,45 +153,238 @@ class CYLMenuStyle {
     var imagePlacement: CYLTagImagePlacement = CYLTagImagePlacement.CYLTagImagePlacementLeading
     var layoutCentered: Boolean = true
     var contentAlignment: CYLTagContentAlignment = CYLTagContentAlignment.CYLTagContentAlignmentCenter
+
+    /**
+     * The tag background: flat (the default) is the solid color of each state's appearance; Liquid Glass draws a glass background
+     * behind the content, tinted with the state's `backgroundColor` and clipped to the corner radius. Where the device draws no
+     * Liquid Glass the style is ignored (`resolvedBackgroundStyle`).
+     */
+    var backgroundStyle: CYLTagBackgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat
+
+    /**
+     * The background style a tag really draws: `backgroundStyle`, or flat when `CYLLiquidGlass.isActive()`
+     * (`CYLAnimatedItemView.isLiquidGlassActive()`, the rule of CYLTabBarController: Android 12 and later) is false.
+     */
+    val resolvedBackgroundStyle: CYLTagBackgroundStyle
+        get() = if (backgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass && com.cyl.animateditem.CYLAnimatedItemView.isLiquidGlassActive())
+            CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass else CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat
+
+    /**
+     * The smallest size of a tag, dp: a tag narrower or shorter than it grows to it, its content staying where `contentAlignment`
+     * puts it. `CYLSize.ZERO` (the default) keeps the tag as large as its content and `itemHeight` make it.
+     */
+    var minimumTagSize: CYLSize = CYLSize.ZERO
     var animationSize: CYLSize = CYLSize.ZERO
     var animationSpeed: Float = 1f
     var adjustsFontForContentSizeCategory: Boolean = true
+
+    /**
+     * The largest system font scale this style's texts follow when `adjustsFontForContentSizeCategory`: the text grows with the
+     * system font size up to this factor. Default [CYLMaximumFontScale]; the fold controls lower it to
+     * [CYL_FOLD_CONTROL_MAX_FONT_SCALE] so they stay small at accessibility font sizes.
+     */
+    var maximumFontScale: Float = CYLMaximumFontScale
     var itemHeight: Float = 30f
+
+    /**
+     * The most lines a title may take: a title too wide for its tag wraps onto more lines, up to this number, and the tag
+     * grows taller; beyond it the title is truncated. Default [CYLTagTitleMaxLines.SINGLE] (1, one line, truncated).
+     * [CYLTagTitleMaxLines.UNLIMITED] shows every line. The app chooses the number; a value below 1 is 1.
+     */
+    var titleMaxLines: Int = CYLTagTitleMaxLines.SINGLE
+        set(value) { field = max(CYLTagTitleMaxLines.SINGLE, value) }
     var numberOfItemsPerRow: Int = 0
 
     // Layout
     var interitemSpacing: Float = 10f
     var lineSpacing: Float = 10f
     var sectionInsets: CYLEdgeInsets = CYLEdgeInsets(10f, 16f, 10f, 16f)
-    var backgroundColor: Int = Color.WHITE
+    private var backgroundColorValue: Int = Color.WHITE
+    private var backgroundColorWasSet: Boolean = false
+
+    /**
+     * The list's background color. Never set, the list paints the SYSTEM background (white in light mode, black in dark mode),
+     * or the grouped background under `insetGrouped` ([resolvedBackgroundColor], resolved per mode); this getter then returns
+     * white, the light value, because it has no context. A set color, even a transparent one, wins in both modes.
+     */
+    var backgroundColor: Int
+        get() = backgroundColorValue
+        set(value) {
+            backgroundColorValue = value
+            backgroundColorWasSet = true
+        }
+
+    /** The list background the app set, null while it was never set (the default follows light / dark mode). */
+    internal val explicitBackgroundColor: Int? get() = if (backgroundColorWasSet) backgroundColorValue else null
+
+    // The section card, the header band and the header divider (the contract is docs/tag-section-style.md)
+    /**
+     * `insetGrouped` (the default): the section's tags inside a rounded card; `plain` opts out (the tags on the list's
+     * background). The library's own looks that must stay flat ([tagCloudStyle], [wordPicker], ...) set `plain`.
+     */
+    var sectionStyle: CYLSectionStyle = CYLSectionStyle.CYLSectionStyleInsetGrouped
+    /** The card's color; null resolves to the system card color ([resolvedSectionBackgroundColor]). */
+    var sectionBackgroundColor: Int? = null
+    /**
+     * The card's background: flat (the default) is the solid [sectionBackgroundColor]; Liquid Glass draws the library's glass
+     * behind the tags with the card's corners, tinted with [sectionBackgroundColor] when it is set. Where the device draws no
+     * glass the card stays flat ([resolvedSectionBackgroundStyle]). Independent of the tags' `backgroundStyle`.
+     */
+    var sectionBackgroundStyle: CYLTagBackgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat
+
+    /** The card background really drawn: [sectionBackgroundStyle], or flat when `CYLLiquidGlass.isActive()` is false. */
+    val resolvedSectionBackgroundStyle: CYLTagBackgroundStyle
+        get() = if (sectionBackgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass && com.cyl.animateditem.CYLAnimatedItemView.isLiquidGlassActive())
+            CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass else CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat
+    var sectionCornerRadius: Float = CYLSectionStyleMetrics.CARD_CORNER_RADIUS
+        set(value) { field = max(0f, value) }
+    /** The padding inside the card around the tags (`insetGrouped`), dp. */
+    var sectionContentInsets: CYLEdgeInsets = CYLEdgeInsets(CYLSectionStyleMetrics.CARD_PADDING, CYLSectionStyleMetrics.CARD_PADDING,
+        CYLSectionStyleMetrics.CARD_PADDING, CYLSectionStyleMetrics.CARD_PADDING)
+    /**
+     * How far the board (the card, the header band and the divider) extends beyond the tag column on the leading and trailing
+     * sides, one value for both, dp. The tags and the header title always share the tag column, so this never changes the tag
+     * width. 0: the board's edges coincide with the tags' edges. null (the default): the leading and trailing parts of
+     * [sectionContentInsets] ([CYLSectionStyleMetrics.CARD_PADDING], 12): the board spans the section column as before. A set
+     * value (0 included) replaces those two parts (top and bottom still come from [sectionContentInsets]); a negative value is 0.
+     * A set value above the default can push the board past the list's margin ([sectionInsets]); that is accepted.
+     */
+    var sectionBoardInset: Float? = null
+        set(value) { field = value?.let { max(0f, it) } }
+    /** The header band's color; null: no band (today's look). [CYLSectionStyleColors.HEADER_BAND] is the usual one. */
+    var headerBackgroundColor: Int? = null
+    var headerCornerRadius: Float = 0f
+        set(value) { field = max(0f, value) }
+    /** A plain header's title and fold control inset from the band's edges (left and right), dp. */
+    var headerContentInsets: CYLEdgeInsets = CYLEdgeInsets(0f, CYLSectionStyleMetrics.HEADER_BAND_PADDING, 0f, CYLSectionStyleMetrics.HEADER_BAND_PADDING)
+    var headerSeparatorStyle: CYLHeaderSeparatorStyle = CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleNone
+    /** The divider's color; null resolves to the system separator color ([resolvedHeaderSeparatorColor]). */
+    var headerSeparatorColor: Int? = null
+    var headerSeparatorThickness: Float = CYLSectionStyleMetrics.SEPARATOR_THICKNESS
+        set(value) { field = max(0f, value) }
+    /**
+     * The divider's leading (left) and trailing (right) inset from the column's edges, dp; null (the default) is 0 and 0: the
+     * divider has the same left and right edges as the card and the header band, never the title's x.
+     */
+    var headerSeparatorInsets: CYLEdgeInsets? = null
+
+    /** True when the section style draws the cards. */
+    val isInsetGrouped: Boolean get() = sectionStyle == CYLSectionStyle.CYLSectionStyleInsetGrouped
+
+    /**
+     * The list background in use: [backgroundColor] when the app set it (even transparent); else the grouped background under
+     * `insetGrouped`, else the system background (white in light mode, black in dark mode).
+     */
+    fun resolvedBackgroundColor(context: android.content.Context): Int = when {
+        backgroundColorWasSet -> backgroundColorValue
+        isInsetGrouped -> CYLSectionStyleColors.groupedBackground(context)
+        else -> CYLSystemColors.systemBackground(context)
+    }
+
+    /** The card's color in use. */
+    fun resolvedSectionBackgroundColor(context: android.content.Context): Int = sectionBackgroundColor ?: CYLSectionStyleColors.card(context)
+
+    /** The divider's color in use. */
+    fun resolvedHeaderSeparatorColor(context: android.content.Context): Int = headerSeparatorColor ?: CYLSectionStyleColors.separator(context)
 
     // Section headers
-    var headerHeight: Float = 36f
-    var headerFont: CYLFont = CYLFont.systemFont(14f)
-    var headerTextColor: Int = Color.GRAY
+    private var headerHeightValue: Float = 36f
+    private var headerHeightWasSet: Boolean = false
+
+    /**
+     * The fixed header height, dp (default 36). Under `insetGrouped` with no header divider the header is sized to its text
+     * instead (a title line plus [HEADER_BOARD_TITLE_PADDING], not below the fold control) and this value is a minimum only
+     * when the app set it ([isHeaderHeightSet]); the divider and the plain style keep it as the minimum always.
+     */
+    var headerHeight: Float
+        get() = headerHeightValue
+        set(value) {
+            headerHeightValue = value
+            headerHeightWasSet = true
+        }
+
+    /** Whether the app set [headerHeight] (the default 36 does not count). */
+    val isHeaderHeightSet: Boolean get() = headerHeightWasSet
+
+    /**
+     * The most lines a section header's title may take: a title too wide for the room beside the fold control wraps onto more
+     * lines, up to this number, and the header grows taller than [headerHeight]. Default [CYLHeaderTitleMaxLines.SINGLE] (1, one
+     * line, truncated: the header is exactly [headerHeight] high). [CYLHeaderTitleMaxLines.UNLIMITED] shows every line. A value
+     * below 1 is 1.
+     */
+    var headerMaxLines: Int = CYLHeaderTitleMaxLines.SINGLE
+        set(value) { field = max(CYLHeaderTitleMaxLines.SINGLE, value) }
+    /** The section header title: 17 dp semibold ([CYLSectionStyleMetrics.HEADER_FONT_SIZE], weight 600), the table header look. */
+    var headerFont: CYLFont = CYLFont.semiboldSystemFont(CYLSectionStyleMetrics.HEADER_FONT_SIZE)
+    /** null (the default): [tintColor], else its default by the background luminance ([resolvedHeaderTextColor]). */
+    var headerTextColor: Int? = null
     var headerHorizontalInset: Float = 16f
 
     // Fold controls
-    var foldControlColor: Int = Color.GRAY
+    /** null (the default): the tint (see [headerTextColor]); a control's own color wins. */
+    var foldControlColor: Int? = null
     var expandTitle: String = CYLMenuLocalizedString("CYLMenuExpand", "Expand a section")
     var foldChevronImage: Drawable? = null
     var collapseTitle: String = CYLMenuLocalizedString("CYLMenuCollapse", "Collapse a section")
 
     // The More button
     var moreButtonImage: Drawable? = null
-    var moreButtonColor: Int = CYLColor.white(0.24f, 0.6f)
+    /** null (the default): the tint (see [headerTextColor]). */
+    var moreButtonColor: Int? = null
+
+    /**
+     * The one color of every built-in view that is not a tag (header title, section icon, fold / More / clear controls); null
+     * (the default): black or white by the luminance of the background it is drawn on ([resolvedTintColor]). A color set on
+     * the title, the fold control, the More button or the clear button itself wins over it for that view.
+     */
+    var tintColor: Int? = null
+
+    /**
+     * The default tint on `background`: black on a light one, white on a dark one ([CYLTintLuminanceThreshold]); the system
+     * mode ([CYLSystemColors.primary]) when the background is not an opaque color (a transparent list shows the page).
+     */
+    private fun tintOn(context: android.content.Context, background: Int): Int {
+        val luminance = CYLMenuColorLuminance(background) ?: return CYLSystemColors.primary(context)
+        return if (luminance > CYLTintLuminanceThreshold) Color.BLACK else Color.WHITE
+    }
+
+    /**
+     * The tint as drawn: [tintColor], else the default against what is behind the view: the band color when `onBand` (a
+     * header with a band) and a band is set, else the list's own background ([resolvedBackgroundColor]: the app's color, the
+     * grouped background under `insetGrouped`, the system background the list paints by default).
+     */
+    @JvmOverloads
+    fun resolvedTintColor(context: android.content.Context, onBand: Boolean = false): Int {
+        tintColor?.let { return it }
+        val band = headerBackgroundColor
+        return tintOn(context, if (onBand && band != null) band else resolvedBackgroundColor(context))
+    }
+
+    /** The header title color in use: [headerTextColor], else the tint. */
+    @JvmOverloads
+    fun resolvedHeaderTextColor(context: android.content.Context, onBand: Boolean = false): Int = headerTextColor ?: resolvedTintColor(context, onBand)
+
+    /** The fold controls' color in use: [foldControlColor], else the tint (a control's own color still wins). */
+    @JvmOverloads
+    fun resolvedFoldControlColor(context: android.content.Context, onBand: Boolean = false): Int = foldControlColor ?: resolvedTintColor(context, onBand)
+
+    /** The More button's color in use: [moreButtonColor], else the tint. */
+    @JvmOverloads
+    fun resolvedMoreButtonColor(context: android.content.Context, onBand: Boolean = false): Int = moreButtonColor ?: resolvedTintColor(context, onBand)
+
+    /** The clear button's color in use: [clearButtonColor], else the header title's. */
+    @JvmOverloads
+    fun resolvedClearButtonColor(context: android.content.Context, onBand: Boolean = false): Int = clearButtonColor ?: resolvedHeaderTextColor(context, onBand)
 
     init {
         val hairline = 1f / max(1f, Resources.getSystem().displayMetrics.density)
-        normalAppearance.borderColor = CYLColor.white(0.82f)
-        normalAppearance.borderWidth = hairline
+        // The built-in default borders are not explicit: under drawn Liquid Glass they are dropped (the glass draws its own rim).
+        normalAppearance.setDefaultBorder(CYLColor.white(0.82f), hairline)
         selectedAppearance.backgroundColor = CYLAppTintColor
         selectedAppearance.textColor = Color.WHITE
-        selectedAppearance.borderColor = CYLAppTintColor
-        selectedAppearance.borderWidth = hairline
+        selectedAppearance.setDefaultBorder(CYLAppTintColor, hairline)
         disabledAppearance.textColor = CYLColor.white(0.7f)
-        disabledAppearance.borderColor = CYLColor.white(0.88f)
-        disabledAppearance.borderWidth = hairline
+        disabledAppearance.setDefaultBorder(CYLColor.white(0.88f), hairline)
     }
 
     /** The content insets of every state; reads the normal state's. */
@@ -191,6 +440,18 @@ class CYLMenuStyle {
         appearanceForState(forState).iconColor = iconColor
     }
 
+    /**
+     * The icon color the app set for `state`, null while it was never set: the built-in default (the text color) does not count.
+     * The tag hands only an explicit color to the item as its icon color; the item adapts it on dark Liquid Glass.
+     */
+    internal fun explicitIconColorForState(state: Int): Int? = appearanceForState(state).iconColor
+
+    /**
+     * The text color the app set for `state`, null while it was never set: the built-in default does not count.
+     * The tag hands only an explicit color to the item as its title color; the item adapts it on dark Liquid Glass.
+     */
+    internal fun explicitTextColorForState(state: Int): Int? = appearanceForState(state).explicitTextColor
+
     /** `-iconColorForState:`: the icon color, else the text color. */
     fun iconColorForState(state: Int): Int {
         val appearance = appearanceForState(state)
@@ -205,7 +466,7 @@ class CYLMenuStyle {
         var result = if (boldText) font.bold() else font
         if (!adjustsFontForContentSizeCategory) return result
         val scale = fontScale ?: Resources.getSystem().configuration.fontScale
-        result = result.withSize(result.size * min(max(scale, 0f), CYLMaximumFontScale))
+        result = result.withSize(result.size * min(max(scale, 0f), maximumFontScale))
         return result
     }
 
@@ -239,13 +500,32 @@ class CYLMenuStyle {
         copy.animationSize = animationSize
         copy.animationSpeed = animationSpeed
         copy.adjustsFontForContentSizeCategory = adjustsFontForContentSizeCategory
+        copy.maximumFontScale = maximumFontScale
         copy.itemHeight = itemHeight
+        copy.titleMaxLines = titleMaxLines
         copy.interitemSpacing = interitemSpacing
         copy.lineSpacing = lineSpacing
         copy.sectionInsets = sectionInsets
-        copy.backgroundColor = backgroundColor
-        copy.headerHeight = headerHeight
+        copy.backgroundColorValue = backgroundColorValue
+        copy.backgroundColorWasSet = backgroundColorWasSet
+        copy.sectionStyle = sectionStyle
+        copy.sectionBackgroundColor = sectionBackgroundColor
+        copy.sectionBackgroundStyle = sectionBackgroundStyle
+        copy.sectionCornerRadius = sectionCornerRadius
+        copy.sectionContentInsets = sectionContentInsets
+        copy.sectionBoardInset = sectionBoardInset
+        copy.headerBackgroundColor = headerBackgroundColor
+        copy.headerCornerRadius = headerCornerRadius
+        copy.headerContentInsets = headerContentInsets
+        copy.headerSeparatorStyle = headerSeparatorStyle
+        copy.headerSeparatorColor = headerSeparatorColor
+        copy.headerSeparatorThickness = headerSeparatorThickness
+        copy.headerSeparatorInsets = headerSeparatorInsets
+        copy.headerHeightValue = headerHeightValue
+        copy.headerHeightWasSet = headerHeightWasSet
+        copy.headerMaxLines = headerMaxLines
         copy.headerFont = headerFont
+        copy.tintColor = tintColor
         copy.headerTextColor = headerTextColor
         copy.headerHorizontalInset = headerHorizontalInset
         copy.foldControlColor = foldControlColor
@@ -254,6 +534,8 @@ class CYLMenuStyle {
         copy.collapseTitle = collapseTitle
         copy.numberOfItemsPerRow = numberOfItemsPerRow
         copy.contentAlignment = contentAlignment
+        copy.backgroundStyle = backgroundStyle
+        copy.minimumTagSize = minimumTagSize
         copy.moreButtonImage = moreButtonImage
         copy.moreButtonColor = moreButtonColor
         copy.highlightedBackgroundColor = highlightedBackgroundColor
@@ -287,17 +569,23 @@ class CYLMenuStyle {
         @JvmStatic
         fun defaultStyle() = CYLMenuStyle()
 
+        /**
+         * The base of every library look that is a complete look of its own (a tag cloud, a word picker, a grid, a tag of the
+         * classify menu): the default style with the section card opted out, so the look is the flat one it always was.
+         */
+        private fun plainBaseStyle(): CYLMenuStyle = defaultStyle().also { it.sectionStyle = CYLSectionStyle.CYLSectionStylePlain }
+
         /** `+tagCloudStyle`: android-tagview's look: blue square tags, white text, 5 dp spacing. */
         @JvmStatic
         fun tagCloudStyle(): CYLMenuStyle {
-            val style = defaultStyle()
+            val style = plainBaseStyle()
             val blue = Color.rgb(0, 0xBF, 0xFF)
             for (appearance in style.appearances()) {
                 appearance.backgroundColor = blue
                 appearance.textColor = Color.WHITE
                 appearance.borderWidth = 0f
                 appearance.borderColor = Color.WHITE
-                appearance.cornerRadius = 0f
+                appearance.cornerRadius = CYLAnimatedItemCornerRadiusCapsule
                 appearance.font = CYLFont.systemFont(14f)
             }
             style.disabledAppearance.backgroundColor = CYLColor.withAlpha(blue, 0.4f)
@@ -318,7 +606,7 @@ class CYLMenuStyle {
          */
         @JvmStatic
         fun wordPicker(): CYLMenuStyle {
-            val style = defaultStyle()
+            val style = plainBaseStyle()
             style.numberOfItemsPerRow = 9
             val font = CYLFont(18f, android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.NORMAL))
             for (appearance in style.appearances()) {
@@ -346,7 +634,7 @@ class CYLMenuStyle {
         /** `+tagContainerStyle`: AndroidTagView's look: translucent red capsules, gray text, 23 characters at most. */
         @JvmStatic
         fun tagContainerStyle(): CYLMenuStyle {
-            val style = defaultStyle()
+            val style = plainBaseStyle()
             val red = Color.rgb(0xF4, 0x43, 0x36)
             for (appearance in style.appearances()) {
                 appearance.backgroundColor = CYLColor.withAlpha(red, 0x33 / 255f)
@@ -431,7 +719,7 @@ class CYLMenuStyle {
             val style = compactTagStyle()
             for (appearance in style.appearances()) {
                 appearance.backgroundColor = CYLColor.CLEAR
-                appearance.cornerRadius = CYLTagCornerRadiusSquare
+                appearance.cornerRadius = 0f
             }
             style.normalAppearance.backgroundImage = CYLStretchableDrawable.named("btn_slide_normal")
             style.normalAppearance.textColor = Color.rgb(96, 147, 130)
@@ -447,12 +735,12 @@ class CYLMenuStyle {
         @JvmStatic
         @JvmOverloads
         fun sectionTitle(fontSize: Float = 15f, textColor: Int = Color.BLACK, leadingInset: Float = 0f): CYLMenuStyle {
-            val style = defaultStyle()
+            val style = plainBaseStyle()
             for (appearance in style.appearances()) {
                 appearance.backgroundColor = CYLColor.CLEAR
                 appearance.borderWidth = 0f
                 appearance.borderColor = null
-                appearance.cornerRadius = CYLTagCornerRadiusSquare
+                appearance.cornerRadius = 0f
                 appearance.textColor = textColor
                 appearance.font = CYLFont.systemFont(fontSize)
                 appearance.contentInsets = CYLEdgeInsets(0f, leadingInset, 0f, 0f)
@@ -469,7 +757,7 @@ class CYLMenuStyle {
          * The tags of the classify menu and the multiple filter: the tags' title font, small end margins, no border.
          */
         private fun compactTagStyle(): CYLMenuStyle {
-            val style = defaultStyle()
+            val style = plainBaseStyle()
             val font = CYLFont.systemFont(CYLTagTitleFontSize)
             for (appearance in style.appearances()) {
                 appearance.font = font
@@ -486,7 +774,7 @@ class CYLMenuStyle {
         /** `+gridStyleWithNumberOfItemsPerRow:`: borderless items in `numberOfItemsPerRow` columns, icon after title. */
         @JvmStatic
         fun gridStyleWithNumberOfItemsPerRow(numberOfItemsPerRow: Int): CYLMenuStyle {
-            val style = defaultStyle()
+            val style = plainBaseStyle()
             style.numberOfItemsPerRow = max(1, numberOfItemsPerRow)
             val font = CYLFont.systemFont(17f)
             for (appearance in style.appearances()) {
@@ -509,4 +797,22 @@ class CYLMenuStyle {
             return style
         }
     }
+}
+
+/** The line limits of a section header's title ([CYLMenuStyle.headerMaxLines]): named values, never a literal at a call site. */
+object CYLHeaderTitleMaxLines {
+    /** One line, the default: a title too wide for its header is truncated and the header keeps its fixed height. */
+    const val SINGLE: Int = 1
+
+    /** No limit: a title wraps onto as many lines as it needs and the header grows with it. */
+    const val UNLIMITED: Int = Int.MAX_VALUE
+}
+
+/** The line limits of a tag's title ([CYLMenuStyle.titleMaxLines]): named values, never a literal at a call site. */
+object CYLTagTitleMaxLines {
+    /** One line, the default: a title too wide for its tag is truncated. */
+    const val SINGLE: Int = 1
+
+    /** No limit: a title wraps onto as many lines as it needs (the MAX of the line counts). */
+    const val UNLIMITED: Int = Int.MAX_VALUE
 }

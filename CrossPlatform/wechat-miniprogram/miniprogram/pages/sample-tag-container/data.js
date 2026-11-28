@@ -53,6 +53,7 @@ const AVATAR = '/images/samples/avatar.png';
  */
 function makeContainer(configure) {
   const style = model.tagContainerStyle();
+  style.backgroundStyle = 'liquidGlass';
   style.sectionInsets = { top: 10, left: 10, bottom: 10, right: 10 };
   style.backgroundColor = model.rgba(1, 0, 0, 0x11 / 255);
   const options = {

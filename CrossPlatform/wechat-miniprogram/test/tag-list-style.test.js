@@ -11,12 +11,13 @@ test('the default style is CYLMenuStyle(): hairline gray borders, green selectio
   assert.equal(s.normal.textColor, '#404040');
   assert.equal(s.normal.borderColor, '#D1D1D1');
   assert.equal(s.normal.borderWidth, 1 / 3);
-  assert.equal(s.normal.cornerRadius, 3);
+  assert.equal(s.normal.cornerRadius, model.cylAnimatedItemCornerRadiusCapsule);
   assert.deepEqual([s.selected.backgroundColor, s.selected.textColor], ['#2AB9A0', '#FFFFFF']);
   assert.equal(s.disabled.textColor, '#B3B3B3');
   assert.equal(s.layoutCentered, true);
   assert.equal(s.animationSpeed, 1);
-  assert.equal(s.headerTextColor, '#808080');
+  // The list's own texts and icons: one tint that follows dark mode (iOS UIColor.label), black in light mode.
+  assert.equal(s.headerTextColor, '#000000');
   assert.equal(model.normalize({}).style.normal.borderWidth, 0.5);
 });
 
@@ -84,8 +85,16 @@ test('the fold control reads a dictionary or a position alone, as CYLMenuFoldCon
   assert.deepEqual(model.foldControlValue({ position: 'footer', content: 'iconAndTitle' }).position, 'footer');
   assert.equal(model.foldControlValue({ position: 'footer', content: 'iconAndTitle' }).content, 'iconAndTitle');
   assert.equal(model.foldControlValue('footer').content, 'icon');
+  // The tail defaults to the chevron icon only (as the footer), in the string and in the dictionary form; the header shows icon and title.
+  assert.equal(model.foldControlValue('tail').content, 'icon');
+  assert.equal(model.foldControlValue({ position: 'tail' }).content, 'icon');
+  assert.equal(model.foldControlValue({ position: 'headerTrailing' }).content, 'iconAndTitle');
+  assert.equal(model.foldControlValue({ position: 'tail', content: 'iconAndTitle' }).content, 'iconAndTitle');
   assert.equal(model.foldControlValue('headerRight').position, 'headerTrailing');
   assert.equal(model.foldControlValue('headerRight').content, 'iconAndTitle');
+  // The new fourth content: only "titleAndIconAlways" gives 'titleAndIcon'; the old aliases keep 'iconAndTitle'.
+  assert.equal(model.foldControlValue({ position: 'tail', content: 'titleAndIconAlways' }).content, 'titleAndIcon');
+  assert.equal(model.foldControlValue({ position: 'tail', content: 'titleAndIcon' }).content, 'iconAndTitle');
 });
 
 test('a disabled tag uses the disabled appearance; the icon color is iconColor, else the text color', () => {
@@ -110,6 +119,16 @@ test('icons: the selected image while selected, SF Symbols tinted as SVG, emoji 
   const svg = Buffer.from(symbols.symbolURI('star', '#FF9500').split(',')[1], 'base64').toString('ascii');
   assert.match(svg, /stroke="#FF9500"/);
   assert.equal(symbols.base64('ab'), Buffer.from('ab').toString('base64'));
+});
+
+test('the tag list reads "file#options" and "file?options" through the engine\'s source parser (cylAnimatedItemSource)', () => {
+  assert.equal(model.animationKey('Animations/Rive/house.riv?artboard=A&input=active'), 'Rive/house.riv');
+  assert.equal(model.animationKey('Animations/Rive/house.riv#artboard=A'), 'Rive/house.riv');
+  assert.deepEqual(model.animationParameters('Rive/house.riv?stateMachine=State%20Machine&restingProgress=1'),
+    { stateMachine: 'State Machine', restingProgress: '1' });
+  assert.deepEqual(model.animationParameters('Rive/house.riv#a=1?b=2'), { a: '1', b: '2' }, 'the first "#" or "?" starts the options; "&" and "?" separate pairs');
+  assert.equal(model.animationURL('https://example.com/a.json?token=1', {}, {}), 'https://example.com/a.json',
+    'an absolute URL loses its query: the engine reads it as options, as on every platform');
 });
 
 test('animations resolve by file, with no engine check: the app\'s engine component reports what it cannot play', () => {
@@ -170,23 +189,26 @@ test('animatedIcon: the static image under the animation, a glyph stays text, on
   assert.equal(tag.iconSize, 20, 'cyl-animated-item draws a square: the largest that fits the frame');
 });
 
-test('tag layout: capsule for corner radius 0, insets with the border inside, imageInsets shrink the icon from the top left', () => {
+test('tag layout: capsule for a corner radius of half the height or more, insets with the border inside, imageInsets shrink the icon from the top left', () => {
   const style = model.mergeStyle({
     itemHeight: 44, imageSize: '{28, 28}', imageTitleSpacing: 6, imageInsets: [3, 3, 3, 3],
-    normal: { cornerRadius: 0, margin: 12, borderColor: '#D1D1D6', borderWidth: 1 },
-    selected: { cornerRadius: 0, margin: 12, borderWidth: 1 },
+    normal: { cornerRadius: 1000, margin: 12, borderColor: '#D1D1D6', borderWidth: 1 },
+    selected: { cornerRadius: 1000, margin: 12, borderWidth: 1 },
     titlePositionAdjustment: '{4, -2}',
   });
   const item = { title: '首页', enabled: true };
   const tag = model.tagLayout(style, item, 'normal', { kind: 'image' }, 10, 10);
-  assert.match(tag.cellStyle, /border-radius: 22px/);
+  assert.match(tag.cellStyle, /border-radius:1000px/);
   assert.match(tag.cellStyle, /padding: 0 11px 0 11px/);
   assert.match(tag.cellStyle, /height: 44px/);
   assert.match(tag.slotStyle, /width: 28px; height: 28px; margin-right: 6px/);
   assert.equal(tag.iconStyle, 'width: 22px; height: 22px');
   assert.equal(tag.titleStyle, 'left: 4px; top: -2px');
   assert.equal(model.cornerRadius(8, 36), 8);
-  assert.equal(model.cornerRadius(0.001, 36), 0);
+  assert.equal(model.cornerRadius(0, 36), 0, '0 is square');
+  assert.equal(model.cornerRadius(18, 36), 18);
+  assert.equal(model.cornerRadius(-1, 36), 0);
+  assert.equal(model.CORNER_RADIUS_SQUARE, undefined);
   assert.equal(model.cornerRadius(40, 36), 18);
 });
 

@@ -29,7 +29,7 @@ function mainTags() {
   for (const [width, borderColor] of [[1, null], [2, color(1)], [3, color(3)]]) {
     tags.push(model.makeTag(t('边框'), { borderWidth: width, borderColor }));
   }
-  for (const radius of [model.CORNER_RADIUS_SQUARE, 20 / 3, 60 / 3]) {
+  for (const radius of [0, 20 / 3, 60 / 3]) {
     tags.push(model.makeTag(t('圆角'), { cornerRadius: radius }));
   }
   tags.push(model.makeTag(t('可删除'), { isDeletable: true }));
@@ -51,6 +51,7 @@ function mainTags() {
 /** activity_main.xml and item_list_tag.xml: `.tagCloud()`, lineMargin 5, tagMargin 3, textPadding 10 × 3. */
 function cloudStyle() {
   const style = model.tagCloudStyle();
+  style.backgroundStyle = 'liquidGlass';
   style.lineSpacing = 5;
   style.interitemSpacing = 3;
   model.setTagContentInsets(style, { top: 3, left: 10, bottom: 3, right: 10 });
@@ -115,13 +116,14 @@ function hotTags() {
 /** White capsules with a light gray border, 16 pt titles, 18 pt badges, an orange bar before 热门搜索. */
 function hotStyle() {
   const style = model.defaultStyle();
+  style.backgroundStyle = 'liquidGlass';
   for (const state of ['normal', 'selected']) {
     Object.assign(style[state], {
       backgroundColor: '#FFFFFF',
       borderColor: model.white(0.88),
       borderWidth: 1,
       textColor: model.white(0.13),
-      cornerRadius: 0,
+      cornerRadius: model.cylAnimatedItemCornerRadiusCapsule,
       fontSize: 16,
     });
   }

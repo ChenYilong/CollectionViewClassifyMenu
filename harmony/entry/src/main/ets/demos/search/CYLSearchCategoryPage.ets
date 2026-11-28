@@ -6,7 +6,7 @@ import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
  */
 import {
   CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLIndexPath, CYLMenuSelectionMode, CYLMenuStyle,
-  CYLTagListState, CYLTagListView
+  CYLSectionStyle, CYLTagBackgroundStyle, CYLTagListState, CYLTagListView
 } from '@cyl/classifymenu';
 import { CYL_DEMO_BAR_HEIGHT, CYLDemoNav } from '../DemoNav';
 import { CYLExampleMenuSection, CYLExampleMenuSource } from '../shell/CYLExampleMenuSource';
@@ -66,6 +66,8 @@ const PLACEHOLDERS: string[] = ['搜人名,职位,公司...', '搜动态', '搜�
 
 export function maimaiStyle(): CYLMenuStyle {
   const style = new CYLMenuStyle();
+  style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
+  style.sectionStyle = CYLSectionStyle.plain;
   style.setTitleTextAttributes(CYLFont.systemFont(14), CYLColor.white(0.35), CYLControlState.NORMAL);
   style.normalAppearance.borderColor = CYLColor.white(0.8);
   style.normalAppearance.borderWidth = 1;

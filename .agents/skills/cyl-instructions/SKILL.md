@@ -10,7 +10,7 @@ description: Keep this project's instruction files (AGENTS.md, CLAUDE.md, docs/i
 - Every rule in an instruction file sits under a visible tag heading: `## [<tag>] <title>`. A heading is never hidden
   or folded away.
 - Tags in use: `behavioral`, `instructions`, `workflow`, `sessions`, `windows`, `macos`, `testing`, `harmonyos`, `code`,
-  `dependencies`, `examples`, `i18n`, `accessibility`, `docs`, `git`. Add a new tag only when no existing one fits,
+  `dependencies`, `examples`, `i18n`, `accessibility`, `docs`, `git`, `memory`. Add a new tag only when no existing one fits,
   and add it to the tag table in AGENTS.md.
 - Every instruction file stays at 200 lines or fewer. When a tag's text would push a file over, move the overflow into
   `docs/instructions/<tag>.md` (one file per tag) and link it from the tag heading with a relative path, so the details

@@ -259,6 +259,19 @@ final class CYLExampleAppDelegate: UIResponder, UIApplicationDelegate {
                 demo.setLoops(true)
                 DispatchQueue.main.async {
                     demo.scroll(toSectionIdentifier: "rive")
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    demo.playAllAnimations()
+                }
+            } else if screen == "animations-rive-once" {
+                // The Rive section with looping off: Play all three seconds after launch (a recording is running by then),
+                // to watch every Rive tag, menu.riv above all, play its one pass and rest.
+                demo.loadViewIfNeeded()
+                demo.setLoops(false)
+                DispatchQueue.main.async {
+                    demo.scroll(toSectionIdentifier: "rive")
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                     demo.playAllAnimations()
                 }
             } else if screen == "animations-svga" {

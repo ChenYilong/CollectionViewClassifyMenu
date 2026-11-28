@@ -35,7 +35,9 @@ class CYLTagCreateCell @JvmOverloads constructor(context: Context, attrs: Attrib
         fun styleWithStyle(style: CYLMenuStyle): CYLMenuStyle {
             val outlined = style.copy()
             val normal = outlined.normalAppearance
-            normal.backgroundColor = style.backgroundColor
+            // The list's background when the app set one; otherwise the tag default (never the built-in white as an explicit color).
+            val listBackground = style.explicitBackgroundColor
+            if (listBackground != null) normal.backgroundColor = listBackground else normal.resetBackgroundColor()
             normal.borderColor = Color.argb(73, 60, 60, 67)
             normal.borderWidth = max(1f / max(1f, Resources.getSystem().displayMetrics.density), 1f)
             normal.textColor = Color.argb(153, 60, 60, 67)

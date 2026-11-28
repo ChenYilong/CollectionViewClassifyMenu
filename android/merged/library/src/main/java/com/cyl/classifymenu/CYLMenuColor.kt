@@ -20,6 +20,39 @@ fun CYLMenuColorFromString(string: String?): Int? {
     return CYLUIColorNames[name]
 }
 
+/**
+ * The relative luminance (WCAG 2.x, 0 black ... 1 white) of an opaque ARGB color; null when the color is not opaque
+ * (transparent or translucent: what is behind it is not known).
+ */
+fun CYLMenuColorLuminance(color: Int): Float? {
+    if (Color.alpha(color) != CYLTintChannelMax) return null
+    return CYLMenuRelativeLuminance(
+        Color.red(color) / CYLTintChannelMax.toDouble(), Color.green(color) / CYLTintChannelMax.toDouble(), Color.blue(color) / CYLTintChannelMax.toDouble(),
+    ).toFloat()
+}
+
+/** The WCAG relative luminance of an opaque sRGB color given as components in 0...1 (iOS: `CYLTintContrast.relativeLuminance(red:green:blue:)`). */
+internal fun CYLMenuRelativeLuminance(red: Double, green: Double, blue: Double): Double {
+    fun linear(c: Double): Double =
+        if (c <= CYLTintLinearCutoff) c / CYLTintLinearSlope else Math.pow((c + CYLTintOffset) / CYLTintScale, CYLTintGamma)
+    return CYLTintLumaRed * linear(red) + CYLTintLumaGreen * linear(green) + CYLTintLumaBlue * linear(blue)
+}
+
+/**
+ * The relative luminance above which a background counts as light, so that the default tint on it is black: 0.179 is where
+ * black and white have the same contrast ratio against it.
+ */
+const val CYLTintLuminanceThreshold: Float = 0.179f
+private const val CYLTintChannelMax = 255
+private const val CYLTintLinearCutoff = 0.03928
+private const val CYLTintLinearSlope = 12.92
+private const val CYLTintOffset = 0.055
+private const val CYLTintScale = 1.055
+private const val CYLTintGamma = 2.4
+private const val CYLTintLumaRed = 0.2126
+private const val CYLTintLumaGreen = 0.7152
+private const val CYLTintLumaBlue = 0.0722
+
 /** The UIColor class properties a configuration may name, in their light appearance. */
 internal val CYLUIColorNames: Map<String, Int> = mapOf(
     "black" to Color.BLACK, "white" to Color.WHITE, "clear" to Color.TRANSPARENT, "darkGray" to CYLColor.white(1f / 3),
@@ -37,3 +70,47 @@ internal val CYLUIColorNames: Map<String, Int> = mapOf(
     "secondarySystemBackground" to Color.rgb(242, 242, 247), "tertiarySystemBackground" to Color.WHITE,
     "separator" to Color.argb(73, 60, 60, 67), "link" to Color.rgb(0, 122, 255), "tint" to Color.rgb(0, 122, 255),
 )
+
+/**
+ * The list's own tint and the tag defaults in dark mode, as iOS does with dynamic colors (`UIColor.label`,
+ * `secondarySystemBackground`): resolved from the context when the host left a color unset.
+ */
+internal object CYLSystemColors {
+    /** Whether the context is in night mode (the system's dark theme or the app's). */
+    fun isNight(context: android.content.Context): Boolean =
+        (context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+            android.content.res.Configuration.UI_MODE_NIGHT_YES
+
+    /** The relative luminance (0...1) at or above which a color counts as light; the midpoint between black and white text. */
+    private const val LIGHT_COLOR_LUMINANCE = 0.5
+
+    /**
+     * The one tint of the list's texts and icons: the theme's `textColorPrimary` (what `UIColor.label` is on iOS), else white in
+     * night mode and black otherwise. The theme's color counts only where it agrees with the mode: a host theme that is not a
+     * DayNight theme keeps a DARK `textColorPrimary` in night mode (and a light one in day mode), which would put dark text on dark
+     * glass; there the label color of the mode (white in night mode, black otherwise) is used.
+     */
+    fun primary(context: android.content.Context): Int {
+        val night = isNight(context)
+        val fallback = if (night) Color.WHITE else Color.BLACK
+        val attributes = context.obtainStyledAttributes(intArrayOf(android.R.attr.textColorPrimary))
+        return try {
+            val theme = attributes.getColorStateList(0)?.defaultColor ?: return fallback
+            val luminance = CYLMenuRelativeLuminance(
+                Color.red(theme) / CYLTintChannelMax.toDouble(), Color.green(theme) / CYLTintChannelMax.toDouble(),
+                Color.blue(theme) / CYLTintChannelMax.toDouble(),
+            )
+            if (night == (luminance >= LIGHT_COLOR_LUMINANCE)) theme else fallback
+        } catch (error: Throwable) {
+            fallback
+        } finally {
+            attributes.recycle()
+        }
+    }
+
+    /** The system background (iOS `systemBackground`): white in light mode, black in dark mode; the default list background. */
+    fun systemBackground(context: android.content.Context): Int = if (isNight(context)) Color.BLACK else Color.WHITE
+
+    /** The secondary system background of dark mode (iOS #1C1C1E), the default tag background there. */
+    const val SECONDARY_BACKGROUND_DARK: Int = -0xe3e3e2 // 0xFF1C1C1E
+}

@@ -21,6 +21,12 @@ export interface CYLMenuDataSource {
   menuTitleForSection(section: number): string;
   menuTitleForItem(indexPath: CYLIndexPath): string;
 
+  /**
+   * The item's subtitle, shown in a callout with an arrow on a long press when the list's `longPressAction` includes
+   * `CYLTagLongPressActions.callout` (a longer description of a short title). undefined or empty: none.
+   */
+  menuSubtitleForItem?: (indexPath: CYLIndexPath) => string | undefined;
+
   /** An image shown before the title (a resource or a path). */
   menuImageForItem?: (indexPath: CYLIndexPath) => CYLImage | undefined;
   /** The image of a selected item. */
@@ -36,8 +42,8 @@ export interface CYLMenuDataSource {
   /** The icon of a section header. */
   menuImageForSection?: (section: number) => CYLImage | undefined;
   /**
-   * A view at the trailing end of a section header, left of a trailing fold control, at most half the header's
-   * width (a builder that takes the section; ArkTS passes builders as WrappedBuilder).
+   * A view at the trailing end of a section header, left of a trailing fold control, at most
+   * `CYLHeaderAccessoryMaxFraction` (30%) of the header's inner width (a builder that takes the section; ArkTS passes builders as WrappedBuilder).
    */
   menuAccessoryViewForSection?: (section: number) => WrappedBuilder<[number]> | undefined;
   menuItemIsEnabled?: (indexPath: CYLIndexPath) => boolean;

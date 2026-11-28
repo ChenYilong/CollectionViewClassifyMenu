@@ -21,6 +21,7 @@
  */
 const model = require('../cyl-tag-list/model.js');
 const animations = require('../cyl-tag-list/animations.js');
+const theme = require('../cyl-tag-list/theme.js');
 
 function pixelRatio() {
   try {
@@ -60,6 +61,10 @@ Component({
   lifetimes: {
     attached() {
       this.render();
+      this.stopThemeChanges = theme.onChange(() => this.render());
+    },
+    detached() {
+      if (this.stopThemeChanges) this.stopThemeChanges();
     },
   },
 
@@ -67,7 +72,7 @@ Component({
     render() {
       const url = animations.url(this.data.animationURL, this.data.animationOptions, this.data.animationRestingProgress);
       const props = { ...this.data, ...animations.gifOptions(this.data.animationURL, this.data) };
-      this.setData({ view: model.tagButtonView(props, url, pixelRatio()) });
+      this.setData({ view: model.tagButtonView(props, url, pixelRatio(), theme.isDark()) });
     },
 
     /** Plays the animated icon from progress 0 (`CYLTagButton.playAnimation()`). */

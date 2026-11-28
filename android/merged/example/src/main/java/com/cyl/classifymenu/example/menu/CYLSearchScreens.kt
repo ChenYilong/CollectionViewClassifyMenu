@@ -29,7 +29,9 @@ import com.cyl.classifymenu.CYLIndexPath
 import com.cyl.classifymenu.CYLMenuDelegate
 import com.cyl.classifymenu.CYLMenuSelectionMode
 import com.cyl.classifymenu.CYLMenuStyle
+import com.cyl.classifymenu.CYLTagBackgroundStyle
 import com.cyl.classifymenu.CYLTagListView
+import com.cyl.classifymenu.example.plainSections
 import com.cyl.classifymenu.example.R
 import com.cyl.tabbar.CYLConstants
 import com.cyl.tabbar.CYLTabBarController
@@ -202,12 +204,13 @@ class CYLSearchCategoryScreen(private val context: Context) : CYLMenuScreen, CYL
          * `maimaiStyle()`: Maimai's hot tags (grey outlined boxes, grey section titles).
          */
         fun maimaiStyle(): CYLMenuStyle {
-            val style = CYLMenuStyle()
+            val style = CYLMenuStyle().plainSections()
             style.setTitleTextAttributes(CYLFont.systemFont(14f), Color.rgb(89, 89, 89), CYLControlState.NORMAL)
             style.normalAppearance.borderColor = Color.rgb(204, 204, 204)
             style.normalAppearance.borderWidth = 1f
             style.normalAppearance.cornerRadius = 2f
             style.normalAppearance.margin = 14f
+            style.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
             style.itemHeight = 32f
             style.interitemSpacing = 14f
             style.lineSpacing = 14f

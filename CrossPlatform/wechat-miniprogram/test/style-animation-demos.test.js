@@ -40,7 +40,7 @@ test('styles: the initial values are those of demoStyle()', () => {
   assert.equal(value('selectedImage'), 'YES');
   assert.equal(value('font'), '.SFUI-Regular 14');
   assert.equal(value('borderWidth'), '0.3');
-  assert.equal(value('cornerRadius'), '3');
+  assert.equal(value('cornerRadius'), '1000'); // the capsule constant, cylAnimatedItemCornerRadiusCapsule
   assert.equal(value('margin'), '10');
   assert.equal(value('animationSpeed'), '1.0');
   assert.equal(value('content.iconAndTitle'), '✓');
@@ -73,6 +73,7 @@ test('styles: every action cycles through the iOS values', () => {
   assert.deepEqual(run('selectedImage', 2), ['NO', 'YES']);
   const effective = () => styles.effectiveStyle(state);
   styles.performAction(state, 'iconColor.normal');
+  assert.equal(effective().sectionStyle, 'plain', 'the style demo previews flat glass tags: it opts out of the default card');
   assert.equal(effective().normal.iconColor, '#FF9500');
   styles.performAction(state, 'iconColor.selected');
   assert.equal(effective().selected.iconColor, '#FFCC00');
@@ -153,6 +154,8 @@ test('animations: ten sections in the iOS order, single choice, the first tag of
   assert.equal(m.allowsEmptySelection, false);
   assert.deepEqual(m.selectedItems, ['0-0', '1-0', '2-0', '3-0', '4-0', '5-0', '6-0', '7-0', '8-0', '9-0']);
   assert.equal(m.style.imageSize, 28);
+  // The animations screen shows the default look: the rounded section card (the configuration sets no sectionStyle).
+  assert.equal(m.style.sectionStyle, 'insetGrouped');
   assert.equal(m.sections[5].style.normal.backgroundColor, '#17203A');
   assert.equal(m.sections[7].style.normal.backgroundColor, '#17203A');
   assert.equal(m.sections[3].items[5].animationRestingProgress, 1);
@@ -196,7 +199,8 @@ test('configuration: the file is read as the core reads it, and the map configur
   const file = configurationDemo.readConfiguration(read);
   assert.equal(file.error, '');
   const m = model.normalize(file.configuration);
-  assert.equal(m.foldControl.position, 'footer');
+  assert.equal(m.foldControl.position, 'tail');
+  assert.equal(m.foldControl.content, 'icon');
   assert.equal(m.defaultVisibleRows, 2);
   assert.equal(m.style.selected.font.weight, 'semibold');
   assert.equal(m.style.headerTextColor, '#8E8E93');
@@ -221,6 +225,9 @@ test('configuration: the file is read as the core reads it, and the map configur
   assert.equal(map.style.normal.iconColor, '#5856D6');
   assert.equal(map.style.selected.textColor, '#FFFFFF');
   assert.equal(map.style.normal.cornerRadius, 8);
+  // The configuration screen shows the default look: the rounded section card (neither list sets sectionStyle).
+  assert.equal(map.style.sectionStyle, 'insetGrouped');
+  assert.equal(m.style.sectionStyle, 'insetGrouped');
 });
 
 test('configuration: the copied file is the iOS bundle file, byte for byte', () => {

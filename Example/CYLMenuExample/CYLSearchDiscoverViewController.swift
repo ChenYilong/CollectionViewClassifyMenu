@@ -12,6 +12,7 @@
 
 import UIKit
 import CollectionViewClassifyMenu
+import CYLAnimatedItem
 import CYLSearchViewController
 
 /**
@@ -148,7 +149,7 @@ final class CYLSearchDiscoverViewController: UIViewController {
             appearance.backgroundColor = .systemBackground
             appearance.borderColor = .separator
             appearance.borderWidth = 1
-            appearance.cornerRadius = 0
+            appearance.cornerRadius = cylAnimatedItemCornerRadiusCapsule
             appearance.margin = 14
             appearance.font = .systemFont(ofSize: 17)
             appearance.textColor = .label
@@ -158,6 +159,8 @@ final class CYLSearchDiscoverViewController: UIViewController {
         style.lineSpacing = 12
         style.sectionInsets = UIEdgeInsets(top: 4, left: 16, bottom: 24, right: 16)
         applyHeaderLook(to: style)
+        // The page draws its own background: the flat list, not the default section card.
+        style.sectionStyle = .plain
         return style
     }
 
@@ -179,6 +182,7 @@ final class CYLSearchDiscoverViewController: UIViewController {
     }
 
     private static func applyHeaderLook(to style: CYLMenuStyle) {
+        style.backgroundStyle = .liquidGlass
         style.backgroundColor = .systemBackground
         style.headerHeight = 44
         style.headerFont = .systemFont(ofSize: 20, weight: .bold)

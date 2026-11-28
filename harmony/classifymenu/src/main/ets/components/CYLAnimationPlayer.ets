@@ -3,13 +3,18 @@
  * (`CYLAnimationEngine`, `cylAnimationEngine`) and the handle a tag drives (`CYLAnimationPlayer`: play from the start,
  * stop at a progress, speed, loop). The library depends on no animation library: the icon is CYLTabBarController's
  * `CYLAnimatedItemView` (`CYLTagAnimatedIcon`), and the app supplies the views and players that play each type (the
- * example's `CYLLottiePlayer`, `CYLPAGPlayer`, `CYLRivePlayer`, `CYLGIFPlayer` and `CYLSVGAPlayer`), registered with
- * `CYLAnimatedItemEngines.register(type)` and `CYLTagAnimationBuilder.register(builder)`.
+ * example's `CYLLottiePlayer`, `CYLPAGPlayer`, `CYLGIFPlayer` and `CYLSVGAPlayer`), registered with
+ * `CYLAnimatedItemEngines.register(type)` and `CYLTagAnimationBuilder.register(builder)`. A type whose engine ships a
+ * builder for `CYLAnimatedItemView` itself (Rive: CYLTabBarController's `CYLRiveAnimationBuilder`) is registered with
+ * `CYLTagAnimationBuilder.registerItemBuilder(engine, builder)` instead; the tag passes its speed, loop switch and
+ * replay straight to `CYLAnimatedItemView`'s `animationSpeed` / `animationLoops` / `animationRestartToken`.
  *
  * The value is `asset:<rawfile path>` (or Lottie JSON text); options (`cylAddingAnimationOptions`) follow `#` as
  * "name=value&...". A player that cannot do something reports it with `supportsSpeed` / `supportsLoops` /
  * `supportsProgress` and treats the call as a no-op.
  */
+
+import { CYLAnimatedItemPlayer } from 'cylanimateditem';
 
 /**
  * The type of an animation file, by its extension. `cylAnimatedItemTypeOf` (CYLAnimatedItemEngines) names the same
@@ -187,5 +192,65 @@ export class CYLAnimationPlayer {
   }
 
   protected applyLoops(): void {
+  }
+}
+
+/**
+ * The `CYLAnimationPlayer` of an icon played by CYLTabBarController's engine views (`CYLAnimatedItemView`'s default engine
+ * view: GIF and SVGA in `cylanimateditem`, Lottie, PAG and Rive in `cylanimateditem_lottie` / `_pag` / `_rive`): it hands
+ * every call to the component's `CYLAnimatedItemPlayer` (`itemPlayer`), so `CYLTagButton.animationView` keeps its type.
+ * The engine view owns the player's lifetime: `destroy()` does nothing here.
+ */
+export class CYLAnimatedItemPlayerAdapter extends CYLAnimationPlayer {
+  /**
+   * The component's player (`CYLAnimatedItemLottiePlayer` exposes `lottieItem`, `CYLAnimatedItemPAGPlayer` `pagController`,
+   * `CYLAnimatedItemGIFPlayer` `gifFrames`, ...).
+   */
+  readonly itemPlayer: CYLAnimatedItemPlayer;
+
+  constructor(player: CYLAnimatedItemPlayer) {
+    super(cylAnimationEngine(player.source.path), CYLAnimationSource.parse(player.source.url));
+    this.itemPlayer = player;
+    this.speedValue = player.speed;
+    this.loopsValue = player.loops;
+  }
+
+  get supportsSpeed(): boolean {
+    return this.itemPlayer.supportsSpeed;
+  }
+
+  get supportsLoops(): boolean {
+    return this.itemPlayer.supportsLoops;
+  }
+
+  get supportsProgress(): boolean {
+    return this.itemPlayer.supportsProgress;
+  }
+
+  get isPlaying(): boolean {
+    return this.itemPlayer.isPlaying;
+  }
+
+  get progress(): number | undefined {
+    return this.itemPlayer.progress;
+  }
+
+  play(): void {
+    this.itemPlayer.play();
+  }
+
+  stopAtProgress(progress: number): void {
+    this.itemPlayer.stopAtProgress(progress);
+  }
+
+  destroy(): void {
+  }
+
+  protected applySpeed(): void {
+    this.itemPlayer.speed = this.speedValue;
+  }
+
+  protected applyLoops(): void {
+    this.itemPlayer.loops = this.loopsValue;
   }
 }

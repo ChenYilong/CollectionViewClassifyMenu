@@ -7,6 +7,9 @@
  */
 const { t } = require('../../utils/i18n.js');
 
+/** The Maimai tag lists sit on the page itself (the page draws their headers), not in a card: the list's `plain` section style. */
+const PLAIN_SECTION_STYLE = 'plain';
+
 /** CYLSearchCategory: people = 0, feeds, gossip, jobs. */
 const CATEGORIES = ['people', 'feeds', 'gossip', 'jobs'];
 
@@ -110,6 +113,8 @@ function industryButton(industry) {
 function maimaiStyle() {
   const look = { cornerRadius: 2, borderColor: '#CCCCCC', borderWidth: 1, textColor: '#595959', backgroundColor: '#F2F2F7' };
   return {
+    sectionStyle: PLAIN_SECTION_STYLE,
+    backgroundStyle: 'liquidGlass',
     font: 14,
     itemHeight: 32,
     interitemSpacing: 14,

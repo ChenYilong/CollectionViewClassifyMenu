@@ -23,8 +23,10 @@ import com.cyl.classifymenu.CYLMenuFoldControlPosition
 import com.cyl.classifymenu.CYLMenuFoldStyle
 import com.cyl.classifymenu.CYLMenuSelectionMode
 import com.cyl.classifymenu.CYLMenuStyle
+import com.cyl.classifymenu.CYLTagBackgroundStyle
 import com.cyl.classifymenu.CYLSize
 import com.cyl.classifymenu.CYLTagListView
+import com.cyl.classifymenu.example.plainSections
 import com.cyl.classifymenu.example.tageditor.CYLSymbolDrawable
 
 private val CYLSecondaryText = Color.argb(153, 60, 60, 67)
@@ -34,7 +36,7 @@ private val CYLSecondaryText = Color.argb(153, 60, 60, 67)
  */
 fun reviewFilterStyle(): CYLMenuStyle {
     val orange = Color.rgb(255, 79, 0)
-    val style = CYLMenuStyle()
+    val style = CYLMenuStyle().plainSections()
     val font = CYLFont.systemFont(12f)
     style.setTitleTextAttributes(font, Color.rgb(77, 77, 77), CYLControlState.NORMAL)
     style.setTitleTextAttributes(font, Color.WHITE, CYLControlState.SELECTED)
@@ -50,6 +52,7 @@ fun reviewFilterStyle(): CYLMenuStyle {
     }
     style.selectedAppearance.backgroundColor = orange
     style.selectedAppearance.borderColor = orange
+    style.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
     style.itemHeight = 28f
     style.interitemSpacing = 8f
     style.lineSpacing = 10f

@@ -65,6 +65,7 @@ class CYLTagEditingDragTest {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
         val source = CYLDragSource(titles.toMutableList())
         val list = CYLTagListView(activity)
+        list.usePlainSections()
         list.menuDataSource = source
         list.menuDelegate = source
         list.isScrollEnabled = false

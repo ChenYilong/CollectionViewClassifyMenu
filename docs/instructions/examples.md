@@ -17,6 +17,39 @@ means the section of that name here.
   `docs/Tab-Icon-Animation-Quick-Start.md` ("Playback controls in the animation examples").
 
 
+## Sectioned lists in demos use the tag list
+
+- **Rule (owner's request, 2026-11-25).** When an example (demo) screen needs a list with section groups, such as a
+  table view with sections, a list with section headers or an inset-grouped list, build it with
+  CollectionViewClassifyMenu's tag list (`CYLTagListView`, `CYLTagListState` on HarmonyOS) instead of the platform's own
+  grouped list. Use the tag list's section style:
+  - One tag list; one section per group; the section title is the section header.
+  - A tag shows only the **main title and the icon**. The secondary line (detail, subtitle) is not drawn in the tag.
+  - **Colourful page, library plate.** The page behind the list is colourful (a gradient or an image, set in one shared place per example). The library draws the plate itself, one Liquid Glass card per section (sectionStyle insetGrouped, the default, with sectionBackgroundStyle = liquidGlass); the example draws no plate.
+  - **Headers and icon colours.** Long headers use headerMaxLines 2 (a named constant); icon colours are static colours passed through the item style (menuStyleForItem + setIconColor), template images, never .alwaysOriginal.
+  - **The tail fold control is itself a Liquid Glass tag**, icon only (the same tag background style as the other tags).
+  - **Fold with the tail control, icon only.** Sections that have more rows than `defaultVisibleRows` fold with the core's **tail**
+    fold control: the last tag of the section is the expand / collapse button and shows only the chevron icon, no More / Less text
+    (`foldControl` position `tail`, content `icon`; JSON `"foldControl": {"position": "tail", "content": "icon"}`). Never use the
+    header trailing More / Less control in an example.
+  - Other positions and contents (`footer`, `headerTrailing`, `title`, `iconAndTitle`) stay available in the core; only the fold-styles demo screen
+    (`CYLFoldStylesViewController`) shows them, because that screen exists to demo every variant. (Replaces the earlier rule "More / Less, header trailing", 2026-11-25.)
+  - A tap on a tag does exactly what a tap on the replaced cell did (open the screen, select the row). The tag does not
+    stay selected unless the cell did.
+  - A **long press** on a tag shows the secondary line in a small floating callout with an arrow, through the tag list's
+    long-press action API: data source `menuSubtitleForItem` (item key `subtitle`, `CYLTag.subtitle`) and
+    `longPressAction` `"callout"` / `CYLTagLongPressActions.callout` (contract:
+    [docs/tag-long-press-action.md](../tag-long-press-action.md)). Do not draw a popup in the example.
+  - A title that does not fit one line wraps through the style's `titleMaxLines` (default 1; any number; every line
+    shown with the named constant `CYLTagTitleMaxLinesUnlimited`, never a literal such as 0 or 999). The tag list leaves
+    the number to the app; an example picks its own (the placeholder example uses 3).
+  - If the tag list lacks an API the example needs, add it to CollectionViewClassifyMenu first (core first, every
+    platform, documented), then use it from the example.
+- **After such a change, re-test the contact-list long-press reordering.** Reordering is the tag list's built-in
+  `reorder` long-press action; it must behave exactly as before (host tests, ui-test and a look on the emulator).
+- Where the example lives in another repository, that repository vendors the library at a pinned commit (see
+  [dependencies.md](dependencies.md)); update the pin instead of copying the code by hand.
+
 ## Search bars
 
 - A search bar never covers any view, at any time: not the view controller's view, not a sibling, not a background

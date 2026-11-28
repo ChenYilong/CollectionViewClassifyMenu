@@ -39,6 +39,7 @@ class CYLTagListTailFoldTest {
     private fun makeList(count: Int): CYLTagListView {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
         val list = CYLTagListView(activity)
+        list.usePlainSections()
         list.menuDataSource = CYLTailFoldSource(count)
         list.showsSectionHeaders = false
         list.defaultVisibleRows = 2
@@ -64,6 +65,18 @@ class CYLTagListTailFoldTest {
         val fold = folds[0]
         val last = list.tagButtonAtIndexPath(CYLIndexPath(tags - 1, 0))!!.parent as View
         assertTrue("the fold cell follows the last tag", fold.top > last.top || (fold.top == last.top && fold.left > last.left))
+    }
+
+    @Test
+    fun noSectionCanFoldBeforeTheListKnowsItsWidth() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val list = CYLTagListView(activity)
+        list.menuDataSource = CYLTailFoldSource(TAGS_IN_TWO_ROWS)
+        list.defaultVisibleRows = 2
+        list.foldControl = CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.HEADER_TRAILING, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon)
+        list.reloadMenuData()
+        // Not attached, no width: every tag would be a row of its own (6 rows), which is no layout.
+        assertFalse(list.canFoldSection(0))
     }
 
     @Test

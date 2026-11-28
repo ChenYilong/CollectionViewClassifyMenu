@@ -37,8 +37,24 @@
       "srcPath": "./cylanimateditem"
     },
     {
+      "name": "cylanimateditem_lottie",
+      "srcPath": "./cylanimateditem_lottie"
+    },
+    {
+      "name": "cylanimateditem_pag",
+      "srcPath": "./cylanimateditem_pag"
+    },
+    {
+      "name": "cylanimateditem_rive",
+      "srcPath": "./cylanimateditem_rive"
+    },
+    {
       "name": "cylanimateditemrive",
       "srcPath": "./cylanimateditemrive"
+    },
+    {
+      "name": "cyldeallocblockexecutor",
+      "srcPath": "./cyldeallocblockexecutor"
     },
     {
       "name": "entry",

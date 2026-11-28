@@ -54,7 +54,7 @@ class TagCollectionDemoFragment : Fragment(), CYLMenuDataSource, CYLMenuDelegate
     override fun numberOfSectionsInMenu() = sections.size
     override fun menuNumberOfItemsInSection(section: Int) = sections[section].size
     override fun menuTitleForSection(section: Int) = sectionTitles[section]
-    override fun menuTitleForItemAtIndexPath(indexPath: CYLIndexPath) = sections[indexPath.section][indexPath.item] + " 扩展文字😀✨"  // NOLOCALIZE: sample data of the iOS TagCollectionView demo (Chinese there too)
+    override fun menuTitleForItemAtIndexPath(indexPath: CYLIndexPath) = sections[indexPath.section][indexPath.item] + (if (indexPath.item % 3 == 0) "😀✨" else "")  // NOLOCALIZE: sample data (Chinese like the iOS TagCollectionView demo); only every third tag has the emoji suffix, so the widths differ and several tags fit one row
 
     override fun menuDidSelectItemAtIndexPath(menu: Any, indexPath: CYLIndexPath) {
         val text = menuTitleForItemAtIndexPath(indexPath)

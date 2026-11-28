@@ -8,7 +8,7 @@ import { deviceInfo } from '@kit.BasicServicesKit';
 import { image } from '@kit.ImageKit';
 import {
   CYLColor, CYLEdgeInsets, CYLIndexPath, CYLMenuStyle, CYLSize, CYLTag, CYLTagAppearance, CYLTagColorTheme,
-  CYLTagColors, CYLTagDeleteIndicatorPlacement, CYLTagListState, CYLTagListView, CYLTagRowAlignment
+  CYLTagBackgroundStyle, CYLTagColors, CYLTagDeleteIndicatorPlacement, CYLTagListState, CYLTagListView, CYLTagRowAlignment
 } from '@cyl/classifymenu';
 import { CYLDemoBar } from '../DemoNav';
 import { CYLSampleButton, SYSTEM_GRAY, SYSTEM_TEAL, cylFormat, cylToast } from './SampleSupport';
@@ -77,6 +77,7 @@ export class CYLTagContainerSampleData {
 function makeContainer(configure: (list: CYLTagListState, style: CYLMenuStyle) => void): CYLTagListState {
   const list = new CYLTagListState();
   const style = CYLMenuStyle.tagContainer();
+  style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
   style.sectionInsets = new CYLEdgeInsets(10, 10, 10, 10);
   style.backgroundColor = CYLColor.rgb(1, 0, 0, 0x11 / 255);
   list.containerBorderWidth = 0.5;

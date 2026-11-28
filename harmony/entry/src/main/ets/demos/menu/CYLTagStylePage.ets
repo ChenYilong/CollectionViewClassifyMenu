@@ -6,7 +6,7 @@ import { CYLExampleLocalizedString } from '../../data/CYLExampleLocalization';
  */
 import {
   CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLIndexPath, CYLMenuSelectionMode, CYLMenuStyle, CYLOffset,
-  CYLSize, CYLTagAppearance, CYLTagListController, CYLTagListState, CYLTagListView
+  CYLSize, CYLTagAppearance, CYLSectionStyle, CYLTagBackgroundStyle, CYLTagListController, CYLTagListState, CYLTagListView
 } from '@cyl/classifymenu';
 import { CYLDemoBar, CYLDemoNav } from '../DemoNav';
 import {
@@ -25,7 +25,7 @@ const ACTIONS: string[][] = [
     'content.iconAndTitle', 'content.iconOnly', 'content.titleOnly', 'layoutCentered', 'selectedImage'],
   ['backgroundColor.normal', 'backgroundColor.selected', 'borderColor', 'borderWidth', 'cornerRadius', 'margin'],
   ['animation.lottie', 'animation.pag', 'animation.rive', 'animation.svga', 'animation.gif', 'animation.off', 'animationSpeed',
-    'configuration', 'tagCloud'],
+    'configuration', 'glass', 'tagCloud'],
   ['sample.tagCloud', 'sample.imageTag', 'sample.tagContainer'],
   ['sample.wordPicker'],
   ['reset']
@@ -55,7 +55,7 @@ const ACTION_TITLES: Map<string, string> = new Map<string, string>([
   ['backgroundColor.selected', CYLExampleLocalizedString('设置背景色 backgroundColor（selected）')],
   ['borderColor', CYLExampleLocalizedString('设置边框颜色 borderColor')],
   ['borderWidth', CYLExampleLocalizedString('设置边框宽度 borderWidth')],
-  ['cornerRadius', CYLExampleLocalizedString('设置圆角 cornerRadius（0 为胶囊）')],
+  ['cornerRadius', CYLExampleLocalizedString('设置圆角 cornerRadius（0 为直角，1000 为胶囊）')],
   ['margin', CYLExampleLocalizedString('设置内边距 margin')],
   ['animation.lottie', CYLExampleLocalizedString('Lottie 动效图标')],
   ['animation.pag', CYLExampleLocalizedString('PAG 动效图标')],
@@ -65,6 +65,7 @@ const ACTION_TITLES: Map<string, string> = new Map<string, string>([
   ['animation.off', CYLExampleLocalizedString('关闭动效（静态图标）')],
   ['animationSpeed', CYLExampleLocalizedString('设置动效速度 animationSpeed')],
   ['configuration', CYLExampleLocalizedString('配置文件 / 字典（map）初始化')],
+  ['glass', CYLExampleLocalizedString('液态玻璃：标签、分区板与折叠控件')],
   ['tagCloud', CYLExampleLocalizedString('标签云：android-tagview 的初始化方式')],
   ['sample.tagCloud', CYLExampleLocalizedString('android-tagview 示例（Swift 版）')],
   ['sample.imageTag', CYLExampleLocalizedString('TagViewGroup 示例：图片标签')],
@@ -76,6 +77,7 @@ const ACTION_TITLES: Map<string, string> = new Map<string, string>([
 /** The rows that open another screen, by route (the iOS class name). */
 const ROUTES: Map<string, string> = new Map<string, string>([
   ['configuration', 'CYLTagConfigurationDemoViewController'],
+  ['glass', 'CYLTagGlassDemoViewController'],
   ['tagCloud', 'CYLTagCloudDemoViewController'],
   ['sample.tagCloud', 'CYLTagCloudSampleViewController'],
   ['sample.imageTag', 'CYLImageTagSampleViewController'],
@@ -144,6 +146,7 @@ const ANIMATION_FILES: Map<string, string[]> = new Map<string, string[]>([
 
 export function demoStyle(): CYLMenuStyle {
   const style = new CYLMenuStyle();
+  style.backgroundStyle = CYLTagBackgroundStyle.liquidGlass;
   style.setIconColor(CYLSystemColor.blue, CYLControlState.NORMAL);
   style.setIconColor('#FFFFFF', CYLControlState.SELECTED);
   style.selectedAppearance.backgroundColor = CYLSystemColor.blue;
@@ -152,6 +155,7 @@ export function demoStyle(): CYLMenuStyle {
   style.imageTitleSpacing = 4;
   style.itemHeight = 34;
   style.sectionInsets = new CYLEdgeInsets(12, 16, 12, 16);
+  style.sectionStyle = CYLSectionStyle.plain;
   return style;
 }
 

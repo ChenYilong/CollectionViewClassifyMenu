@@ -1,0 +1,11 @@
+{
+  "color": [
+    { "name": "cyl_tag_background", "value": "#1C1C1E" },
+    { "name": "cyl_tag_text", "value": "#FFFFFF" },
+    { "name": "cyl_list_background", "value": "#000000" },
+    { "name": "cyl_section_card", "value": "#1C1C1E" },
+    { "name": "cyl_section_header_band", "value": "#2C2C2E" },
+    { "name": "cyl_section_grouped_background", "value": "#000000" },
+    { "name": "cyl_section_separator", "value": "#99545458" }
+  ]
+}

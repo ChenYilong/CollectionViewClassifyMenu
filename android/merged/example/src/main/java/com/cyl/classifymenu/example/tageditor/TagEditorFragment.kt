@@ -37,10 +37,12 @@ import com.cyl.classifymenu.CYLMenuFoldControlPosition
 import com.cyl.classifymenu.CYLMenuItemType
 import com.cyl.classifymenu.CYLMenuSelectionMode
 import com.cyl.classifymenu.CYLMenuStyle
+import com.cyl.classifymenu.CYLTagBackgroundStyle
 import com.cyl.classifymenu.CYLMenuTitlePosition
 import com.cyl.classifymenu.CYLSize
 import com.cyl.classifymenu.CYLTagImagePlacement
 import com.cyl.classifymenu.CYLTagListView
+import com.cyl.classifymenu.example.plainSections
 import com.cyl.classifymenu.example.classify.classifyNavigationBar
 import com.cyl.classifymenu.tagListViewWithConfigurationFile
 
@@ -117,7 +119,7 @@ object CYLTagEditorStyle {
     val linkColor: Int = Color.rgb(87, 107, 149)
 
     fun tagStyle(): CYLMenuStyle {
-        val style = CYLMenuStyle()
+        val style = CYLMenuStyle().plainSections()
         val font = CYLFont.systemFont(16f)
         for (state in listOf(CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED)) {
             val appearance = style.appearanceForState(state)
@@ -130,6 +132,7 @@ object CYLTagEditorStyle {
         style.normalAppearance.textColor = Color.BLACK
         style.selectedAppearance.backgroundColor = Color.argb(26, 7, 193, 96)
         style.selectedAppearance.textColor = green
+        style.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
         style.itemHeight = 36f
         style.interitemSpacing = 12f
         style.lineSpacing = 12f
@@ -563,7 +566,8 @@ class CYLFoldStylesView(context: Context, val data: CYLTagData) : ScrollView(con
         }
         for (file in configurationFiles) {
             try {
-                add(CYLTagListView.tagListViewWithConfigurationFile(context, CYLTagEditorLocalization.path(file)))
+                // The shared fold-styles files set no sectionStyle: keep these lists flat, as they always were.
+                add(CYLTagListView.tagListViewWithConfigurationFile(context, CYLTagEditorLocalization.path(file)).also { it.plainSections() })
             } catch (e: Exception) {
                 configurationErrors[file] = e
                 stack.addView(TextView(context).apply {

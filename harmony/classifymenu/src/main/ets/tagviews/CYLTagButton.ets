@@ -19,16 +19,20 @@
 import {
   CYLAnimatedItemEngines, CYLAnimatedItemStackItem, CYLAnimatedItemStackModel, CYLAnimatedItemStackView, cylIconColorFilter
 } from 'cylanimateditem';
+import { CYLAnimatedItemBackgroundModifier, CYLAnimatedItemBackgroundStyle } from 'cylanimateditem';
+import { CYLAnimatedItemColorInput, CYLAnimatedItemColorResolver, CYLLiquidGlass } from 'cylanimateditem';
+import { CYLAnimatedItemContrast, CYLAnimatedItemContrastKindIcon, CYLAnimatedItemContrastKindText } from 'cylanimateditem';
 import { CYLAnimationPlayer } from '../components/CYLAnimationPlayer';
 import {
   CYLTagAnimatedIcon, cylTagAnimatedIconOuterHeight, cylTagAnimatedIconOuterWidth, cylTagAnimationImage
 } from '../components/CYLTagAnimatedIcon';
 import { CYLTagButtonMetrics } from '../components/CYLTagListState';
 import {
-  CYLMenuStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement, CYLTagImagePlacementIsVertical
+  CYLMenuStyle, CYLTagBackgroundStyle, CYLTagContentAlignment, CYLTagDeleteIndicatorPlacement, CYLTagImagePlacement, CYLTagImagePlacementIsVertical,
+  CYLTagTitleMaxLines
 } from '../core/CYLMenuStyle';
+import { CYLTagAppearance } from '../core/CYLTagAppearance';
 import { CYLMenuLocalizedString } from '../core/CYLMenuResources';
-import { CYLTagCornerRadiusSquare } from '../core/CYLTagAppearance';
 import { CYLUIContext } from '../core/CYLUIContext';
 import {
   CYLColor, CYLControlState, CYLEdgeInsets, CYLFont, CYLImage, CYLImageIsSymbol, CYLOffset, CYLRect, CYLSize
@@ -74,9 +78,10 @@ export class CYLTagButtonPart {
    */
   rotation: number = 0;
   /**
-   * The lines of a title: 1, or 0 for as many as it needs (`CYLMenuStyle.titleWraps`).
+   * The most lines of a title (`CYLMenuStyle.titleMaxLines`): 1 by default, `CYLTagTitleMaxLines.unlimited` for as many
+   * as it needs.
    */
-  maxLines: number = 1;
+  maxLines: number = CYLTagTitleMaxLines.single;
 }
 
 @Observed
@@ -169,8 +174,99 @@ export class CYLTagButton {
   editingIndicatorsFrame: CYLRect = new CYLRect();
   /** The color of the editing icons (`CYLMenuStyle.deleteIndicatorColor`, else the text color). */
   editingIconColor: ResourceColor = CYLColor.BLACK;
+  /**
+   * Whether `crossColor`, `editingIconColor` and the delete label's colour are EXPLICIT (the style's `deleteIndicatorColor`, or an
+   * explicit title colour they follow) rather than the built-in default text colour. Only an explicit colour is lifted on a disabled
+   * tag (the built-in disabled look is never adapted); the `resolvedCrossColor` family reads it.
+   */
+  indicatorColorIsExplicit: boolean = false;
   cornerRadius: number = 0;
+  /** The appearance's radius as it is (the capsule constant by default): `cylanimateditem` implements the capsule. */
+  appearanceCornerRadius: number = 0;
+  /** A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); -1 is the modifier's default share. */
+  glassTintAlpha: number = -1;
+  /**
+   * What a glass tag with no explicit background color hands to `CYLAnimatedItemBackgroundModifier`: a transparent color means
+   * "no color", and the glass draws its frosted default tint (225, 222, 220 at 0.5; white at 0.14 in dark mode).
+   */
+  static readonly GLASS_DEFAULT_TINT: ResourceColor = Color.Transparent;
+
+  /**
+   * The color a glass tag hands to the modifier: the explicit color, or `GLASS_DEFAULT_TINT` ("no color") when there is none
+   * or it is fully transparent (a cleared color means "unset" under glass, as on iOS).
+   */
+  static glassTintColor(explicitColor: ResourceColor | undefined): ResourceColor {
+    if (explicitColor === undefined || explicitColor === Color.Transparent || explicitColor === CYLColor.CLEAR) {
+      return CYLTagButton.GLASS_DEFAULT_TINT;
+    }
+    return explicitColor;
+  }
+
+  /** The background style a tag of `style` hands to `CYLAnimatedItemBackgroundModifier` (also the inline fold cell's). */
+  static itemBackgroundStyleOf(style: CYLMenuStyle): CYLAnimatedItemBackgroundStyle {
+    return style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass ?
+    CYLAnimatedItemBackgroundStyle.liquidGlass : CYLAnimatedItemBackgroundStyle.flat;
+  }
+
+  /**
+   * The color a tag in `appearance` hands to `CYLAnimatedItemBackgroundModifier`. Where glass is drawn only an EXPLICIT color
+   * tints it (`glassTintColor`; an unset one means no tint); flat keeps the effective color. `pressed` uses the style's
+   * highlighted color. The inline fold cell shares this rule, so it has the tags' background.
+   */
+  static itemBackgroundColor(style: CYLMenuStyle, appearance: CYLTagAppearance, pressed: boolean = false): ResourceColor {
+    const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
+    const explicitBackground: ResourceColor | undefined = pressed ? style.highlightedBackgroundColor :
+    appearance.explicitBackgroundColor;
+    return glass ? CYLTagButton.glassTintColor(explicitBackground) :
+      (pressed ? (style.highlightedBackgroundColor ?? CYLColor.CLEAR) : appearance.backgroundColor);
+  }
+  /**
+   * Whether a tag in `appearance` hands a border to `CYLAnimatedItemBackgroundModifier`. Flat: any border colour. Where glass
+   * is drawn: only a colour the app / configuration / preset set (the built-in default is dropped so the shared glass rim
+   * shows); a width set without a colour draws none. The inline fold cell shares this rule.
+   */
+  static hasItemBorder(style: CYLMenuStyle, appearance: CYLTagAppearance): boolean {
+    const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
+    return glass ? appearance.glassBorderColor !== undefined : appearance.borderColor !== undefined;
+  }
+
+  /** The border colour a tag in `appearance` hands to the modifier (clear when `hasItemBorder` is false). */
+  static itemBorderColor(style: CYLMenuStyle, appearance: CYLTagAppearance): ResourceColor {
+    const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
+    const color: ResourceColor | undefined = glass ? appearance.glassBorderColor : appearance.borderColor;
+    return color ?? CYLColor.CLEAR;
+  }
+
+  /** The border width a tag in `appearance` hands to the modifier: 0 without a border (the shared glass rim then applies). */
+  static itemBorderWidth(style: CYLMenuStyle, appearance: CYLTagAppearance): number {
+    const glass = style.resolvedBackgroundStyle() === CYLTagBackgroundStyle.liquidGlass;
+    return glass ? appearance.glassBorderWidth : (appearance.borderColor !== undefined ? appearance.borderWidth : 0);
+  }
   backgroundColor: ResourceColor = CYLColor.CLEAR;
+  /**
+   * The background, radius and border are `cylanimateditem`'s (`CYLAnimatedItemBackgroundModifier`, the interface of
+   * `CYLAnimatedItemView.itemBackgroundStyle…`): the style; the radius is `cornerRadius` (the appearance's, the capsule constant by default).
+   */
+  itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat;
+  /**
+   * The glass tint the item's colour resolution judges a colour against: the explicit (or pressed) background color, undefined
+   * while there is none (the frosted default tint). Not `backgroundColor`, which holds `GLASS_DEFAULT_TINT` for "none".
+   */
+  glassTint?: ResourceColor = undefined;
+  /**
+   * The CHANNELS of the title colour, handed to `CYLAnimatedItemColorResolver` (the item's one precedence and adaptation path):
+   * the EXPLICIT colour of the current state (set by the app / configuration / preset: the subclass-explicit level), undefined
+   * while there is none; and the BUILT-IN one (the style's default: the subclass built-in level). The tag never writes the
+   * integrator-owned `titleColor` / `iconColor`.
+   */
+  subclassTitleColor?: ResourceColor = undefined;
+  builtInTitleColor: ResourceColor = CYLTagAppearance.defaultTextColor;
+  /**
+   * The same two channels of the icon colour: the style's icon color, or, while that is unset, an explicit title color the icon
+   * follows; and the style's built-in colour (the icon follows the title's).
+   */
+  subclassIconColor?: ResourceColor = undefined;
+  builtInIconColor: ResourceColor = CYLTagAppearance.defaultTextColor;
   backgroundImage?: ResourceStr;
   borderColor: ResourceColor = CYLColor.CLEAR;
   borderWidth: number = 0;
@@ -188,8 +284,8 @@ export class CYLTagButton {
    */
   animationImage: ResourceStr = '';
   /**
-   * The color `CYLAnimatedItemView` tints the animated icon's static image with (`iconColor`: `animationImage` /
-   * `animationSelectedImage` while the animation loads and after it fails): the state's `CYLMenuStyle.iconColor` when
+   * The explicit color `CYLAnimatedItemView` tints the animated icon's static image with (its `subclassIconColor` channel:
+   * `animationImage` / `animationSelectedImage` while the animation loads and after it fails): the state's `CYLMenuStyle.iconColor` when
    * the style sets one, as the tag's own static icon is tinted; '' (the image's own colors) otherwise or without an
    * animation.
    */
@@ -436,7 +532,9 @@ export class CYLTagButton {
   /**
    * `animationView`: the live player of the animated icon, the one the app's animation view handed over with
    * `CYLTagAnimationContext.ready(player)` (the example's players expose `lottieItem`, `pagController`,
-   * `gifFrames`, `svgaMovie`), or undefined while there is none (no `animationURL`, not drawn yet, no engine).
+   * `gifFrames`, `svgaMovie`), or undefined while there is none (no `animationURL`, not drawn yet, no engine). It is
+   * always undefined for a type drawn by a component-level builder (Rive): that one is driven through
+   * `CYLAnimatedItemView`'s own props.
    */
   get animationView(): CYLAnimationPlayer | undefined {
     return this.player;
@@ -696,6 +794,17 @@ export class CYLTagButton {
   }
 
   /**
+   * The animated icon of a builder-drawn type has loaded: a `playAnimation()` made before that replays now.
+   */
+  itemDidLoad(): void {
+    if (this.pendingPlay) {
+      this.pendingPlay = false;
+      this.playToken++;
+      this.changed();
+    }
+  }
+
+  /**
    * Plays once the animated icon is loaded (a tap made it again).
    */
   pendingPlay: boolean = false;
@@ -739,7 +848,11 @@ export class CYLTagButton {
     const height = this.boundsHeight;
     const style = this.styleStorage;
     const state = this.currentState;
-    const insets = style.appearance(state).contentInsets;
+    // Left and right at least the shape's inset (14 on a drawn Liquid Glass tag, 0 on flat), as the measured width counted it.
+    const appearanceInsets = style.appearance(state).contentInsets;
+    const sideInset: number = CYLTagButtonMetrics.contentInset(style);
+    const insets = new CYLEdgeInsets(appearanceInsets.top, Math.max(appearanceInsets.left, sideInset), appearanceInsets.bottom,
+      Math.max(appearanceInsets.right, sideInset));
     const deleteWidth = this.layOutDeleteIndicator(state, insets);
     const indicatorFirst = this.showsDeleteIndicatorValue &&
       style.deleteIndicatorPlacement === CYLTagDeleteIndicatorPlacement.leading;
@@ -765,7 +878,8 @@ export class CYLTagButton {
     const measured = showsTitle ? CYLTagButtonMetrics.textMeasurer(titleText, font) : 0;
     let titleWidth = Math.min(available, Math.ceil(measured));
     // A wrapping title (`CYLMenuStyle.titleWraps`) is measured at the width it can have; otherwise on one line.
-    const lineHeight = style.titleWraps ? CYLTagButtonMetrics.wrappedTextHeight(titleText, font, available) :
+    const lineHeight = style.titleWraps ? CYLTagButtonMetrics.wrappedTextHeight(titleText, font, available,
+      style.titleMaxLines) :
       CYLTagButtonMetrics.lineHeight(font);
     const titleHeight = showsTitle ? Math.min(height, Math.ceil(lineHeight)) : 0;
 
@@ -833,9 +947,9 @@ export class CYLTagButton {
       this.layOutBadge(showsTitle ? this.titleLabel.frame :
         new CYLRect(insets.left, insets.top, Math.max(0, width - 2 * margin), contentHeight));
     }
-    // 0 is automatic: a capsule, as for CYLBadgeAppearance.
+    // Points, limited to half the height: 0 is square, half the height or more a capsule.
     const radius = style.appearance(state).cornerRadius;
-    this.cornerRadius = radius > 0 ? (radius <= CYLTagCornerRadiusSquare ? 0 : Math.min(radius, height / 2)) : height / 2;
+    this.cornerRadius = Math.min(radius, height / 2);
   }
 
   /**
@@ -865,7 +979,8 @@ export class CYLTagButton {
       const measured = Math.ceil(CYLTagButtonMetrics.textMeasurer(titleText, font));
       const room = Math.max(0, this.boundsWidth - trailing - x);
       if (style.titleWraps) {
-        titleHeight = Math.min(height, Math.ceil(CYLTagButtonMetrics.wrappedTextHeight(titleText, font, room)));
+        titleHeight = Math.min(height, Math.ceil(CYLTagButtonMetrics.wrappedTextHeight(titleText, font, room,
+          style.titleMaxLines)));
       }
       this.titleLabel.frame = new CYLRect(x + style.titlePositionAdjustment.horizontal,
         CYLTagButton.centeredY(titleHeight, insets.top, contentHeight, height) + style.titlePositionAdjustment.vertical,
@@ -874,7 +989,7 @@ export class CYLTagButton {
       this.titleLabel.frame = new CYLRect();
     }
     const radius = style.appearance(this.currentState).cornerRadius;
-    this.cornerRadius = radius > 0 ? (radius <= CYLTagCornerRadiusSquare ? 0 : Math.min(radius, height / 2)) : height / 2;
+    this.cornerRadius = Math.min(radius, height / 2);
   }
 
   /**
@@ -1030,6 +1145,106 @@ export class CYLTagButton {
     }
   }
 
+  /**
+   * The input of the item's colour resolution for the current state (the title, or the icon): the tag's channels in the slot of
+   * the current state only (so the resolver's "missing selected value falls back to the normal one" never lends the normal
+   * state's explicit colour to a selected tag that has none), and the glass state the colour is judged against.
+   */
+  private colorInput(title: boolean): CYLAnimatedItemColorInput {
+    const input = new CYLAnimatedItemColorInput();
+    const explicit: ResourceColor = (title ? this.subclassTitleColor : this.subclassIconColor) ?? '';
+    const builtIn: ResourceColor = title ? this.builtInTitleColor : this.builtInIconColor;
+    input.enabled = this.enabledValue;
+    input.selected = this.selectedValue;
+    if (!this.enabledValue) {
+      input.subclassExplicit.disabled = explicit;
+    } else if (this.selectedValue) {
+      input.subclassExplicit.selected = explicit;
+      input.subclassBuiltIn.selected = builtIn;
+    } else {
+      input.subclassExplicit.normal = explicit;
+      input.subclassBuiltIn.normal = builtIn;
+    }
+    input.dark = CYLLiquidGlass.isDark();
+    input.drawsGlass = CYLAnimatedItemBackgroundModifier.isGlassDrawn(this.itemBackgroundStyle);
+    input.glassTint = this.glassTint;
+    input.tintAlpha = this.glassTintAlpha;
+    return input;
+  }
+
+  /**
+   * The title color to draw: the item's resolution (`CYLAnimatedItemColorResolver.resolvedTitleColor`) of the tag's channels.
+   * Read when the tag draws, so a light / dark switch re-resolves it.
+   */
+  resolvedTitleColor(): ResourceColor {
+    return CYLAnimatedItemColorResolver.resolvedTitleColor(this.colorInput(true));
+  }
+
+  /**
+   * The icon color to draw (a symbol's font color, a bitmap's tint when `imageView.tintsImage`): the item's resolution
+   * (`CYLAnimatedItemColorResolver.resolvedIconColor`) of the tag's channels.
+   */
+  resolvedIconColor(): ResourceColor {
+    return CYLAnimatedItemColorResolver.resolvedIconColor(this.colorInput(false));
+  }
+
+  /**
+   * The dark-glass rule for a colour the tag draws itself (the item's `adaptedOnGlass`, `CYLAnimatedItemContrast.adaptedOnGlassState`),
+   * judged against the tag's own glass state: `color` itself unless glass is drawn in dark mode, then lifted to 4.5:1 (`kind` text)
+   * or 3:1 (icon). A built-in colour (`explicit` false) of a disabled tag is never adapted; a dynamic colour (a resource) is never changed.
+   */
+  adaptedOnGlass(color: ResourceColor, kind: string, explicit: boolean): ResourceColor {
+    if (!explicit && !this.enabledValue) {
+      return color;
+    }
+    return CYLTagButton.adaptedOnGlassOf(color, kind, this.itemBackgroundStyle, this.glassTint, this.glassTintAlpha);
+  }
+
+  /**
+   * The same rule for any view that draws a glass of `backgroundStyle` (the inline fold cell shares it): `color` itself unless glass is
+   * really drawn and the mode is dark, then lifted against the glass of `glassTint` / `tintAlpha`.
+   */
+  static adaptedOnGlassOf(color: ResourceColor, kind: string, backgroundStyle: CYLAnimatedItemBackgroundStyle,
+    glassTint: ResourceColor | undefined, tintAlpha: number | undefined): ResourceColor {
+    return CYLAnimatedItemContrast.adaptedOnGlassState(color, kind, CYLAnimatedItemBackgroundModifier.isGlassDrawn(backgroundStyle),
+      CYLLiquidGlass.isDark(), glassTint, tintAlpha);
+  }
+
+  /** The delete cross's colour to draw (an icon: 3:1 on drawn dark glass). Read when the tag draws, so a light / dark switch re-resolves it. */
+  resolvedCrossColor(): ResourceColor {
+    return this.adaptedOnGlass(this.crossColor, CYLAnimatedItemContrastKindIcon, this.indicatorColorIsExplicit);
+  }
+
+  /** The delete label's colour to draw (a text: 4.5:1 on drawn dark glass). */
+  resolvedDeleteLabelColor(): ResourceColor {
+    return this.adaptedOnGlass(this.deleteIndicatorLabel.textColor, CYLAnimatedItemContrastKindText, this.indicatorColorIsExplicit);
+  }
+
+  /** The delete symbol image's colour to draw (an icon: 3:1). A delete bitmap keeps its own colours. */
+  resolvedDeleteSymbolColor(): ResourceColor {
+    return this.adaptedOnGlass(this.deleteIndicatorLabel.textColor, CYLAnimatedItemContrastKindIcon, this.indicatorColorIsExplicit);
+  }
+
+  /** The editing icons' colour (an icon: 3:1), the value `editingIndicatorsView.iconColor` gets when it is a static colour. */
+  resolvedEditingIconColor(): ResourceColor {
+    return this.adaptedOnGlass(this.editingIconColor, CYLAnimatedItemContrastKindIcon, this.indicatorColorIsExplicit);
+  }
+
+  /**
+   * The explicit icon colour handed to the animated icon (`CYLTagAnimatedIcon.subclassIconColor`), '' while there is none. The
+   * tag lifts it itself (3:1) because the inner `CYLAnimatedItemView` stays flat: giving it the glass state would make it draw a
+   * second glass inside the tag. The item then judges the lifted colour as flat and leaves it as it is.
+   */
+  resolvedAnimationIconColor(): ResourceColor {
+    return CYLAnimatedItemColorResolver.isSet(this.animationIconColor) ?
+    this.adaptedOnGlass(this.animationIconColor, CYLAnimatedItemContrastKindIcon, true) : '';
+  }
+
+  /** The built-in icon colour handed to the animated icon (`CYLTagAnimatedIcon.builtInIconColor`), lifted like `resolvedAnimationIconColor`. */
+  resolvedAnimationBuiltInIconColor(): ResourceColor {
+    return this.adaptedOnGlass(this.builtInIconColor, CYLAnimatedItemContrastKindIcon, false);
+  }
+
   protected updateAppearance(): void {
     const style = this.styleStorage;
     const state = this.currentState;
@@ -1043,17 +1258,34 @@ export class CYLTagButton {
     this.animationImage = animated ? cylTagAnimationImage(this.imageValue) : '';
     this.animationSelectedImage = animated ? cylTagAnimationImage(this.selectedImageValue) : '';
     this.animationOpacity = state === CYLControlState.DISABLED ? DISABLED_ANIMATION_ALPHA : 1;
-    this.imageView.tintColor = style.iconColor(state);
-    this.imageView.tintsImage = style.appearance(state).iconColor !== undefined;
-    this.animationIconColor = animated && this.imageView.tintsImage ? this.imageView.tintColor : '';
     this.titleLabel.text = style.displayedTitle(this.titleValue);
     this.titleLabel.font = style.titleFont(state, this.fontScale);
     this.titleLabel.textColor = appearance.textColor;
+    this.subclassTitleColor = appearance.explicitTextColor;
+    this.builtInTitleColor = appearance.textColor;
 
     const pressed = this.highlightedValue && state !== CYLControlState.DISABLED &&
       style.highlightedBackgroundColor !== undefined;
     // Pressed, as android-tagview's layoutColorPress.
-    this.backgroundColor = pressed ? (style.highlightedBackgroundColor ?? CYLColor.CLEAR) : appearance.backgroundColor;
+    // Liquid Glass: the state's background color tints the glass (CYLAnimatedItemBackgroundModifier, see build()). Where glass is
+    // drawn only an EXPLICIT color tints it: an unset background (the built-in default, which would hide the backdrop) hands no
+    // color, so the modifier uses the glass's frosted default tint. The pressed color is always explicit. Flat (also where the
+    // system draws no glass) keeps the effective color.
+    const stateBackground: ResourceColor = CYLTagButton.itemBackgroundColor(style, appearance, pressed);
+    this.itemBackgroundStyle = CYLTagButton.itemBackgroundStyleOf(style);
+    this.appearanceCornerRadius = appearance.cornerRadius;
+    this.glassTintAlpha = state === CYLControlState.SELECTED ? 1 : -1;
+    this.glassTint = pressed ? style.highlightedBackgroundColor : appearance.explicitBackgroundColor;
+    this.backgroundColor = stateBackground;
+    // The icon tint: the style's icon color as set is the EXPLICIT channel; an unset one follows the title color, explicit only
+    // when that is, else the built-in channel. The item's resolution (`resolvedIconColor`) picks and adapts; the animated icon's
+    // static image gets the same channels (`CYLTagAnimatedIcon`).
+    const explicitIcon = style.explicitIconColor(state);
+    this.subclassIconColor = explicitIcon ?? appearance.explicitTextColor;
+    this.builtInIconColor = appearance.textColor;
+    this.imageView.tintColor = style.iconColor(state);
+    this.imageView.tintsImage = explicitIcon !== undefined;
+    this.animationIconColor = animated && this.imageView.tintsImage ? this.imageView.tintColor : '';
     this.backgroundImage = this.highlightedValue && style.highlightedBackgroundColor !== undefined ? undefined :
     appearance.backgroundImage;
     // With the rename indicator, the two editing icons are drawn instead of the style's indicator.
@@ -1061,8 +1293,9 @@ export class CYLTagButton {
     const indicatorImage: CYLImage | undefined = editingIcons ? undefined : style.deleteIndicatorImage;
     const drawsCross = style.deleteIndicatorLineWidth > 0 && indicatorImage === undefined && !editingIcons;
     this.editingIconColor = style.deleteIndicatorColor ?? appearance.textColor;
+    this.indicatorColorIsExplicit = style.deleteIndicatorColor !== undefined || appearance.explicitTextColor !== undefined;
     if (editingIcons) {
-      const color = this.editingIconColor;
+      const color = this.resolvedEditingIconColor();
       this.editingIndicatorsView.iconColor = typeof color === 'string' ? color : '';
     }
     this.deleteIndicatorLabel.isHidden = !this.showsDeleteIndicatorValue || drawsCross || indicatorImage !== undefined ||
@@ -1073,7 +1306,7 @@ export class CYLTagButton {
     this.showsCross = this.showsDeleteIndicatorValue && drawsCross;
     this.deleteIndicatorImage = this.showsDeleteIndicatorValue ? indicatorImage : undefined;
     // A wrapping title (`CYLMenuStyle.titleWraps`) takes as many lines as it needs.
-    this.titleLabel.maxLines = style.titleWraps ? 0 : 1;
+    this.titleLabel.maxLines = style.titleMaxLines;
     this.elevation = Math.max(0, style.elevation);
     this.crossLineWidth = style.deleteIndicatorLineWidth;
     this.crossColor = style.deleteIndicatorColor ?? appearance.textColor;
@@ -1082,9 +1315,9 @@ export class CYLTagButton {
       Math.min(imageRadius, Math.min(style.imageSize.width, style.imageSize.height) / 2) : 0;
     this.deleteIndicatorLabel.font = style.deleteIndicatorFontFor(state, this.fontScale);
     this.deleteIndicatorLabel.textColor = style.deleteIndicatorColor ?? appearance.textColor;
-    const borderColor = appearance.borderColor;
-    this.borderColor = borderColor ?? CYLColor.CLEAR;
-    this.borderWidth = borderColor !== undefined ? appearance.borderWidth : 0;
+    // Liquid Glass hands only an explicit border; the built-in default is dropped so the shared glass rim shows.
+    this.borderColor = CYLTagButton.itemBorderColor(style, appearance);
+    this.borderWidth = CYLTagButton.itemBorderWidth(style, appearance);
     const badge = this.badgeValueStorage;
     this.badgeLabel.isHidden = badge === undefined;
     this.badgeLabel.text = badge !== undefined && badge.length > 0 ? badge : undefined;
@@ -1154,9 +1387,9 @@ export struct CYLTagButtonComponent {
         Text(this.tl().text ?? '')
           .fontSize(this.tl().font.size)
           .fontWeight(this.tl().font.weight)
-          .fontColor(this.tl().textColor)
-          // 0: as many lines as the title needs (`CYLMenuStyle.titleWraps`).
-          .maxLines(this.tl().maxLines > 0 ? this.tl().maxLines : Number.MAX_SAFE_INTEGER)
+          .fontColor(this.button.resolvedTitleColor())
+          // `CYLMenuStyle.titleMaxLines` lines at most (`CYLTagTitleMaxLines.unlimited`: as many as the title needs).
+          .maxLines(this.tl().maxLines)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width(this.part(this.tl()).width)
           .height(this.part(this.tl()).height)
@@ -1166,7 +1399,7 @@ export struct CYLTagButtonComponent {
         // A system symbol (`$r('sys.symbol.camera')`): `SymbolGlyph`, its font color the icon color of the state.
         SymbolGlyph(this.iv().image as Resource)
           .fontSize(this.symbolSide())
-          .fontColor([this.iv().tintColor])
+          .fontColor([this.button.resolvedIconColor()])
           .width(this.part(this.iv()).width > 0 ? this.part(this.iv()).width : this.symbolSide())
           .height(this.part(this.iv()).height > 0 ? this.part(this.iv()).height : this.symbolSide())
           .position({ x: this.part(this.iv()).x, y: this.part(this.iv()).y })
@@ -1178,12 +1411,12 @@ export struct CYLTagButtonComponent {
           .width(this.part(this.iv()).width > 0 ? this.part(this.iv()).width : undefined)
           .height(this.part(this.iv()).height > 0 ? this.part(this.iv()).height : undefined)
           .position({ x: this.part(this.iv()).x, y: this.part(this.iv()).y })
-          .fillColor(this.iv().tintColor)
+          .fillColor(this.button.resolvedIconColor())
           // Bitmaps too, when the style sets an icon color (see `tintsImage`): an orange PNG on an orange selected tag
           // stayed orange and invisible (HarmonyOS issue Y2). A drawing color filter (`ColorFilter`) applies to every
           // image source; the matrix form had no effect after `fillColor` on the emulator. The filter is the shared
           // component's (`cylIconColorFilter`, `CYLAnimatedItemView.iconColor`), as for the animated icon's static image.
-          .colorFilter(new ColorFilter(cylIconColorFilter(this.iv().tintsImage ? this.iv().tintColor : '')))
+          .colorFilter(new ColorFilter(cylIconColorFilter(this.iv().tintsImage ? this.button.resolvedIconColor() : '')))
           .objectFit(this.iv().cornerRadius > 0 ? ImageFit.Cover : ImageFit.Contain)
           .borderRadius(this.iv().cornerRadius)
           .clip(this.iv().cornerRadius > 0)
@@ -1199,10 +1432,17 @@ export struct CYLTagButtonComponent {
             animationURL: this.button.animationURL ?? '',
             image: this.button.animationImage,
             selectedImage: this.button.animationSelectedImage,
-            iconColor: this.button.animationIconColor,
+            subclassIconColor: this.button.resolvedAnimationIconColor(),
+            subclassSelectedIconColor: this.button.resolvedAnimationIconColor(),
+            builtInIconColor: this.button.resolvedAnimationBuiltInIconColor(),
+            builtInSelectedIconColor: this.button.resolvedAnimationBuiltInIconColor(),
             isSelected: this.button.isSelected,
             iconWidth: this.af().width,
             iconHeight: this.af().height,
+            animationSpeed: this.button.resolvedAnimationSpeed,
+            animationLoops: this.button.animationLoops,
+            animationRestartToken: this.button.playToken,
+            onItemLoaded: () => this.button.itemDidLoad(),
             onPlayer: (player: CYLAnimationPlayer | undefined) => {
               if (player !== undefined || this.button.animationPlayer !== undefined) {
                 this.button.setAnimationPlayer(player);
@@ -1221,7 +1461,7 @@ export struct CYLTagButtonComponent {
         Text(this.dl().text ?? '')
           .fontSize(this.dl().font.size)
           .fontWeight(this.dl().font.weight)
-          .fontColor(this.dl().textColor)
+          .fontColor(this.button.resolvedDeleteLabelColor())
           .textAlign(TextAlign.Center)
           .width(this.part(this.dl()).width)
           .height(this.part(this.dl()).height)
@@ -1247,7 +1487,7 @@ export struct CYLTagButtonComponent {
         // `CYLMenuStyle.deleteIndicatorImage` as a system symbol ($r('sys.symbol.xmark_circle_fill')), in the indicator color.
         SymbolGlyph(this.button.deleteIndicatorImage as Resource)
           .fontSize(this.button.deleteIndicatorImageFrame.height)
-          .fontColor([this.dl().textColor])
+          .fontColor([this.button.resolvedDeleteSymbolColor()])
           .width(this.button.deleteIndicatorImageFrame.width)
           .height(this.button.deleteIndicatorImageFrame.height)
           .position({ x: this.button.deleteIndicatorImageFrame.x, y: this.button.deleteIndicatorImageFrame.y })
@@ -1277,7 +1517,7 @@ export struct CYLTagButtonComponent {
           Line()
             .startPoint([line[0], line[1]])
             .endPoint([line[2], line[3]])
-            .stroke(this.button.crossColor)
+            .stroke(this.button.resolvedCrossColor())
             .strokeWidth(this.button.crossLineWidth)
             .strokeLineCap(LineCapStyle.Round)
             .position({ x: 0, y: 0 })
@@ -1289,10 +1529,11 @@ export struct CYLTagButtonComponent {
     }
     .width(this.tagWidth ?? this.button.intrinsicSize().width)
     .height(this.tagHeight ?? this.button.intrinsicSize().height)
-    .backgroundColor(this.button.backgroundColor)
+    // Background, radius and border (the tint over the glass for Liquid Glass): cylanimateditem's one interface.
+    .attributeModifier(new CYLAnimatedItemBackgroundModifier(this.button.itemBackgroundStyle, this.button.backgroundColor,
+      this.button.appearanceCornerRadius, this.button.borderWidth, this.button.borderColor, this.button.glassTintAlpha))
     .backgroundImage(this.button.backgroundImage)
     .backgroundImageSize(ImageSize.Cover)
-    .border({ width: this.button.borderWidth, color: this.button.borderColor, radius: this.button.cornerRadius })
     // `CYLMenuStyle.elevation`: a shadow under the tag (offset down by half of it, blurred by it); the tag stops
     // clipping its content then, since the shadow is outside its bounds.
     .shadow(this.button.elevation > 0 ?

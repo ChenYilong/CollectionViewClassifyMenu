@@ -1,10 +1,35 @@
 /**
  * The fold control of a `CYLTagListView` ("更多 ⌄"), as iOS `CYLMenuFoldControl.swift`: where it is (below the
- * section, in the section header, or as the last tag) and what it shows (icon and title, title only, icon only).
- * Expanded, a control with an icon keeps only the icon, turned 180°; a title-only control shows its collapse title.
+ * section, in the section header, or as the last tag) and what it shows (icon and title, title only, icon only, or
+ * title and icon always). Expanded, a control with an icon keeps only the icon, turned 180°; a title-only control shows
+ * its collapse title; a title-and-icon-always control shows its collapse title and the turned icon.
  */
 import { CYLMenuLocalizedString, CYLMenuResources } from './CYLMenuResources';
 import { CYLFont, CYLImage } from './CYLTypes';
+
+/**
+ * The most the system font scale grows a fold / More control (its text and its size). At accessibility font sizes the
+ * control would otherwise dwarf the header; tags and titles keep scaling normally.
+ */
+export const CYLFoldControlMaxFontScale: number = 1.3;
+
+/**
+ * The widest a fold control in a section header gets when it is the only extra view of the header row, as a fraction of
+ * the header's inner width (the width between the header edges); the title gives way.
+ */
+export const CYLHeaderFoldAloneMaxFraction: number = 0.4;
+
+/**
+ * The widest a fold control in a section header gets when a More button, a clear button or an accessory is also shown,
+ * as a fraction of the header's inner width.
+ */
+export const CYLHeaderFoldSharedMaxFraction: number = 0.3;
+
+/** The widest a header accessory view gets, as a fraction of the header's inner width. */
+export const CYLHeaderAccessoryMaxFraction: number = 0.3;
+
+/** The widest a fold control in a section header gets alone: `CYLHeaderFoldAloneMaxFraction` (the older name). */
+export const CYLHeaderFoldMaxWidthFraction: number = CYLHeaderFoldAloneMaxFraction;
 
 /** Where the fold control of a foldable section is. */
 export enum CYLMenuFoldControlPosition {
@@ -27,7 +52,13 @@ export enum CYLMenuFoldControlContent {
   /** "更多"; expanded, the collapse title ("收起"). */
   title = 1,
   /** "⌄"; expanded, the same icon, turned. */
-  icon = 2
+  icon = 2,
+  /**
+   * "更多 ⌄" collapsed and "收起 ⌃" expanded ("More ⌄" / "Less ⌃"): the title and the icon in both states, the icon
+   * turned 180° when expanded. In a configuration: "titleAndIconAlways" ("titleAndIcon" is an older alias of
+   * `iconAndTitle`).
+   */
+  titleAndIcon = 3
 }
 
 export class CYLMenuFoldControl {
@@ -58,7 +89,7 @@ export class CYLMenuFoldControl {
     this.customTitle = value;
   }
 
-  /** Shown while expanded by a title-only control; default the localized "收起" (`CYLMenuCollapse`). */
+  /** Shown while expanded by a control that keeps its title; default the localized "收起" (`CYLMenuCollapse`). */
   get collapseTitle(): string {
     return this.customCollapseTitle ?? CYLMenuLocalizedString('CYLMenuCollapse');
   }
@@ -90,6 +121,7 @@ export class CYLMenuFoldControl {
       case CYLMenuFoldControlContent.iconAndTitle:
         return !expanded;
       case CYLMenuFoldControlContent.title:
+      case CYLMenuFoldControlContent.titleAndIcon:
         return true;
       default:
         return false;

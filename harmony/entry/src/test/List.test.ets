@@ -1,5 +1,4 @@
 import localUnitTest from './LocalUnit.test';
-import svgaDecoderTest from './SVGADecoder.test';
 import localizationTest from './Localization.test';
 import tagListStateTest from './TagListState.test';
 import classifyAndFilterTest from './ClassifyAndFilter.test';
@@ -12,10 +11,19 @@ import androidParityTest from './AndroidParity.test';
 import tagListEditingTest from './TagListEditing.test';
 import tagListWordPickerTest from './TagListWordPicker.test';
 import tagListTailFoldTest from './TagListTailFold.test';
+import tagLongPressActionTest from './TagLongPressAction.test';
+import tagTitleMaxLinesTest from './TagTitleMaxLines.test';
+import tagSectionStyleTest from './TagSectionStyle.test';
+import tagSectionRtlTest from './TagSectionRtl.test';
+import tagHeaderMaxLinesAndFoldScaleTest from './TagHeaderMaxLinesAndFoldScale.test';
+import tagGlassBackgroundTest from './TagGlassBackground.test';
+import tagFoldTitleAndIconTest from './TagFoldTitleAndIcon.test';
+import tagHeaderFontAndBoardAlignTest from './TagHeaderFontAndBoardAlign.test';
+import tagIconColorTest from './TagIconColor.test';
+import tagGlassIconCoverageTest from './TagGlassIconCoverage.test';
 
 export default function testsuite() {
   localUnitTest();
-  svgaDecoderTest();
   localizationTest();
   tagListStateTest();
   classifyAndFilterTest();
@@ -28,4 +36,14 @@ export default function testsuite() {
   tagListEditingTest();
   tagListWordPickerTest();
   tagListTailFoldTest();
+  tagLongPressActionTest();
+  tagTitleMaxLinesTest();
+  tagSectionStyleTest();
+  tagSectionRtlTest();
+  tagHeaderMaxLinesAndFoldScaleTest();
+  tagGlassBackgroundTest();
+  tagFoldTitleAndIconTest();
+  tagHeaderFontAndBoardAlignTest();
+  tagIconColorTest();
+  tagGlassIconCoverageTest();
 }

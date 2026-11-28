@@ -3,6 +3,15 @@
  * as `CYLTagListView(configuration:)`, the Flutter plugin and the React Native component (model.js). A Mini Program
  * cannot host the native iOS / Android view, so this component draws the list itself with the same rules.
  *
+ * Long press (docs/tag-long-press-action.md): the configuration's `longPressAction` ("callout", "report", "none", "reorder",
+ * or an array: the first that can begin wins; this list does not reorder, cyl-tag-cloud does) or the property
+ * `longPressAction` decides what a long press on an item does: a callout with the item's `subtitle` (a small bubble with an
+ * arrow), or only the event `taglongpress` {section, item, title, subtitle}, which every long press sends (except "none").
+ * A tap, a fold, a rebuild, a scroll (`onScroll()`, which the page calls from its scroller's `bindscroll` or `onPageScroll`)
+ * or another long press hides the callout; `dismissCallout()` does too. The callout goes below the tag when it would cover
+ * the section header (the core's `placesBelow`). WeChat sends no tap for the
+ * release of a long press.
+ *
  * Properties: `configuration`, `animationSpeed` (0, the default, uses each section's `style.animationSpeed`; above 0
  * overrides it, as `CYLTagListView.animationSpeed`), `animationLoops`.
  * Methods (through `selectComponent`): `playAll()`, `playItems(keys)`, `selectedItems()`, `contentHeight()`,
@@ -17,6 +26,7 @@
 const model = require('./model.js');
 const animations = require('./animations.js');
 const locale = require('../locale.js');
+const theme = require('./theme.js');
 
 /** The core's localized fold titles (CYLMenuExpand / CYLMenuCollapse) when the string tables have them. */
 function foldTitle(control, expanded) {
@@ -28,6 +38,31 @@ function foldTitle(control, expanded) {
     if (text && text !== k) return text;
   }
   return model.foldTitle(expanded);
+}
+
+/** The callout's font size, line height factor, paddings and line limit (the wxss .cyl-callout). */
+const CALLOUT_FONT_SIZE = 13;
+const CALLOUT_LINE_HEIGHT = 1.35;
+const CALLOUT_VERTICAL_PADDING = 16;
+const CALLOUT_HORIZONTAL_PADDING = 24;
+const CALLOUT_MAX_LINES = 3;
+/** The average glyph width as a fraction of the font size (the same estimate the bubble's width uses). */
+const CALLOUT_GLYPH_WIDTH = 0.9;
+
+/** The bubble's estimated height for a text of `length` characters in a bubble `width` wide. */
+function calloutHeight(width, length) {
+  const room = width - CALLOUT_HORIZONTAL_PADDING;
+  const lines = Math.min(CALLOUT_MAX_LINES, Math.max(1, Math.ceil(length * CALLOUT_FONT_SIZE * CALLOUT_GLYPH_WIDTH / room)));
+  return lines * CALLOUT_FONT_SIZE * CALLOUT_LINE_HEIGHT + CALLOUT_VERTICAL_PADDING;
+}
+
+/** The window's height, or no limit when it cannot be read. */
+function windowHeight() {
+  try {
+    return (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()).windowHeight || Infinity;
+  } catch (error) {
+    return Infinity;
+  }
 }
 
 function pixelRatio() {
@@ -45,6 +80,8 @@ Component({
     // which a Number property reports as a type warning; anything not above 0 uses the style's speed anyway.
     animationSpeed: { type: null, value: 0 },
     animationLoops: { type: Boolean, value: false },
+    // What a long press does (a name or an array of names); null: the configuration's `longPressAction`, else a report.
+    longPressAction: { type: null, value: null },
   },
 
   data: {
@@ -52,13 +89,26 @@ Component({
     foldPosition: 'none',
     foldContent: 'title',
     foldColor: '#808080',
+    // The fold chevron turns when expanded (foldControl `rotatesImageWhenExpanded`, true by default).
+    foldRotates: true,
     backgroundStyle: '',
+    // Right to left (style key `direction`): the list's CSS direction is in backgroundStyle, this selects the mirrored wxss rules.
+    rtl: false,
+    // The fold / More control's capped font size (header and footer controls).
+    foldFontStyle: '',
+    // The long-press callout {text, left, top, arrow, below}, or null.
+    callout: null,
   },
 
   lifetimes: {
     attached() {
       this.expanded = {};
       this.rebuild();
+      // The defaults follow dark mode: build again when the system theme changes.
+      this.stopThemeChanges = theme.onChange(() => this.rebuild());
+    },
+    detached() {
+      if (this.stopThemeChanges) this.stopThemeChanges();
     },
   },
 
@@ -71,7 +121,8 @@ Component({
 
   methods: {
     rebuild() {
-      this.model = model.normalize(this.data.configuration, { pixelRatio: pixelRatio() });
+      this.dismissCallout();
+      this.model = model.normalize(this.data.configuration, { pixelRatio: pixelRatio(), dark: theme.isDark() });
       this.selection = this.model.selectedItems.slice();
       this.rows = null;
       this.expanded = this.expanded || {};
@@ -87,9 +138,15 @@ Component({
         const rows = this.rows && this.rows[section.index];
         const expanded = !!this.expanded[section.index];
         const fold = rows && !remeasure ? model.foldState(m, rows, expanded) : { canFold: false, visible: [] };
-        const layout = model.sectionLayout(style);
+        // A section with no header (no shown title, no header fold control) keeps the section's top inset above its board.
+        const hasHeader = (m.showsSectionHeaders && section.title !== '')
+          || (fold.canFold && m.foldControl.position === 'headerTrailing');
+        const layout = model.sectionLayout(style, { hasHeader });
         const tailStyle = model.tagLayout(style, { title: 'x', enabled: true }, 'normal', { kind: 'none' },
-          style.interitemSpacing, style.lineSpacing).cellStyle;
+          style.interitemSpacing, style.lineSpacing).cellStyle
+          // The More tag follows the tag's font size, capped (the system font size scales the text up).
+          + `; ${model.foldControlFontCSS(style.normal.font.size)}`;
+        const tailColors = model.tailFoldColors(style, m.foldControl.color);
         return {
           index: section.index,
           title: section.title,
@@ -97,7 +154,12 @@ Component({
           canFold: fold.canFold,
           expanded,
           foldTitle: foldTitle(m.foldControl, expanded),
+          // The longer of the two titles: a hidden sizer in the "titleAndIcon" control, so it keeps its width when toggled.
+          foldSizerTitle: model.longerFoldTitle(foldTitle(m.foldControl, false), foldTitle(m.foldControl, true)),
           tailStyle,
+          // The tail is a drawn glass tag: its title and chevron colours are adapted like any tag's (header and footer folds are flat).
+          tailTitleColor: tailColors.titleColor,
+          tailIconColor: tailColors.iconColor,
           ...layout,
           items: section.items.map((item, i) => {
             const selected = this.selection.includes(item.key);
@@ -111,6 +173,7 @@ Component({
               title: item.title,
               styleSpeed: style.animationSpeed,
               ...icon,
+              ...model.iconColorData(item, state, style, icon),
               enabled: item.enabled,
               selected,
               hidden: fold.visible.length ? !fold.visible[i] : false,
@@ -124,8 +187,12 @@ Component({
         sections,
         foldPosition: m.foldControl.position,
         foldContent: m.foldControl.content,
-        foldColor: m.foldControl.color || m.style.foldControlColor,
-        backgroundStyle: `background-color: ${m.style.backgroundColor}`,
+        foldRotates: m.foldControl.rotatesImage,
+        foldColor: m.foldControl.color || model.resolvedFoldControlColor(m.style, m.foldControl.position === 'headerTrailing'),
+        backgroundStyle: `background-color: ${model.resolvedBackgroundColor(m.style)}${model.directionCSS(m.style)}`,
+        rtl: model.isRtl(m.style),
+        foldFontStyle: model.foldControlFontCSS(),
+        foldHeaderStyle: model.foldHeaderWidthCSS({ rtl: model.isRtl(m.style) }),
       }, () => {
         if (remeasure) this.measure();
         else this.reportHeight();
@@ -198,6 +265,7 @@ Component({
     },
 
     onItemTap(event) {
+      this.dismissCallout();
       const k = event.currentTarget.dataset.key;
       const item = model.itemAt(this.model, k);
       if (!item || !item.enabled) return;
@@ -218,10 +286,61 @@ Component({
     },
 
     onFoldTap(event) {
+      this.dismissCallout();
       const section = Number(event.currentTarget.dataset.section);
       this.expanded[section] = !this.expanded[section];
       this.render(false);
       this.reportFoldState();
+    },
+
+    /** The list scrolled (the page's scroller or `onPageScroll`): hides the callout, as the core does on a content offset change. */
+    onScroll() {
+      this.dismissCallout();
+    },
+
+    /** Hides the long-press callout. */
+    dismissCallout() {
+      if (this.data.callout) this.setData({ callout: null });
+    },
+
+    /** A long press on an item: the first action of `longPressAction` that can begin decides (model.longPressDecision). */
+    onItemLongPress(event) {
+      const k = event.currentTarget.dataset.key;
+      const item = model.itemAt(this.model, k);
+      if (!item) return;
+      const own = this.data.longPressAction;
+      const actions = own ? model.longPressActions(own) : this.model.longPressActions;
+      const decision = model.longPressDecision(actions, item.subtitle.length > 0);
+      this.dismissCallout();
+      if (decision === 'none') return;
+      if (decision === 'callout') this.showCallout(item);
+      this.triggerEvent('taglongpress', { section: item.section, item: item.item, title: item.title, subtitle: item.subtitle });
+    },
+
+    /** Shows the callout above the item (below when there is no room), its arrow at the item's center. */
+    showCallout(item) {
+      const query = this.createSelectorQuery();
+      query.select(`#cyl-item-${item.key}`).boundingClientRect();
+      query.select('.cyl-tag-list').boundingClientRect();
+      // The item's section header, which the bubble must not cover (null when the section has none).
+      query.select(`#cyl-header-s${item.section}`).boundingClientRect();
+      query.exec(([itemRect, listRect, headerRect]) => {
+        if (!itemRect || !listRect) return;
+        const center = itemRect.left - listRect.left + itemRect.width / 2;
+        // The bubble is at most 240 wide; keep it inside the list and point the arrow at the item.
+        const width = Math.min(240, Math.max(60, item.subtitle.length * 13 * 0.9 + 24));
+        const left = Math.max(8, Math.min(listRect.width - 8 - width, center - width / 2));
+        const below = model.calloutPlacesBelow(itemRect, calloutHeight(width, item.subtitle.length), headerRect, windowHeight());
+        this.setData({
+          callout: {
+            text: item.subtitle,
+            left,
+            top: below ? itemRect.bottom - listRect.top : itemRect.top - listRect.top,
+            arrow: Math.max(14, Math.min(width - 14, center - left)),
+            below,
+          },
+        });
+      });
     },
 
     selectionPayload() {

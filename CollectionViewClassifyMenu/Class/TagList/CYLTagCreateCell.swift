@@ -44,7 +44,8 @@ open class CYLTagCreateCell: CYLTagListCell {
         normal.borderColor = .separator
         normal.borderWidth = max(1 / max(1, UIScreen.main.scale), 1)
         normal.textColor = .secondaryLabel
-        outlined.setIconColor(.tertiaryLabel, for: .normal)
+        // The title's color: `tertiaryLabel` gave the plus icon about 2.4:1 in dark and 1.7:1 in light (3:1 needed).
+        outlined.setIconColor(.secondaryLabel, for: .normal)
         outlined.setTitleTextAttributes(nil, for: .normal)
         outlined.imagePlacement = .leading
         if outlined.imageSize == .zero {

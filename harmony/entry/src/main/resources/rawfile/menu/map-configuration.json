@@ -5,10 +5,14 @@
   "content": "icon"
  },
  "scrollEnabled": false,
+ "longPressAction": "callout",
  "selectedItems": [
   "0-1"
  ],
  "style": {
+  "sectionStyle": "insetGrouped",
+  "headerSeparatorStyle": "line",
+  "backgroundStyle": "liquidGlass",
   "imageSize": "{20, 20}",
   "imageTitleSpacing": 4,
   "itemHeight": 36,
@@ -32,10 +36,13 @@
    "items": [
     {
      "title": "Lottie",
-     "animation": "asset:tab_me_animate.json"
+     "subtitle": "Long press: a callout shows this subtitle",
+     "animation": "asset:tab_me_animate.json",
+     "animationOptions": { "tint": "title" }
     },
     {
      "title": "GIF",
+     "subtitle": "A tag without a subtitle shows no callout",
      "animation": ""
     },
     {

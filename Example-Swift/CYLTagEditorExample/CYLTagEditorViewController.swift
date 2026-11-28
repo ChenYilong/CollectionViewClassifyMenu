@@ -88,6 +88,9 @@ final class CYLTagEditorViewController: UIViewController {
         style.backgroundColor = .systemBackground
         style.imageSize = CGSize(width: 14, height: 14)
         style.imageTitleSpacing = 6
+        style.backgroundStyle = .liquidGlass
+        // The page draws its own background: the flat list, not the default section card.
+        style.sectionStyle = .plain
         return style
     }
 

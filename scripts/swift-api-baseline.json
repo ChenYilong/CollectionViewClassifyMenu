@@ -28866,29 +28866,6 @@
         ]
       },
       {
-        "kind": "Var",
-        "name": "CYLTagCornerRadiusSquare",
-        "printedName": "CYLTagCornerRadiusSquare",
-        "children": [
-          {
-            "kind": "TypeNominal",
-            "name": "CGFloat",
-            "printedName": "CoreGraphics.CGFloat",
-            "usr": "s:14CoreFoundation7CGFloatV"
-          }
-        ],
-        "declKind": "Var",
-        "usr": "s:26CollectionViewClassifyMenu24CYLTagCornerRadiusSquare14CoreFoundation7CGFloatVvp",
-        "mangledName": "$s26CollectionViewClassifyMenu24CYLTagCornerRadiusSquare12CoreGraphics7CGFloatVvp",
-        "moduleName": "CollectionViewClassifyMenu",
-        "declAttributes": [
-          "HasInitialValue",
-          "HasStorage"
-        ],
-        "isLet": true,
-        "hasStorage": true
-      },
-      {
         "kind": "TypeDecl",
         "name": "CYLTagAppearance",
         "printedName": "CYLTagAppearance",

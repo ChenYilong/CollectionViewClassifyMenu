@@ -17,10 +17,22 @@ function validValue(value: number | undefined): number | undefined {
 
 /** `UIColor.systemBlue`, the badge color when the tag has neither a badge nor a text color. */
 const SYSTEM_BLUE: string = '#FF007AFF';
+/** `UIColor.systemRed`, the badge dot's color when the tag has no badge color (`CYLTagBadgeDefaultColor`). */
+const SYSTEM_RED: string = '#FFFF3B30';
+/** The diameter of a badge dot, vp. */
+const BADGE_DOT_DIAMETER: number = 8;
+/** The side padding of a badge image's text, vp. */
+const BADGE_IMAGE_TEXT_PADDING: number = 4;
+/** The badge text's font size as a share of the badge diameter. */
+const BADGE_IMAGE_FONT_RATIO: number = 0.6;
+/** The badge diameter when the style's image size is zero, vp. */
+const BADGE_DEFAULT_DIAMETER: number = 16;
 
 export class CYLTag {
   identifier: number;
   title: string;
+  /** A longer description, shown in a callout on a long press (`CYLTagLongPressActions.callout`). */
+  subtitle?: string;
   image?: CYLImage;
   selectedImage?: CYLImage;
   /** A Lottie animation: `asset:<rawfile path>` or the JSON text. */
@@ -176,23 +188,77 @@ export class CYLTag {
     return c;
   }
 
-  /** A filled circle of `color`, `diameter` vp wide, with `text` in bold white at 60 % of the diameter. */
-  static badgeImage(text: string, color: string, diameter: number): image.PixelMap {
-    const side = Math.max(1, Math.round(CYLUIContext.vp2px(Math.max(1, diameter))));
-    const canvas = new OffscreenCanvas(side, side);
-    const context = canvas.getContext('2d');
+  /** The diameter of a badge dot, vp: 8, as `CYLTagButton`'s dot (iOS `badgeDotDiameter`). */
+  static readonly badgeDotDiameter: number = BADGE_DOT_DIAMETER;
+  /** The side padding of a badge image's text, vp: 4, as `CYLTagButton`'s corner badge (iOS `badgeImageTextPadding`). */
+  static readonly badgeImageTextPadding: number = BADGE_IMAGE_TEXT_PADDING;
+
+  /** A badge dot: a filled `color` circle `badgeDotDiameter` vp wide (at most `canvas`), centered in a `canvas` square. */
+  static badgeDotImage(color: string, canvas: number): image.PixelMap {
+    const side = Math.max(1, canvas);
+    const dot = Math.min(CYLTag.badgeDotDiameter, side);
+    const pixels = Math.max(1, Math.round(CYLUIContext.vp2px(side)));
+    const surface = new OffscreenCanvas(pixels, pixels);
+    const context = surface.getContext('2d');
     context.fillStyle = color;
     context.beginPath();
-    context.arc(side / 2, side / 2, side / 2, 0, Math.PI * 2);
+    const center = pixels / 2;
+    context.arc(center, center, CYLUIContext.vp2px(dot) / 2, 0, Math.PI * 2);
+    context.fill();
+    return context.getPixelMap(0, 0, pixels, pixels);
+  }
+
+  /**
+   * The width of a badge image: the diameter (a circle) for a short text, or `textWidth` and `badgeImageTextPadding` on
+   * both sides when that is more (a capsule; iOS `badgeImageWidth`: max(diameter, text + 2 * padding)). Pure, so that
+   * the math is testable without a canvas.
+   */
+  static badgeImageWidthForText(textWidth: number, diameter: number,
+    padding: number = BADGE_IMAGE_TEXT_PADDING): number {
+    const side = Math.max(1, diameter);
+    return Math.max(side, Math.ceil(Math.max(0, textWidth)) + 2 * padding);
+  }
+
+  /** One character (a digit, a letter, a CJK character such as "热") always keeps the circle, as on iOS. */
+  static badgeTextKeepsCircle(text: string): boolean {
+    return Array.from(text).length <= 1;
+  }
+
+  /** The font of a badge image's text: bold, 60 % of the diameter, in vp (the canvas' default unit). */
+  private static badgeImageFont(diameter: number): string {
+    return `bold ${Math.round(diameter * BADGE_IMAGE_FONT_RATIO)}vp sans-serif`;
+  }
+
+  /** A capsule of `color`, `diameter` vp high, with `text` in bold white at 60 % of the diameter (a circle when short). */
+  static badgeImage(text: string, color: string, diameter: number): image.PixelMap {
+    // The canvas is drawn in px (as before the capsule), the font in vp (see below); the width math runs in px.
+    const pixelHeight = Math.max(1, Math.round(CYLUIContext.vp2px(Math.max(1, diameter))));
+    const font = CYLTag.badgeImageFont(pixelHeight);
+    const probe = new OffscreenCanvas(1, 1).getContext('2d');
+    probe.font = font;
+    const textWidth = CYLTag.badgeTextKeepsCircle(text) ? 0 : probe.measureText(text).width;
+    const pixelWidth = Math.max(1, Math.round(CYLTag.badgeImageWidthForText(textWidth,
+      pixelHeight, CYLUIContext.vp2px(CYLTag.badgeImageTextPadding))));
+    const canvas = new OffscreenCanvas(pixelWidth, pixelHeight);
+    const context = canvas.getContext('2d');
+    context.fillStyle = color;
+    const radius = pixelHeight / 2;
+    context.beginPath();
+    context.moveTo(radius, 0);
+    context.lineTo(pixelWidth - radius, 0);
+    context.arc(pixelWidth - radius, radius, radius, -Math.PI / 2, Math.PI / 2);
+    context.lineTo(radius, pixelHeight);
+    context.arc(radius, radius, radius, Math.PI / 2, Math.PI * 1.5);
+    context.closePath();
     context.fill();
     context.fillStyle = '#FFFFFFFF';
     // Canvas coordinates are vp (its default unit), so the font is too: a px font drew the glyph a density-fraction
     // of the circle (unreadable "神" / "热" in the hot-search badges).
-    context.font = `bold ${Math.round(side * 0.6)}vp sans-serif`;
+    context.font = font;
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    context.fillText(text, side / 2, side / 2);
-    return context.getPixelMap(0, 0, side, side);
+    context.fillText(text, pixelWidth / 2, pixelHeight / 2);
+    return context.getPixelMap(0, 0, pixelWidth, pixelHeight);
   }
 
   get description(): string {
@@ -295,14 +361,18 @@ export class CYLTagDataSource implements CYLMenuDataSource {
     if (tag === undefined) {
       return undefined;
     }
-    if (tag.image === undefined && tag.badgeText !== undefined && tag.badgeText.length > 0) {
+    if (tag.image === undefined && tag.badgeText !== undefined) {
       const size = this.baseStyleStorage.imageSize;
       const side = Math.max(size.width, size.height);
-      tag.image = CYLTag.badgeImage(tag.badgeText, tag.badgeColor ?? tag.textColor ?? SYSTEM_BLUE,
-        side > 0 ? side : 16);
+      const canvas = side > 0 ? side : BADGE_DEFAULT_DIAMETER;
+      // "" is a dot (iOS `badgeDotImage`, red by default); any text is a capsule (blue by default).
+      tag.image = tag.badgeText.length === 0
+        ? CYLTag.badgeDotImage(tag.badgeColor ?? SYSTEM_RED, canvas)
+        : CYLTag.badgeImage(tag.badgeText, tag.badgeColor ?? tag.textColor ?? SYSTEM_BLUE, canvas);
     }
     return tag.image;
   }
+  menuSubtitleForItem = (indexPath: CYLIndexPath): string | undefined => this.tagAt(indexPath)?.subtitle;
   menuSelectedImageForItem = (indexPath: CYLIndexPath): CYLImage | undefined => this.tagAt(indexPath)?.selectedImage;
   menuAnimationURLForItem = (indexPath: CYLIndexPath): string | undefined => this.tagAt(indexPath)?.animationURL;
   menuItemIsEnabled = (indexPath: CYLIndexPath): boolean => this.tagAt(indexPath)?.isEnabled ?? true;

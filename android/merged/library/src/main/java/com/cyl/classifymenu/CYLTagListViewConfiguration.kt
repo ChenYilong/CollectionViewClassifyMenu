@@ -1,5 +1,6 @@
 package com.cyl.classifymenu
 
+import com.cyl.animateditem.CYLAnimatedItemSource
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
@@ -42,6 +43,8 @@ const val CYLTagListViewAllowsEmptySelection = "allowsEmptySelection"
  * Tag list key: a Boolean.
  */
 const val CYLTagListViewShowsSectionHeaders = "showsSectionHeaders"
+/** What a long press does: "reorder", "callout", "report" or "none", or a list of them (the first that can begin wins). */
+const val CYLTagListViewLongPressAction = "longPressAction"
 /**
  * Tag list key: a Boolean.
  */
@@ -133,6 +136,8 @@ const val CYLTagSectionStyle = "style"
  * Item key: the title.
  */
 const val CYLTagItemTitle = "title"
+/** A longer description, shown in a callout on a long press (`longPressAction` "callout"). */
+const val CYLTagItemSubtitle = "subtitle"
 /**
  * Item key: an image name or path.
  */
@@ -198,6 +203,10 @@ const val CYLMenuStyleImageTitleSpacing = "imageTitleSpacing"
  * Style key: a number.
  */
 const val CYLMenuStyleItemHeight = "itemHeight"
+/** The most lines a title may take: a whole number, or "unlimited". Default 1. */
+const val CYLMenuStyleTitleMaxLines = "titleMaxLines"
+/** The most lines a section header's title may take: a whole number, or "unlimited"; a value below 1 is 1. Default 1. */
+const val CYLMenuStyleHeaderMaxLines = "headerMaxLines"
 /**
  * Style key: a number, 0 for flowing rows.
  */
@@ -254,6 +263,12 @@ const val CYLMenuStyleImagePlacement = "imagePlacement"
  * Style key: "center" or "leading".
  */
 const val CYLMenuStyleContentAlignment = "contentAlignment"
+
+/** A `CYLTagBackgroundStyle` ordinal, or "flat" / "liquidGlass" (case-insensitive); anything else is flat. */
+const val CYLMenuStyleBackgroundStyle = "backgroundStyle"
+
+/** A size "{width, height}" in dp, or {"width": 69, "height": 29}: `CYLMenuStyle.minimumTagSize`. */
+const val CYLMenuStyleMinimumTagSize = "minimumTagSize"
 /**
  * Style key: a Boolean.
  */
@@ -262,6 +277,34 @@ const val CYLMenuStyleAdjustsFontForContentSizeCategory = "adjustsFontForContent
  * Style key: a color.
  */
 const val CYLMenuStyleBackgroundColor = "backgroundColor"
+/** Style key: "plain" or "insetGrouped" (case-insensitive), or a `CYLSectionStyle` ordinal: the section card. */
+const val CYLMenuStyleSectionStyle = "sectionStyle"
+/** Style key: a color: the card's. */
+const val CYLMenuStyleSectionBackgroundColor = "sectionBackgroundColor"
+/** Style key: "flat" or "liquidGlass" (case-insensitive), or a `CYLTagBackgroundStyle` ordinal: the card's background. */
+const val CYLMenuStyleSectionBackgroundStyle = "sectionBackgroundStyle"
+/** Style key: a number, dp. */
+const val CYLMenuStyleSectionCornerRadius = "sectionCornerRadius"
+/** Style key: insets, the padding inside the card. */
+const val CYLMenuStyleSectionContentInsets = "sectionContentInsets"
+/** Style key: a number, dp: how far the board extends beyond the tag column on both sides (negative is 0; absent: the content insets' leading/trailing). */
+const val CYLMenuStyleSectionBoardInset = "sectionBoardInset"
+/** Style key: a color: the header band's; absent: no band. */
+const val CYLMenuStyleHeaderBackgroundColor = "headerBackgroundColor"
+/** Style key: a number, dp. */
+const val CYLMenuStyleHeaderCornerRadius = "headerCornerRadius"
+/** Style key: insets (left and right are used). */
+const val CYLMenuStyleHeaderContentInsets = "headerContentInsets"
+/** Style key: "none" or "line" (case-insensitive), or a `CYLHeaderSeparatorStyle` ordinal: the header divider. */
+const val CYLMenuStyleHeaderSeparatorStyle = "headerSeparatorStyle"
+/** Style key: a color: the divider's. */
+const val CYLMenuStyleHeaderSeparatorColor = "headerSeparatorColor"
+/** Style key: a number, dp. */
+const val CYLMenuStyleHeaderSeparatorThickness = "headerSeparatorThickness"
+/** Style key: insets (left and right are used): the divider's inset from the column's edges. */
+const val CYLMenuStyleHeaderSeparatorInsets = "headerSeparatorInsets"
+/** Style key: a color: `CYLMenuStyle.tintColor`, the one color of the title, section icon and fold / More controls. */
+const val CYLMenuStyleTintColor = "tintColor"
 /**
  * Style key: a color.
  */
@@ -479,10 +522,15 @@ private fun fileURL(context: Context?, value: Any?, baseURL: Uri?): Uri? {
     if (value is Uri) return value
     val string = value as? String ?: return null
     if (string.isEmpty()) return null
-    val hash = string.indexOf('#')
-    if (hash > 0 && (Uri.parse(string).scheme?.length ?: 0) <= 1) {
-        val file = fileURL(context, string.substring(0, hash), baseURL) ?: return null
-        return file.buildUpon().encodedFragment(string.substring(hash + 1)).build()
+    // "file.riv#artboard=HOME" or "file.riv?artboard=HOME": the engine's shared source rules (CYLAnimatedItemSource, the
+    // same as iOS, HarmonyOS and the mini program) split the file from its options; resolve the file, then keep the
+    // options in its fragment, as CYLTabBarController writes them.
+    if (string.any { it == '#' || it == '?' } && (Uri.parse(string).scheme?.length ?: 0) <= 1) {
+        val source = CYLAnimatedItemSource.parse(string)
+        if (source.file.isNotEmpty()) {
+            val file = fileURL(context, source.file, baseURL) ?: return null
+            return CYLMenuAnimationURLWithOptions(file, source.options)
+        }
     }
     // An absolute file path first: `File.isAbsolute`, not a leading "/", so a drive path ("C:\...", the unit tests on
     // Windows) is a file too and not an asset name or a one-letter URI scheme (CYLTabBarController B1).
@@ -554,7 +602,12 @@ private fun image(context: Context?, value: Any?, baseURL: Uri?): Drawable? {
         // underscores, e.g. "system:star.fill" -> R.drawable.cyl_system_star_fill), tinted like a template image.
         context ?: return null
         val id = context.resources.getIdentifier("cyl_system_" + name.replace('.', '_').replace('-', '_').lowercase(), "drawable", context.packageName)
-        return if (id != 0) androidx.core.content.ContextCompat.getDrawable(context, id) else null
+        if (id == 0) {
+            // A missing drawable leaves the icon slot empty (no crash): the warning names the drawable to add.
+            android.util.Log.w("CYLTagList", "No drawable cyl_system_" + name.replace('.', '_').replace('-', '_').lowercase() + " for \"" + string + "\"")
+            return null
+        }
+        return androidx.core.content.ContextCompat.getDrawable(context, id)
     }
     if (context != null) {
         val name = string.substringBeforeLast('.').replace('-', '_').lowercase()
@@ -591,6 +644,8 @@ private class CYLTagListConfigurationSource(
     override fun menuNumberOfItemsInSection(section: Int): Int = items(section).size
     override fun menuTitleForSection(section: Int): String = sections.getOrNull(section)?.get(CYLTagSectionTitle)?.toString() ?: ""
     override fun menuTitleForItemAtIndexPath(indexPath: CYLIndexPath): String = item(indexPath)[CYLTagItemTitle]?.toString() ?: ""
+
+    override fun menuSubtitleForItemAtIndexPath(indexPath: CYLIndexPath): String? = item(indexPath)[CYLTagItemSubtitle]?.toString()
     override fun menuImageForItemAtIndexPath(indexPath: CYLIndexPath): Drawable? = image(context, item(indexPath)[CYLTagItemImage], baseURL)
     override fun menuSelectedImageForItemAtIndexPath(indexPath: CYLIndexPath): Drawable? = image(context, item(indexPath)[CYLTagItemSelectedImage], baseURL)
 
@@ -656,13 +711,20 @@ fun CYLMenuFoldControl.Companion.foldControlWithConfiguration(configuration: Any
     val control = CYLMenuFoldControl.noFoldControl()
     if (configuration is String || configuration is Number) {
         control.applyConfiguration(mapOf(CYLMenuFoldControlKeyPosition to configuration), context)
-        control.content = if (control.position == CYLMenuFoldControlPosition.FOOTER)
-            CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon else CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle
+        control.content = usualContentForPosition(control.position)
         return control
     }
     val dictionary = map(configuration) ?: return null
     control.applyConfiguration(dictionary, context)
+    // A dictionary without a content gets the position's usual content (the tail and the footer: the icon only).
+    if (dictionary[CYLMenuFoldControlKeyContent] == null) control.content = usualContentForPosition(control.position)
     return control
+}
+
+/** The content a position has when none is given: the header controls show the icon and the title, the tail and the footer the icon only. */
+private fun usualContentForPosition(position: CYLMenuFoldControlPosition): CYLMenuFoldControlContent = when (position) {
+    CYLMenuFoldControlPosition.FOOTER, CYLMenuFoldControlPosition.TAIL -> CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon
+    else -> CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle
 }
 
 /**
@@ -681,6 +743,7 @@ fun CYLMenuFoldControl.applyConfiguration(configuration: Map<String, Any?>, cont
     configuration[CYLMenuFoldControlKeyContent]?.let {
         content = enumValue(it, mapOf("iconandtitle" to CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle,
             "titleandicon" to CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle,
+            "titleandiconalways" to CYLMenuFoldControlContent.CYLMenuFoldControlContentTitleAndIcon,
             "title" to CYLMenuFoldControlContent.CYLMenuFoldControlContentTitle,
             "icon" to CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon), CYLMenuFoldControlContent.values(), content)
     }
@@ -729,10 +792,18 @@ fun CYLMenuStyle.applyConfiguration(configuration: Map<String, Any?>, context: C
     disabledAppearance.applyConfiguration(map(configuration[CYLMenuStyleDisabled]), context)
     number(configuration[CYLMenuStyleImageTitleSpacing])?.let { imageTitleSpacing = it.toFloat() }
     number(configuration[CYLMenuStyleItemHeight])?.let { itemHeight = it.toFloat() }
+    configuration[CYLMenuStyleTitleMaxLines].let { value ->
+        if (value == "unlimited") titleMaxLines = CYLTagTitleMaxLines.UNLIMITED
+        else number(value)?.let { titleMaxLines = it.toInt() }
+    }
     number(configuration[CYLMenuStyleNumberOfItemsPerRow])?.let { numberOfItemsPerRow = maxOf(0, it.toInt()) }
     number(configuration[CYLMenuStyleInteritemSpacing])?.let { interitemSpacing = it.toFloat() }
     number(configuration[CYLMenuStyleLineSpacing])?.let { lineSpacing = it.toFloat() }
     number(configuration[CYLMenuStyleHeaderHeight])?.let { headerHeight = it.toFloat() }
+    configuration[CYLMenuStyleHeaderMaxLines].let { value ->
+        if (value == "unlimited") headerMaxLines = CYLHeaderTitleMaxLines.UNLIMITED
+        else number(value)?.let { headerMaxLines = it.toInt() }
+    }
     number(configuration[CYLMenuStyleAnimationSpeed])?.let { animationSpeed = it.toFloat() }
     bool(configuration[CYLMenuStyleLayoutCentered])?.let { layoutCentered = it }
     configuration[CYLMenuStyleImagePlacement]?.let {
@@ -746,6 +817,11 @@ fun CYLMenuStyle.applyConfiguration(configuration: Map<String, Any?>, context: C
             "leading" to CYLTagContentAlignment.CYLTagContentAlignmentLeading, "left" to CYLTagContentAlignment.CYLTagContentAlignmentLeading),
             CYLTagContentAlignment.values(), contentAlignment)
     }
+    configuration[CYLMenuStyleBackgroundStyle]?.let {
+        backgroundStyle = enumValue(it, mapOf("flat" to CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat,
+            "liquidglass" to CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass), CYLTagBackgroundStyle.values(), backgroundStyle)
+    }
+    size(configuration[CYLMenuStyleMinimumTagSize])?.let { minimumTagSize = it }
     bool(configuration[CYLMenuStyleAdjustsFontForContentSizeCategory])?.let { adjustsFontForContentSizeCategory = it }
     size(configuration[CYLMenuStyleImageSize])?.let { imageSize = it }
     size(configuration[CYLMenuStyleAnimationSize])?.let { animationSize = it }
@@ -754,6 +830,7 @@ fun CYLMenuStyle.applyConfiguration(configuration: Map<String, Any?>, context: C
     offset(configuration[CYLMenuStyleTitlePositionAdjustment])?.let { titlePositionAdjustment = it }
     offset(configuration[CYLMenuStyleImagePositionAdjustment])?.let { imagePositionAdjustment = it }
     color(configuration[CYLMenuStyleBackgroundColor])?.let { backgroundColor = it }
+    color(configuration[CYLMenuStyleTintColor])?.let { tintColor = it }
     color(configuration[CYLMenuStyleHeaderTextColor])?.let { headerTextColor = it }
     color(configuration[CYLMenuStyleFoldControlColor])?.let { foldControlColor = it }
     font(configuration[CYLMenuStyleHeaderFont])?.let { headerFont = it }
@@ -762,6 +839,33 @@ fun CYLMenuStyle.applyConfiguration(configuration: Map<String, Any?>, context: C
     (configuration[CYLMenuStyleDeleteIndicatorTitle] as? String)?.let { deleteIndicatorTitle = it }
     if (CYLMenuStyleDeleteIndicatorColor in configuration) deleteIndicatorColor = color(configuration[CYLMenuStyleDeleteIndicatorColor])
     if (CYLMenuStyleDeleteIndicatorFont in configuration) deleteIndicatorFont = font(configuration[CYLMenuStyleDeleteIndicatorFont])
+    applySectionStyleConfiguration(configuration)
+}
+
+/** The section card, header band and header divider keys of [applyConfiguration]. */
+private fun CYLMenuStyle.applySectionStyleConfiguration(configuration: Map<String, Any?>) {
+    configuration[CYLMenuStyleSectionStyle]?.let {
+        sectionStyle = enumValue(it, mapOf("plain" to CYLSectionStyle.CYLSectionStylePlain,
+            "insetgrouped" to CYLSectionStyle.CYLSectionStyleInsetGrouped), CYLSectionStyle.values(), sectionStyle)
+    }
+    color(configuration[CYLMenuStyleSectionBackgroundColor])?.let { sectionBackgroundColor = it }
+    configuration[CYLMenuStyleSectionBackgroundStyle]?.let {
+        sectionBackgroundStyle = enumValue(it, mapOf("flat" to CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat,
+            "liquidglass" to CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass), CYLTagBackgroundStyle.values(), sectionBackgroundStyle)
+    }
+    number(configuration[CYLMenuStyleSectionCornerRadius])?.let { sectionCornerRadius = it.toFloat() }
+    insets(configuration[CYLMenuStyleSectionContentInsets])?.let { sectionContentInsets = it }
+    number(configuration[CYLMenuStyleSectionBoardInset])?.let { sectionBoardInset = it.toFloat() }
+    color(configuration[CYLMenuStyleHeaderBackgroundColor])?.let { headerBackgroundColor = it }
+    number(configuration[CYLMenuStyleHeaderCornerRadius])?.let { headerCornerRadius = it.toFloat() }
+    insets(configuration[CYLMenuStyleHeaderContentInsets])?.let { headerContentInsets = it }
+    configuration[CYLMenuStyleHeaderSeparatorStyle]?.let {
+        headerSeparatorStyle = enumValue(it, mapOf("none" to CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleNone,
+            "line" to CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleLine), CYLHeaderSeparatorStyle.values(), headerSeparatorStyle)
+    }
+    color(configuration[CYLMenuStyleHeaderSeparatorColor])?.let { headerSeparatorColor = it }
+    number(configuration[CYLMenuStyleHeaderSeparatorThickness])?.let { headerSeparatorThickness = it.toFloat() }
+    insets(configuration[CYLMenuStyleHeaderSeparatorInsets])?.let { headerSeparatorInsets = it }
 }
 
 // MARK: Tag
@@ -839,6 +943,7 @@ fun CYLTagListView.applyConfiguration(configuration: Map<String, Any?>) {
     image(context, configuration[CYLTagListViewTitleImage], baseURL)?.let { titleImage = it }
     (configuration[CYLTagListViewTitle] as? String)?.let { title = it }
     bool(configuration[CYLTagListViewAllowsEmptySelection])?.let { allowsEmptySelection = it }
+    longPressActionFromConfiguration(configuration[CYLTagListViewLongPressAction])?.let { longPressAction = it }
     bool(configuration[CYLTagListViewShowsSectionHeaders])?.let { showsSectionHeaders = it }
     bool(configuration[CYLTagListViewScrollEnabled])?.let { isScrollEnabled = it }
     number(configuration[CYLTagListViewDefaultVisibleRows])?.let { defaultVisibleRows = maxOf(0, it.toInt()) }
@@ -946,4 +1051,24 @@ private fun plistValue(text: String): Any? {
         if (parser.eventType == XmlPullParser.START_TAG && parser.name != "plist") return read()
     }
     return null
+}
+
+/** A configuration's `longPressAction` (a name or a list of names) as an action; null when absent or unknown. */
+private fun longPressActionFromConfiguration(value: Any?): CYLTagLongPressAction? {
+    value ?: return null
+    val names = if (value is List<*>) value else listOf(value)
+    val actions = ArrayList<CYLTagLongPressAction>()
+    for (name in names) {
+        actions.add(when (name) {
+            "reorder" -> CYLTagLongPressActions.reorder
+            "callout" -> CYLTagLongPressActions.callout
+            "report" -> CYLTagLongPressActions.report
+            "none" -> CYLTagLongPressActions.none
+            else -> return null
+        })
+    }
+    if (actions.isEmpty()) return null
+    // The long press is still reported where no listed action takes it (a tag without a subtitle), unless "none".
+    if (CYLTagLongPressActions.none !in actions && CYLTagLongPressActions.report !in actions) actions.add(CYLTagLongPressActions.report)
+    return if (actions.size == 1) actions[0] else CYLTagLongPressActions.first(actions)
 }

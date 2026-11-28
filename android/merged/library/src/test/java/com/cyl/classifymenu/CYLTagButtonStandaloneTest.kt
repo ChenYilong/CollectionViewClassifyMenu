@@ -1,5 +1,6 @@
 package com.cyl.classifymenu
 
+import com.cyl.animateditem.CYLAnimatedItemCornerRadiusCapsule
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -32,6 +33,17 @@ class CYLTagButtonStandaloneTest {
         val height = (heightDp * density).toInt()
         button.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY))
         button.layout(0, 0, width, height)
+    }
+
+    /** The tag is the host of the engine's player: it never lets the view play on selection (the Android view defaults to false, iOS to true). */
+    @Test
+    fun theTagDrivesItsOwnPlaybackAndTheViewNeverPlaysOnSelection() {
+        val button = CYLTagButton(context, "Tag", icon())
+        assertEquals(false, button.drivesAnimationPlayback)
+        val token = button.animationRestartToken
+        button.isSelected = true
+        assertEquals(false, button.drivesAnimationPlayback)
+        assertEquals("selecting does not restart", token, button.animationRestartToken)
     }
 
     @Test
@@ -80,11 +92,11 @@ class CYLTagButtonStandaloneTest {
     fun theBadgeIsADotOrACapsuleAtTheIconsCorner() {
         val button = CYLTagButton(context, "Messages", icon())
         layOut(button, 120f, 40f)
-        assertNull(button.badgeValue)
+        assertNull(button.tagBadgeValue)
         assertEquals(View.GONE, button.badgeLabel.visibility)
         assertEquals(CYLTagBadgeDefaultColor, button.badgeColor)
 
-        button.badgeValue = ""
+        button.tagBadgeValue = ""
         layOut(button, 120f, 40f)
         assertEquals(View.VISIBLE, button.badgeLabel.visibility)
         assertEquals(8f, button.badgeFrame.width, 0.01f)
@@ -95,7 +107,7 @@ class CYLTagButtonStandaloneTest {
         button.onInitializeAccessibilityNodeInfo(info)
         assertEquals("Messages, " + CYLMenuLocalizedString("CYLTagBadgeDot"), info.contentDescription?.toString())
 
-        button.badgeValue = "99+"
+        button.tagBadgeValue = "99+"
         button.badgeColor = 0xFF0000FF.toInt()
         layOut(button, 120f, 40f)
         assertEquals("99+", button.badgeLabel.text.toString())
@@ -175,5 +187,85 @@ class CYLTagButtonStandaloneTest {
         assertEquals(1, tapped)
         button.showsDeleteIndicator = false
         assertEquals(View.GONE, button.deleteIndicatorLabel.visibility)
+    }
+
+    // MARK: Tag background style (Liquid Glass) and minimumTagSize
+
+    @org.junit.After
+    fun resetLiquidGlass() {
+        com.cyl.animateditem.CYLAnimatedItemView.liquidGlassActiveOverride = null
+    }
+
+    @Test
+    fun theBackgroundStyleAndTheMinimumTagSizeAreReadFromTheConfiguration() {
+        fun style(values: Map<String, Any?>) = CYLMenuStyle.styleWithConfiguration(values)
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat, style(emptyMap()).backgroundStyle)
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass, style(mapOf(CYLMenuStyleBackgroundStyle to "liquidGlass")).backgroundStyle)
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass, style(mapOf(CYLMenuStyleBackgroundStyle to "LiquidGlass")).backgroundStyle)
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat, style(mapOf(CYLMenuStyleBackgroundStyle to "frosted")).backgroundStyle)
+        assertEquals(CYLSize(69f, 29f), style(mapOf(CYLMenuStyleMinimumTagSize to "{69, 29}")).minimumTagSize)
+        assertEquals(CYLSize.ZERO, style(emptyMap()).minimumTagSize)
+        val source = CYLMenuStyle()
+        source.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
+        source.minimumTagSize = CYLSize(69f, 29f)
+        val copy = source.copy()
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass, copy.backgroundStyle)
+        assertEquals(CYLSize(69f, 29f), copy.minimumTagSize)
+    }
+
+    @Test
+    fun liquidGlassIsDrawnOnlyWhereTheDeviceDrawsIt() {
+        val style = CYLMenuStyle()
+        style.backgroundStyle = CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
+        com.cyl.animateditem.CYLAnimatedItemView.liquidGlassActiveOverride = false
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleFlat, style.resolvedBackgroundStyle)
+        val flat = CYLTagButton(context, "Tag", icon())
+        flat.style = style
+        flat.layout(0, 0, 300, 100)
+        assertEquals("flat: no glass layer", null, flat.liquidGlassView)
+
+        com.cyl.animateditem.CYLAnimatedItemView.liquidGlassActiveOverride = true
+        assertEquals(CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass, style.resolvedBackgroundStyle)
+        val glass = CYLTagButton(context, "Tag", icon())
+        glass.layout(0, 0, 300, 100)
+        glass.style = style
+        assertTrue("CYLAnimatedItemView draws the glass layer", glass.liquidGlassView != null)
+    }
+
+    @Test
+    fun theDefaultRadiusIsTheCapsuleConstantInEveryStyleAndASetRadiusCustomizesIt() {
+        com.cyl.animateditem.CYLAnimatedItemView.liquidGlassActiveOverride = true
+        assertEquals(CYLAnimatedItemCornerRadiusCapsule, CYLMenuStyle().normalAppearance.cornerRadius)
+        for (background in CYLTagBackgroundStyle.values()) {
+            val style = CYLMenuStyle()
+            style.backgroundStyle = background
+            val tag = CYLTagButton(context, "Tag", icon())
+            tag.style = style
+            tag.layout(0, 0, 300, 100)
+            assertEquals("$background: the default is the capsule constant", CYLAnimatedItemCornerRadiusCapsule, tag.itemCornerRadius)
+            // A new style object: assigning the same instance again does not re-apply it.
+            val customized = style.copy()
+            customized.normalAppearance.cornerRadius = 6f
+            tag.style = customized
+            tag.layout(0, 0, 300, 100)
+            assertEquals(6f, tag.itemCornerRadius)
+            val square = customized.copy()
+            square.normalAppearance.cornerRadius = 0f
+            tag.style = square
+            tag.layout(0, 0, 300, 100)
+            assertEquals("0 is square", 0f, tag.itemCornerRadius)
+        }
+    }
+
+    @Test
+    fun aMinimumTagSizeGrowsATagThatIsSmaller() {
+        val style = CYLMenuStyle()
+        val plainWidth = CYLTagButton.widthForTitle("A", CYLSize.ZERO, style)
+        val plainHeight = CYLTagButton.heightForTitle("A", CYLSize.ZERO, style)
+        assertTrue(plainWidth < 69f)
+        style.minimumTagSize = CYLSize(69f, plainHeight + 10f)
+        assertEquals(69f, CYLTagButton.widthForTitle("A", CYLSize.ZERO, style))
+        assertEquals(plainHeight + 10f, CYLTagButton.heightForTitle("A", CYLSize.ZERO, style))
+        assertTrue("a larger tag is not shrunk", CYLTagButton.widthForTitle("wide ".repeat(20), CYLSize.ZERO, style) > 69f)
     }
 }

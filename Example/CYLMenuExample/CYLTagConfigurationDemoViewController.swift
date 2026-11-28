@@ -28,6 +28,11 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
     /// HarmonyOS and mini program examples, so its titles stay the source text and are looked up here.
     static func localizedFileConfiguration() throws -> [String: Any] {
         var configuration = try CYLTagListView.configuration(contentsOfFile: configurationFilePath())
+        // The shared configuration file sets no sectionStyle: keep this screen flat, as the Android example does (`plainSections()`). The list folds after
+        // two rows with the fold control at the end, so a tag that does not fit next to it ("SF Symbol") is hidden until expanded: accepted.
+        var style = configuration[CYLTagListKey.style] as? [String: Any] ?? [:]
+        style[CYLMenuStyleKey.sectionStyle] = "plain"
+        configuration[CYLTagListKey.style] = style
         if let sections = configuration[CYLTagListKey.sections] as? [[String: Any]] {
             configuration[CYLTagListKey.sections] = sections.map { section -> [String: Any] in
                 var section = section
@@ -72,6 +77,8 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
                                        CYLTagAppearanceKey.iconColor: UIColor.white,
                                        CYLTagAppearanceKey.cornerRadius: 8]
         let style: [String: Any] = [
+            CYLMenuStyleKey.sectionStyle: "plain",
+            CYLMenuStyleKey.backgroundStyle: "liquidGlass",
             CYLMenuStyleKey.imageSize: NSValue(cgSize: CGSize(width: 20, height: 20)),
             CYLMenuStyleKey.imageTitleSpacing: 4,
             CYLMenuStyleKey.itemHeight: 36,
@@ -80,10 +87,17 @@ final class CYLTagConfigurationDemoViewController: UIViewController {
             CYLMenuStyleKey.selected: selected,
         ]
         let items: [Any] = [
-            [CYLTagItemKey.title: "Lottie", CYLTagItemKey.animation: animationValue("Lottie/tab_me_animate.json")] as [String: Any],
-            [CYLTagItemKey.title: "GIF", CYLTagItemKey.animation: animationValue("GIF/cyl_tab_sample_animated.gif")] as [String: Any],
-            [CYLTagItemKey.title: "Rive", CYLTagItemKey.animation: animationValue("Rive/menu_button.riv")] as [String: Any],
-            [CYLTagItemKey.title: "SVGA", CYLTagItemKey.animation: animationValue("SVGA/tab_chat.svga")] as [String: Any],
+            // Every animated entry uses the unified policy `renderingMode=automatic` (the same for every engine): a ONE-color file is tinted like the title color
+            // (the near-black Lottie person icon follows the item's icon color: white on dark glass, dark on light); multi-colour or undetectable artwork
+            // (PAG, SVGA and Rive cannot be detected) keeps its own colors. `tint=title` would force the template look on every engine, even a multi-colour file.
+            [CYLTagItemKey.title: "Lottie", CYLTagItemKey.animation: animationValue("Lottie/tab_me_animate.json"),
+             CYLTagItemKey.animationOptions: ["renderingMode": "automatic"]] as [String: Any],
+            [CYLTagItemKey.title: "GIF", CYLTagItemKey.animation: animationValue("GIF/cyl_tab_sample_animated.gif"),
+             CYLTagItemKey.animationOptions: ["renderingMode": "automatic"]] as [String: Any],
+            [CYLTagItemKey.title: "Rive", CYLTagItemKey.animation: animationValue("Rive/menu_button.riv"),
+             CYLTagItemKey.animationOptions: ["renderingMode": "automatic"]] as [String: Any],
+            [CYLTagItemKey.title: "SVGA", CYLTagItemKey.animation: animationValue("SVGA/tab_chat.svga"),
+             CYLTagItemKey.animationOptions: ["renderingMode": "automatic"]] as [String: Any],
             [CYLTagItemKey.image: likeImage("heart"), CYLTagItemKey.selectedImage: likeImage("heart.fill")] as [String: Any],
             "Text only",
         ]

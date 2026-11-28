@@ -12,8 +12,9 @@
 | C5：菜单联动的结果行重复菜品和地区 | `de06d49` | `harmony/entry/.../CYLMenuLinkagePage.ets` | 结果行是示例自己的 SQLite 演示数据和文本；核心库没有结果列表。 |
 | P1：根标签页标题互相挤在一起 | `de06d49` | `harmony/entry/.../pages/Index.ets` | 根标签栏是示例应用自己的 `Tabs`，不是核心库组件。 |
 | E1 / E3 / E6：截图打开了错误的标签页、截到了启动器，或在标签绘制之前就截了图 | `de06d49`, `164b0e2` | `harmony/entry/.../pages/Index.ets`, `EntryAbility.ets`, `harmony/scripts/screenshots.sh` | 启动选项和截图脚本属于示例工具；与核心库无关。 |
+| 评价页预选的标签被折叠隐藏（`CYLReviewListViewController`，`570fc65` 之后） | this change | `Example/CYLMenuExample/CYLReviewListViewController.swift` | The example decided in `viewDidLoad`, without a width, and relied on every tag being a row of its own there; `570fc65` (no fold before the width) made the list report all items visible, so the later fold hid the preselected chip. The core is right (no layout, no fold); the example now reveals at the first layout with a width. |
 | E4 / E5 / E8：分区标题为中文，标签标题、分段和关键词标签为英文 | `9db8a0f`, `164b0e2`, `569c29c` | `harmony/entry/.../CYLTagAnimationPage.ets`, `CYLReviewStore.ets`, `CYLReviewListPage.ets`, `data/CYLExampleStrings.ets` | 这些文本是示例数据（演示配置和评价）；核心库只本地化它自己的字符串，并显示应用提供的内容。 |
-| HarmonyOS Rive：`icons.riv` 深色标签播放后都显示同一个画板 | 见 PR #28 | `harmony/entry/.../animation/CYLExampleAnimationPlayers.ets` | Rive 播放器（`CYLRivePlayer`）是示例自己的代码；核心库不依赖 @ohos/rive。@ohos/rive 1.0.4 的 `reset()` 会选回文件的第一个画板，所以播放器在 `reset()` 之后重新选中 `artboard` 指定的画板（CYLTabBarController 的 `CYLRiveTabBarItemAnimator` 有同样的修复）。 |
+| HarmonyOS Rive：`icons.riv` 深色标签播放后都显示同一个画板 | 见 PR #28 | `harmony/entry/.../animation/CYLExampleAnimationPlayers.ets` | Rive 播放器（`CYLRivePlayer`）是示例自己的代码；核心库不依赖 @ohos/rive。@ohos/rive 1.0.4 的 `reset()` 会选回文件的第一个画板，所以播放器在 `reset()` 之后重新选中 `artboard` 指定的画板（CYLTabBarController 的 `CYLRiveTabBarItemAnimator` 有同样的修复）。 2026-11-22 起该修复随 Rive 播放器移入 CYLTabBarController 的 `cylanimateditem_rive`（`CYLAnimatedItemRive`，与 cyltabbar 的 `CYLRiveIcon` 共用），示例不再有自己的播放器。 |
 | Y3：菜单联动的筛选按钮几乎看不见 | `a791539`, `c70e82a` | `harmony/entry/.../CYLMenuLinkagePage.ets` | 该按钮由示例页面绘制（iOS：示例的栏按钮），只有它的图片来自核心库。 |
 | E2 / Z3 / Z4 / Z6：根页面、标签栏和动效页面在深色模式下仍是浅色 | `72426f0`, `6e8ba55`, `535d96a`, `1fa6c78` | `harmony/entry/.../CYLProductPage.ets`, `pages/Index.ets`, `CYLTagAnimationPage.ets`, `DemoNav.ets`, `resources/*/element/color.json` | 页面背景、栏和标签是使用固定浅色的示例视图。 |
 | B20：小程序的 Rive 标签丢失了新的 `cyl-rive` 选项（`numberInput`、`number`、`values`） | 本次变更 | `CrossPlatform/wechat-miniprogram/miniprogram/components/cyl-tag-animation-view/cyl-tag-animation-view.js` (`RIVE_OPTIONS`) | 示例的引擎适配器把 Rive 选项写入路径片段时，使用的是自己保存的一份 `cyl-rive` 选项列表，而 `cyl-rive` 没有导出该列表（`cyl_rive_options.js` 中的 `CYL_OPTION_NAMES`）。已向 CYLTabBarController 提出：导出该列表，然后适配器导入它，这一行即可删除。**已关闭**：CYLTabBarController `a10cdffc` 导出了 `CYL_RIVE_OPTION_NAMES`；适配器 `require` 它，那份副本已删除（固定版本为 `6a9ede85`）。 |
@@ -58,6 +59,13 @@ The row "HarmonyOS Rive: `icons.riv` dark tags all show the same artboard" above
 `CYLRivePlayer` selected the named artboard again after `reset()`, commit `03de656d`) was removed: the example no longer
 has a Rive player that drives `RiveAnimationView`. Every Rive tag now plays through CYLTabBarController's shared engine,
 the vendored `harmony/cylanimateditemrive` (`CYLRiveIcon`, loop policy `WhilePlaying`, registered with
-`cylRegisterRiveEngine(context)`), which handles artboards, replay and the Loop switch itself. `CYLRivePlayer` is only an
+`cylRegisterRiveEngine(context)`), which handles artboards, replay and the Loop switch itself. `CYLRivePlayer` was only an
 adapter (play -> replay token, stopAtProgress -> selected, loops -> loops). The core `harmony/classifymenu` still depends on
 neither the module nor `@ohos/rive`.
+
+**2026-11-22: the adapter is gone too.** The core's `CYLTagAnimatedIcon` takes a component-level builder per type
+(`CYLTagAnimationBuilder.registerItemBuilder`) and drives it through `CYLAnimatedItemView`'s `animationLoops` and
+`animationRestartToken` (first through a `CYLAnimatedItemPlayer` wrapper, removed the same day: the tag now passes its speed,
+loop switch and play token straight to those props). The example registers CYLTabBarController's
+`CYLRiveAnimationBuilder` for Rive and keeps no Rive code of its own (`CYLRiveIconView`, `CYLRiveIconHost` and `CYLRivePlayer`
+deleted); docs/issue-progress.md, "HarmonyOS tags play Rive through `CYLRiveAnimationBuilder`".

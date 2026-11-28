@@ -58,6 +58,7 @@ function styledTags() {
 /** The upper list: `CYLTagListView()` with lineSpacing 5, interitemSpacing 3, tagContentInsets {3, 10, 3, 10}. */
 function codeList() {
   const style = model.defaultStyle();
+  style.backgroundStyle = 'liquidGlass';
   style.lineSpacing = 5;
   style.interitemSpacing = 3;
   model.setTagContentInsets(style, { top: 3, left: 10, bottom: 3, right: 10 });
@@ -68,7 +69,7 @@ function codeList() {
 /** The configuration of the lower list: the same kinds of tags, as strings and dictionaries. */
 function mapConfiguration() {
   const blue = {
-    normal: { backgroundColor: '#00BFFF', textColor: '#FFFFFF', borderWidth: 0, cornerRadius: 0 },
+    normal: { backgroundColor: '#00BFFF', textColor: '#FFFFFF', borderWidth: 0, cornerRadius: 1000 },
     highlightedBackgroundColor: '#88363636',
   };
   return {
@@ -86,7 +87,7 @@ const SYMBOLS = { 'system:globe': '/images/samples/globe.png' };
 /** The lower list built from its configuration (`CYLTagListView(configuration:)`). */
 function mapList() {
   const configuration = mapConfiguration();
-  const style = model.styleFromConfiguration(configuration.style);
+  const style = model.styleFromConfiguration(Object.assign({ backgroundStyle: 'liquidGlass' }, configuration.style));
   const tags = configuration.tags.map((item) => {
     const tag = model.tagFromConfiguration(item);
     if (tag.image) tag.image = SYMBOLS[tag.image] || tag.image;

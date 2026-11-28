@@ -8,7 +8,10 @@
 import { CYLMenuColorFromString } from './CYLMenuColor';
 import { CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPosition } from './CYLMenuFoldControl';
 import { CYLMenuResources } from './CYLMenuResources';
-import { CYLMenuStyle, CYLTagContentAlignment, CYLTagImagePlacement } from './CYLMenuStyle';
+import {
+  CYLHeaderSeparatorStyle, CYLMenuStyle, CYLSectionStyle, CYLTagBackgroundStyle, CYLTagContentAlignment,
+  CYLTagImagePlacement, CYLTagTitleMaxLines, CYLHeaderTitleMaxLines
+} from './CYLMenuStyle';
 import { CYLTag } from './CYLTag';
 import { CYLTagAppearance } from './CYLTagAppearance';
 import { CYLEdgeInsets, CYLFont, CYLImage, CYLOffset, CYLSize } from './CYLTypes';
@@ -30,6 +33,8 @@ export class CYLTagListKey {
   static readonly foldStyle: string = 'foldStyle';
   static readonly allowsEmptySelection: string = 'allowsEmptySelection';
   static readonly showsSectionHeaders: string = 'showsSectionHeaders';
+  /** What a long press does: "reorder", "callout", "report" or "none", or an array of them (the first that can begin wins). */
+  static readonly longPressAction: string = 'longPressAction';
   static readonly scrollEnabled: string = 'scrollEnabled';
   static readonly defaultVisibleRows: string = 'defaultVisibleRows';
   /** An array of index paths ({section, item}), "section-item" strings or [section, item] arrays. */
@@ -71,6 +76,8 @@ export class CYLTagSectionKey {
 /** The keys of an item dictionary. */
 export class CYLTagItemKey {
   static readonly title: string = 'title';
+  /** A longer description, shown in a callout on a long press (`longPressAction` "callout"). */
+  static readonly subtitle: string = 'subtitle';
   static readonly image: string = 'image';
   static readonly selectedImage: string = 'selectedImage';
   /** A Lottie animation: `asset:<rawfile path>`, or the JSON text. */
@@ -94,6 +101,10 @@ export class CYLMenuStyleKey {
   static readonly disabled: string = 'disabled';
   static readonly imageTitleSpacing: string = 'imageTitleSpacing';
   static readonly itemHeight: string = 'itemHeight';
+  /** The most lines a title may take: a whole number, or "unlimited". Default 1. */
+  static readonly titleMaxLines: string = 'titleMaxLines';
+  /** The most lines a section header's title may take: a whole number, or "unlimited". Default 1. */
+  static readonly headerMaxLines: string = 'headerMaxLines';
   static readonly numberOfItemsPerRow: string = 'itemsPerRow';
   static readonly interitemSpacing: string = 'interitemSpacing';
   static readonly lineSpacing: string = 'lineSpacing';
@@ -108,16 +119,44 @@ export class CYLMenuStyleKey {
   static readonly layoutCentered: string = 'layoutCentered';
   static readonly imagePlacement: string = 'imagePlacement';
   static readonly contentAlignment: string = 'contentAlignment';
+  /**
+   * A `CYLTagBackgroundStyle` raw value, or 'flat' / 'liquidGlass' (case-insensitive); anything else is flat.
+   */
+  static readonly backgroundStyle: string = 'backgroundStyle';
+  /**
+   * A size '{width, height}' in vp, or { width: 69, height: 29 }: `CYLMenuStyle.minimumTagSize`.
+   */
+  static readonly minimumTagSize: string = 'minimumTagSize';
   static readonly adjustsFontForContentSizeCategory: string = 'adjustsFontForContentSizeCategory';
   static readonly backgroundColor: string = 'backgroundColor';
   static readonly headerTextColor: string = 'headerTextColor';
   static readonly foldControlColor: string = 'foldControlColor';
+  /** The one color of the built-in views that are not tags (title, icon, fold / More control): `CYLMenuStyle.tintColor`. */
+  static readonly tintColor: string = 'tintColor';
   static readonly headerFont: string = 'headerFont';
   static readonly highlightedBackgroundColor: string = 'highlightedBackgroundColor';
   static readonly tagContentInsets: string = 'tagContentInsets';
   static readonly deleteIndicatorTitle: string = 'deleteIndicatorTitle';
   static readonly deleteIndicatorColor: string = 'deleteIndicatorColor';
   static readonly deleteIndicatorFont: string = 'deleteIndicatorFont';
+  /** The section card: "plain" or "insetGrouped" (case-insensitive), or a `CYLSectionStyle` raw value. */
+  static readonly sectionStyle: string = 'sectionStyle';
+  static readonly sectionBackgroundColor: string = 'sectionBackgroundColor';
+  /** The card's background, as `backgroundStyle`: 'flat' or 'liquidGlass'; anything else is flat. */
+  static readonly sectionBackgroundStyle: string = 'sectionBackgroundStyle';
+  static readonly sectionCornerRadius: string = 'sectionCornerRadius';
+  static readonly sectionContentInsets: string = 'sectionContentInsets';
+  /** The horizontal inset of the content column inside the board, one number for both sides; absent: the default 12. */
+  static readonly sectionBoardInset: string = 'sectionBoardInset';
+  /** The header band's color; absent: no band. */
+  static readonly headerBackgroundColor: string = 'headerBackgroundColor';
+  static readonly headerCornerRadius: string = 'headerCornerRadius';
+  static readonly headerContentInsets: string = 'headerContentInsets';
+  /** The header divider: "none" or "line" (case-insensitive), or a `CYLHeaderSeparatorStyle` raw value. */
+  static readonly headerSeparatorStyle: string = 'headerSeparatorStyle';
+  static readonly headerSeparatorColor: string = 'headerSeparatorColor';
+  static readonly headerSeparatorThickness: string = 'headerSeparatorThickness';
+  static readonly headerSeparatorInsets: string = 'headerSeparatorInsets';
 }
 
 /** The keys of an appearance dictionary. */
@@ -410,6 +449,7 @@ const FOLD_POSITIONS: Map<string, number> = new Map<string, number>([
 
 const FOLD_CONTENTS: Map<string, number> = new Map<string, number>([
   ['iconandtitle', CYLMenuFoldControlContent.iconAndTitle], ['titleandicon', CYLMenuFoldControlContent.iconAndTitle],
+  ['titleandiconalways', CYLMenuFoldControlContent.titleAndIcon],
   ['title', CYLMenuFoldControlContent.title], ['icon', CYLMenuFoldControlContent.icon]
 ]);
 
@@ -417,6 +457,18 @@ const IMAGE_PLACEMENTS: Map<string, number> = new Map<string, number>([
   ['leading', CYLTagImagePlacement.leading], ['left', CYLTagImagePlacement.leading],
   ['trailing', CYLTagImagePlacement.trailing], ['right', CYLTagImagePlacement.trailing],
   ['top', CYLTagImagePlacement.top], ['bottom', CYLTagImagePlacement.bottom]
+]);
+
+const BACKGROUND_STYLES: Map<string, number> = new Map<string, number>([
+  ['flat', CYLTagBackgroundStyle.flat], ['liquidglass', CYLTagBackgroundStyle.liquidGlass]
+]);
+
+const SECTION_STYLES: Map<string, number> = new Map<string, number>([
+  ['plain', CYLSectionStyle.plain], ['insetgrouped', CYLSectionStyle.insetGrouped]
+]);
+
+const HEADER_SEPARATOR_STYLES: Map<string, number> = new Map<string, number>([
+  ['none', CYLHeaderSeparatorStyle.none], ['line', CYLHeaderSeparatorStyle.line]
 ]);
 
 const CONTENT_ALIGNMENTS: Map<string, number> = new Map<string, number>([
@@ -434,7 +486,7 @@ export class CYLMenuConfiguration {
     }
     const content = CYLConfigurationValue.rawValue(configuration[CYLMenuFoldControlKey.content], FOLD_CONTENTS);
     if (content !== undefined && content >= CYLMenuFoldControlContent.iconAndTitle &&
-      content <= CYLMenuFoldControlContent.icon) {
+      content <= CYLMenuFoldControlContent.titleAndIcon) {
       control.content = content as CYLMenuFoldControlContent;
     }
     const title = configuration[CYLMenuFoldControlKey.title];
@@ -494,8 +546,13 @@ export class CYLMenuConfiguration {
    */
   static applyToAppearance(appearance: CYLTagAppearance, configuration: CYLConfiguration): void {
     if (configuration[CYLTagAppearanceKey.backgroundColor] !== undefined) {
-      appearance.backgroundColor = CYLConfigurationValue.color(configuration[CYLTagAppearanceKey.backgroundColor]) ??
-      CYLTagAppearance.defaultBackgroundColor;
+      const configuredBackground = CYLConfigurationValue.color(configuration[CYLTagAppearanceKey.backgroundColor]);
+      if (configuredBackground !== undefined) {
+        appearance.backgroundColor = configuredBackground;
+      } else {
+        // Not a color: back to "unset", never the built-in default stored as if the app had set it.
+        appearance.resetBackgroundColor();
+      }
     }
     if (configuration[CYLTagAppearanceKey.textColor] !== undefined) {
       appearance.textColor = CYLConfigurationValue.color(configuration[CYLTagAppearanceKey.textColor]) ??
@@ -557,6 +614,24 @@ export class CYLMenuConfiguration {
     if (imageTitleSpacing !== undefined) {
       style.imageTitleSpacing = imageTitleSpacing;
     }
+    const maxLinesValue = configuration[CYLMenuStyleKey.titleMaxLines];
+    if (maxLinesValue === 'unlimited') {
+      style.titleMaxLines = CYLTagTitleMaxLines.unlimited;
+    } else {
+      const maxLines = CYLConfigurationValue.number(maxLinesValue);
+      if (maxLines !== undefined) {
+        style.titleMaxLines = maxLines;
+      }
+    }
+    const headerLinesValue = configuration[CYLMenuStyleKey.headerMaxLines];
+    if (headerLinesValue === 'unlimited') {
+      style.headerMaxLines = CYLHeaderTitleMaxLines.unlimited;
+    } else {
+      const headerLines = CYLConfigurationValue.number(headerLinesValue);
+      if (headerLines !== undefined) {
+        style.headerMaxLines = headerLines;
+      }
+    }
     const itemHeight = CYLConfigurationValue.number(configuration[CYLMenuStyleKey.itemHeight]);
     if (itemHeight !== undefined) {
       style.itemHeight = itemHeight;
@@ -593,6 +668,14 @@ export class CYLMenuConfiguration {
     const alignment = CYLConfigurationValue.rawValue(configuration[CYLMenuStyleKey.contentAlignment], CONTENT_ALIGNMENTS);
     if (alignment === CYLTagContentAlignment.center || alignment === CYLTagContentAlignment.leading) {
       style.contentAlignment = alignment as CYLTagContentAlignment;
+    }
+    const backgroundStyle = CYLConfigurationValue.rawValue(configuration[CYLMenuStyleKey.backgroundStyle], BACKGROUND_STYLES);
+    if (backgroundStyle === CYLTagBackgroundStyle.flat || backgroundStyle === CYLTagBackgroundStyle.liquidGlass) {
+      style.backgroundStyle = backgroundStyle as CYLTagBackgroundStyle;
+    }
+    const minimumTagSize = CYLConfigurationValue.size(configuration[CYLMenuStyleKey.minimumTagSize]);
+    if (minimumTagSize !== undefined) {
+      style.minimumTagSize = minimumTagSize;
     }
     const adjusts = CYLConfigurationValue.bool(configuration[CYLMenuStyleKey.adjustsFontForContentSizeCategory]);
     if (adjusts !== undefined) {
@@ -634,6 +717,10 @@ export class CYLMenuConfiguration {
     if (foldControlColor !== undefined) {
       style.foldControlColor = foldControlColor;
     }
+    const tintColor = CYLConfigurationValue.color(configuration[CYLMenuStyleKey.tintColor]);
+    if (tintColor !== undefined) {
+      style.tintColor = tintColor;
+    }
     const headerFont = CYLConfigurationValue.font(configuration[CYLMenuStyleKey.headerFont]);
     if (headerFont !== undefined) {
       style.headerFont = headerFont;
@@ -654,6 +741,62 @@ export class CYLMenuConfiguration {
     }
     if (configuration[CYLMenuStyleKey.deleteIndicatorFont] !== undefined) {
       style.deleteIndicatorFont = CYLConfigurationValue.font(configuration[CYLMenuStyleKey.deleteIndicatorFont]);
+    }
+    CYLMenuConfiguration.applySectionStyle(style, configuration);
+  }
+
+  /** The section card, header band and header divider keys of `applyToStyle`. */
+  private static applySectionStyle(style: CYLMenuStyle, configuration: CYLConfiguration): void {
+    const sectionStyle = CYLConfigurationValue.rawValue(configuration[CYLMenuStyleKey.sectionStyle], SECTION_STYLES);
+    if (sectionStyle === CYLSectionStyle.plain || sectionStyle === CYLSectionStyle.insetGrouped) {
+      style.sectionStyle = sectionStyle as CYLSectionStyle;
+    }
+    const cardBackground =
+      CYLConfigurationValue.rawValue(configuration[CYLMenuStyleKey.sectionBackgroundStyle], BACKGROUND_STYLES);
+    if (cardBackground === CYLTagBackgroundStyle.flat || cardBackground === CYLTagBackgroundStyle.liquidGlass) {
+      style.sectionBackgroundStyle = cardBackground as CYLTagBackgroundStyle;
+    }
+    if (configuration[CYLMenuStyleKey.sectionBackgroundColor] !== undefined) {
+      style.sectionBackgroundColor = CYLConfigurationValue.color(configuration[CYLMenuStyleKey.sectionBackgroundColor]);
+    }
+    const cornerRadius = CYLConfigurationValue.number(configuration[CYLMenuStyleKey.sectionCornerRadius]);
+    if (cornerRadius !== undefined) {
+      style.sectionCornerRadius = Math.max(0, cornerRadius);
+    }
+    const contentInsets = CYLConfigurationValue.insets(configuration[CYLMenuStyleKey.sectionContentInsets]);
+    if (contentInsets !== undefined) {
+      style.sectionContentInsets = contentInsets;
+    }
+    const boardInset = CYLConfigurationValue.number(configuration[CYLMenuStyleKey.sectionBoardInset]);
+    if (boardInset !== undefined) {
+      style.sectionBoardInset = boardInset;
+    }
+    if (configuration[CYLMenuStyleKey.headerBackgroundColor] !== undefined) {
+      style.headerBackgroundColor = CYLConfigurationValue.color(configuration[CYLMenuStyleKey.headerBackgroundColor]);
+    }
+    const headerRadius = CYLConfigurationValue.number(configuration[CYLMenuStyleKey.headerCornerRadius]);
+    if (headerRadius !== undefined) {
+      style.headerCornerRadius = Math.max(0, headerRadius);
+    }
+    const headerInsets = CYLConfigurationValue.insets(configuration[CYLMenuStyleKey.headerContentInsets]);
+    if (headerInsets !== undefined) {
+      style.headerContentInsets = headerInsets;
+    }
+    const separatorStyle =
+      CYLConfigurationValue.rawValue(configuration[CYLMenuStyleKey.headerSeparatorStyle], HEADER_SEPARATOR_STYLES);
+    if (separatorStyle === CYLHeaderSeparatorStyle.none || separatorStyle === CYLHeaderSeparatorStyle.line) {
+      style.headerSeparatorStyle = separatorStyle as CYLHeaderSeparatorStyle;
+    }
+    if (configuration[CYLMenuStyleKey.headerSeparatorColor] !== undefined) {
+      style.headerSeparatorColor = CYLConfigurationValue.color(configuration[CYLMenuStyleKey.headerSeparatorColor]);
+    }
+    const thickness = CYLConfigurationValue.number(configuration[CYLMenuStyleKey.headerSeparatorThickness]);
+    if (thickness !== undefined) {
+      style.headerSeparatorThickness = Math.max(0, thickness);
+    }
+    const separatorInsets = CYLConfigurationValue.insets(configuration[CYLMenuStyleKey.headerSeparatorInsets]);
+    if (separatorInsets !== undefined) {
+      style.headerSeparatorInsets = separatorInsets;
     }
   }
 

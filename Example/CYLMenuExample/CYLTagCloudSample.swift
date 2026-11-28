@@ -9,6 +9,7 @@
 
 import UIKit
 import CollectionViewClassifyMenu
+import CYLAnimatedItem
 import CYLSearchViewController
 
 /// android-tagview's sample data (res/values/arrays.xml).
@@ -38,7 +39,7 @@ enum CYLTagCloudSampleData {
             tag.borderColor = color
             tags.append(tag)
         }
-        for radius: CGFloat in [CYLTagCornerRadiusSquare, 20.0 / 3, 60.0 / 3] {
+        for radius: CGFloat in [0, 20.0 / 3, 60.0 / 3] {
             let tag = CYLTag(title: CYLExampleLocalizedString("圆角"))
             tag.cornerRadius = radius
             tags.append(tag)
@@ -99,6 +100,7 @@ final class CYLTagCloudSampleViewController: UIViewController {
         // activity_main.xml: lineMargin 5dp, tagMargin 3dp, textPadding 10dp × 3dp.
         let list = CYLTagListView()
         list.style = .tagCloud()
+        list.style.backgroundStyle = .liquidGlass
         list.lineSpacing = 5
         list.interitemSpacing = 3
         list.tagContentInsets = UIEdgeInsets(top: 3, left: 10, bottom: 3, right: 10)
@@ -215,6 +217,7 @@ final class CYLTagCloudListCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         tagListView.style = .tagCloud()
+        tagListView.style.backgroundStyle = .liquidGlass
         tagListView.lineSpacing = 5
         tagListView.interitemSpacing = 3
         tagListView.tagContentInsets = UIEdgeInsets(top: 3, left: 10, bottom: 3, right: 10)
@@ -349,7 +352,7 @@ final class CYLHotSearchViewController: UIViewController {
             appearance.borderColor = UIColor(white: 0.88, alpha: 1)
             appearance.borderWidth = 1
             appearance.textColor = UIColor(white: 0.13, alpha: 1)
-            appearance.cornerRadius = 0
+            appearance.cornerRadius = cylAnimatedItemCornerRadiusCapsule
             appearance.font = .systemFont(ofSize: 16)
         }
         style.tagContentInsets = UIEdgeInsets(top: 9, left: 16, bottom: 9, right: 16)
@@ -363,6 +366,9 @@ final class CYLHotSearchViewController: UIViewController {
         style.headerTextColor = UIColor(white: 0.13, alpha: 1)
         style.headerHeight = 48
         style.backgroundColor = .white
+        style.backgroundStyle = .liquidGlass
+        // The page draws its own background: the flat list, not the default section card.
+        style.sectionStyle = .plain
         return style
     }
 

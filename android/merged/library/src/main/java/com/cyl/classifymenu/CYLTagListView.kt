@@ -10,6 +10,8 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import com.cyl.animateditem.CYLAnimatedItemBackgroundStyle
+import com.cyl.animateditem.CYLAnimatedItemView
 import android.view.accessibility.AccessibilityEvent
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -35,6 +37,52 @@ enum class CYLMenuFoldStyle { CYLMenuFoldStyleNone, CYLMenuFoldStyleHeaderButton
 private const val MORE_BUTTON_SIZE = 44f
 private const val FOOTER_HEIGHT = 28f
 private const val HEADER_ICON_SIZE = 16f
+
+/**
+ * The one spacing between every two adjacent views of a header (indicator bar, icon, title, accessory, fold control, clear
+ * button), dp. `HeaderView.onLayout` and the title room ([headerRoom]) both use it. The More button (HEADER_MORE_GAP) and a
+ * leading fold control (HEADER_LEADING_FOLD_GAP) keep their own smaller gap, so the default geometry stays as it was.
+ */
+private const val HEADER_ITEM_SPACING = 8f
+
+/** The overhang of a header's fold control beyond the header's edge in the plain style (its glyph padding), dp. */
+private const val HEADER_FOLD_OVERHANG = 6f
+
+/** The most of the header's inner width the fold control takes when it is the only extra view (the title shrinks in the rest). */
+private const val HEADER_FOLD_ALONE_MAX_FRACTION = 0.4f
+
+/** The most of the header's inner width the fold control takes when a More button, a clear button or an accessory is shown too. */
+private const val HEADER_FOLD_SHARED_MAX_FRACTION = 0.3f
+
+/** The most of the header's inner width an accessory view takes. */
+private const val HEADER_ACCESSORY_MAX_FRACTION = 0.3f
+
+/** The floor of a header title's room, dp: the room is at least one em of the header font, and never below this. */
+private const val HEADER_TITLE_MIN_WIDTH = 1f
+
+/** The gap after a header's More button (its 44 dp box has transparent padding, so this is smaller than the spacing), dp. */
+private const val HEADER_MORE_GAP = 4f
+
+/** The gap between a leading fold control and the title (the control's glyph padding is on its outer side), dp. */
+private const val HEADER_LEADING_FOLD_GAP = 4f
+
+/**
+ * The widths of a header's views at one list width, all in dp. `titleWidth` is the one number the height (wrapping) and the
+ * render (the title's frame) share.
+ */
+private class HeaderRoom(val inner: Float, val titleWidth: Float, val foldWidth: Float, val accessoryWidth: Float, val clearLine: Float)
+
+/** The title's top and bottom padding in a header: a header is at least a title line plus this, dp. */
+private const val HEADER_TITLE_VERTICAL_PADDING = 12f
+
+/**
+ * The title's top and bottom padding in a header that is sized to its text (insetGrouped, no header divider): 4 above, 4
+ * below, dp. See docs/tag-section-style.md "The gap between the header and the board is short when there is no divider".
+ */
+internal const val HEADER_BOARD_TITLE_PADDING = 8f
+
+/** The distance from such a header's bottom edge to the board's top, dp (instead of the section's top inset). */
+internal const val HEADER_BOARD_SPACING = 4f
 private const val TITLE_VERTICAL_INSET = 10f
 
 /**
@@ -48,7 +96,7 @@ private const val TITLE_VERTICAL_INSET = 10f
 open class CYLTagListView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-) : ViewGroup(context, attrs) {
+) : ViewGroup(context, attrs), CYLTagLongPressHost {
 
     private val density: Float get() = resources.displayMetrics.density
     private fun px(dp: Float): Int = (dp * density).roundToInt()
@@ -77,6 +125,75 @@ open class CYLTagListView @JvmOverloads constructor(
     /** The label of `titleView`. */
     val titleLabel: TextView get() = titleView.titleLabel
 
+    /**
+     * `backdropSource` (Android only): the view the Liquid Glass of this list's tags, fold controls and section boards blurs and
+     * refracts. null (the default) keeps the library's choice, the root of the window's views, which CONTAINS the list: the
+     * glass then cannot sample it and draws only its tint and rim.
+     *
+     * The one rule: the source must be a view BEHIND the list and NOT an ancestor of it, a sibling plate (for example the
+     * gradient view under the list in the same parent). The core does not check or guess: an ancestor is passed through
+     * unchanged and the glass then draws tint + rim, as with null. Below Android 12 (API 31) nothing is sampled and the
+     * frosted tint + rim fallback shows; refraction needs API 33+ (blur only on API 31 and 32).
+     *
+     * One parameter for the whole list: it is forwarded to every glass host the list makes, now and when it rebuilds (every
+     * `CYLTagButton`, the inline and header/footer fold controls, the list title and the section boards), and the setter
+     * applies it to the views already shown, so no `reloadMenuData` is needed. Tag buttons made outside the list are not
+     * affected. iOS, HarmonyOS and the mini program sample what is behind them by themselves and have no such property.
+     * See docs/tag-section-style.md "Android backdropSource".
+     */
+    var backdropSource: View? = null
+        set(value) {
+            if (field === value) return
+            field = value
+            titleView.itemGlassBackdropSource = value
+            content.applyBackdropSource()
+            updateGlassResampling()
+        }
+
+    /**
+     * The glass samples its source only when it draws, and a moved view keeps its cached display list: while the list is moved
+     * by an ancestor (a ListView header, a ScrollView, an animation) or scrolls its own content, the glass would keep the colors
+     * of where it was. While `backdropSource` is set and the list is attached, a pre-draw listener compares the list's place in
+     * the window and its scroll offsets with the last frame and invalidates every glass host when they changed.
+     */
+    private val windowPosition = IntArray(WINDOW_POSITION_SIZE)
+    private val glassPlace = IntArray(GLASS_PLACE_SIZE)
+    private val lastGlassPlace = IntArray(GLASS_PLACE_SIZE) { Int.MIN_VALUE }
+    private var glassResamplingOn = false
+    private val glassResampleListener = android.view.ViewTreeObserver.OnPreDrawListener {
+        resampleGlassWhenMoved()
+        true
+    }
+
+    private fun updateGlassResampling() {
+        val wanted = backdropSource != null && isAttachedToWindow
+        if (wanted == glassResamplingOn) return
+        glassResamplingOn = wanted
+        if (wanted) {
+            lastGlassPlace.fill(Int.MIN_VALUE)
+            viewTreeObserver.addOnPreDrawListener(glassResampleListener)
+        } else {
+            viewTreeObserver.removeOnPreDrawListener(glassResampleListener)
+        }
+    }
+
+    private fun resampleGlassWhenMoved() {
+        getLocationInWindow(windowPosition)
+        glassPlace[PLACE_X] = windowPosition[0]
+        glassPlace[PLACE_Y] = windowPosition[1]
+        glassPlace[PLACE_SCROLL_X] = scrollView.scrollX
+        glassPlace[PLACE_SCROLL_Y] = scrollView.scrollY
+        if (glassPlace.contentEquals(lastGlassPlace)) return
+        glassPlace.copyInto(lastGlassPlace)
+        titleView.itemLiquidGlassView?.invalidate()
+        content.invalidateGlassHosts()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        updateGlassResampling()
+    }
+
     private var titles: List<List<String>> = emptyList()
     private var itemWidths: List<List<Float>> = emptyList()
     private var itemHeights: List<List<Float>> = emptyList()
@@ -96,6 +213,15 @@ open class CYLTagListView @JvmOverloads constructor(
         addView(scrollView)
         addView(titleView)
         applyStyleColors()
+        // A scroll hides the callout.
+        scrollView.viewTreeObserver.addOnScrollChangedListener { dismissCallout() }
+    }
+
+    override fun onDetachedFromWindow() {
+        dismissCallout()
+        // isAttachedToWindow is already false here, so this removes the listener.
+        updateGlassResampling()
+        super.onDetachedFromWindow()
     }
 
     // MARK: Initializers (iOS)
@@ -117,6 +243,14 @@ open class CYLTagListView @JvmOverloads constructor(
         this(context, foldControl, null, null, CYLMenuTitlePosition.CYLMenuTitlePositionTopLeading)
 
     companion object {
+        /** The slots of the place the glass last drew at: x and y in the window, then the scroll offsets of the content. */
+        private const val PLACE_X = 0
+        private const val PLACE_Y = 1
+        private const val PLACE_SCROLL_X = 2
+        private const val PLACE_SCROLL_Y = 3
+        private const val GLASS_PLACE_SIZE = 4
+        private const val WINDOW_POSITION_SIZE = 2
+
         /** `+tagListViewWithFoldPosition:content:`. */
         @JvmStatic
         fun tagListViewWithFoldPosition(context: Context, position: CYLMenuFoldControlPosition, content: CYLMenuFoldControlContent) =
@@ -125,7 +259,7 @@ open class CYLTagListView @JvmOverloads constructor(
         /** `+defaultTitleStyle`: a 17 sp headline in the label color, no box. */
         @JvmStatic
         fun defaultTitleStyle(): CYLMenuStyle {
-            val style = CYLMenuStyle.defaultStyle()
+            val style = CYLMenuStyle.defaultStyle().also { it.sectionStyle = CYLSectionStyle.CYLSectionStylePlain }
             val font = CYLFont.boldSystemFont(17f)
             for (state in listOf(CYLControlState.NORMAL, CYLControlState.SELECTED, CYLControlState.DISABLED)) {
                 val appearance = style.appearanceForState(state)
@@ -273,10 +407,16 @@ open class CYLTagListView @JvmOverloads constructor(
     var contentHeight: Float = 0f
         private set
 
+    /** The list background as drawn: the style's, or the grouped background under `insetGrouped`, in the current mode. */
+    internal var backgroundColorInUse: Int = 0
+        private set
+
     private fun applyStyleColors() {
-        container.setColor(listStyle.backgroundColor)
+        backgroundColorInUse = listStyle.resolvedBackgroundColor(context)
+        container.setColor(backgroundColorInUse)
         content.layout.rowAlignment = listStyle.rowAlignment.ordinal
         themeStyles.clear()
+        content.invalidate()
     }
 
     private fun hasTitle(): Boolean = !title.isNullOrEmpty() || titleImage != null
@@ -648,6 +788,7 @@ open class CYLTagListView @JvmOverloads constructor(
 
     /** `-reloadMenuData`: reads the data source again and lays the list out. */
     fun reloadMenuData() {
+        dismissCallout()
         val source = menuDataSource
         if (source != null && source === _tagDataSource) _tagDataSource?.invalidateStyles()
         val sections = source?.numberOfSectionsInMenu() ?: 0
@@ -745,14 +886,181 @@ open class CYLTagListView @JvmOverloads constructor(
 
     private fun footerHeight(): Float = max(FOOTER_HEIGHT, foldSize(false).height)
 
-    private fun headerHeight(): Float {
-        val foldHeight = if (foldIsInHeader()) foldSize(false).height else 0f
+    /**
+     * The header's height: `headerHeight`, at least a line of the title and the fold control. With `headerMaxLines` above 1 the
+     * title of `section` is wrapped at the room it has at the list width `width` ([headerTitleWidth]) and the header grows to
+     * the wrapped lines; `section` -1 (and the default one line) keeps the fixed height. A header sized to its text
+     * ([headerFitsItsText]) is the title lines plus [HEADER_BOARD_TITLE_PADDING], not below the fold control; `headerHeight`
+     * is a minimum there only when the app set it.
+     */
+    private fun headerHeight(section: Int = -1, width: Float = measuredContentWidth): Float {
+        // Only a foldable section shows the header control, so only it reserves height (an unknown section -1 keeps the control's).
+        val foldable = section !in rows.indices || canFoldRowCount(rows[section].size)
+        val foldHeight = if (foldIsInHeader() && foldable) foldSize(false).height else 0f
         if (!showsSectionHeaders) return foldHeight
         val font = listStyle.headerFontForTraitCollection()
-        return max(max(listStyle.headerHeight, ceil(CYLTagButton.fontLineHeight(font)) + 12), foldHeight)
+        var text = ceil(CYLTagButton.fontLineHeight(font))
+        if (listStyle.headerMaxLines > CYLHeaderTitleMaxLines.SINGLE && section in titles.indices) {
+            val title = menuDataSource?.menuTitleForSection(section).orEmpty()
+            text = CYLTagButton.wrappedTextHeight(title, font, headerTitleWidth(section, width), listStyle.headerMaxLines)
+        }
+        if (headerFitsItsText()) {
+            val minimum = if (listStyle.isHeaderHeightSet) listStyle.headerHeight else 0f
+            return max(max(minimum, text + HEADER_BOARD_TITLE_PADDING), foldHeight)
+        }
+        return max(max(listStyle.headerHeight, text + HEADER_TITLE_VERTICAL_PADDING), foldHeight)
     }
 
-    private fun contentWidthFor(width: Float): Float = max(0f, width - listStyle.sectionInsets.left - listStyle.sectionInsets.right)
+    /** Whether the header is sized to its text and the board follows it closely: insetGrouped with no header divider. */
+    private fun headerFitsItsText(): Boolean =
+        listStyle.isInsetGrouped && listStyle.headerSeparatorStyle == CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleNone
+
+    /**
+     * The distance from a header's bottom edge (`header` tall) to the board's top: [HEADER_BOARD_SPACING] when the header is
+     * sized to its text and shown, else the section's top inset. The one place it comes from: the card, the tags, the section
+     * height and the content height all use it.
+     */
+    private fun headerBoardOffset(header: Float): Float =
+        if (header > 0f && headerFitsItsText()) HEADER_BOARD_SPACING else listStyle.sectionInsets.top
+
+    /**
+     * The room a header's title has at the list width `width` dp. The ONE function the header height (wrapping) and
+     * `HeaderView.onLayout` (the title's frame) both call. INNER WIDTH is the width between the header's edges; the title gets
+     * the inner width minus the indicator bar, the icon, the clear button, the More button, the accessory and the fold control,
+     * each followed by one [HEADER_ITEM_SPACING] (More and a leading fold control have their own gap), but at least one em of
+     * the header font ([HEADER_TITLE_MIN_WIDTH] at the least). The fold control keeps its natural width up to a fraction of the
+     * inner width ([HEADER_FOLD_ALONE_MAX_FRACTION] alone, [HEADER_FOLD_SHARED_MAX_FRACTION] beside More, clear or an accessory):
+     * the title is the one that shrinks. `accessoryNatural` is the accessory's natural width, null with none. The fold width is
+     * the wider of the folded and expanded controls, so toggling never changes the title's room.
+     */
+    private fun headerRoom(section: Int, width: Float, accessoryNatural: Float?): HeaderRoom {
+        val style = listStyle
+        val source = menuDataSource
+        val font = style.headerFontForTraitCollection()
+        val (leading, trailing) = headerEdgeInsetsAt(width)
+        val inner = max(0f, width - leading - trailing)
+        val showsClear = source?.menuShowsClearButtonForSection(section) == true
+        val showsMore = showsMoreButtonIn(section)
+        val showsFold = foldIsInHeader() && section in rows.indices && canFoldRowCount(rows[section].size)
+        val clearLine = ceil(CYLTagButton.fontLineHeight(font))
+        val accessoryWidth = if (accessoryNatural != null) min(accessoryNatural, inner * HEADER_ACCESSORY_MAX_FRACTION) else 0f
+        val foldCap = if (showsMore || showsClear || accessoryNatural != null) HEADER_FOLD_SHARED_MAX_FRACTION else HEADER_FOLD_ALONE_MAX_FRACTION
+        val foldWidth = if (showsFold) min(max(foldSize(false).width, foldSize(true).width), inner * foldCap) else 0f
+        var fixed = 0f
+        if (style.headerIndicatorColor != null) fixed += style.headerIndicatorSize.width + HEADER_ITEM_SPACING
+        if (source?.menuImageForSection(section) != null) fixed += HEADER_ICON_SIZE + HEADER_ITEM_SPACING
+        if (showsClear) fixed += clearLine + HEADER_ITEM_SPACING
+        if (showsMore) fixed += MORE_BUTTON_SIZE - floor((MORE_BUTTON_SIZE - 22f) / 2) + HEADER_MORE_GAP
+        if (showsFold) {
+            val gap = if (_foldControl.position == CYLMenuFoldControlPosition.HEADER_LEADING) HEADER_LEADING_FOLD_GAP else HEADER_ITEM_SPACING
+            fixed += foldWidth - HEADER_FOLD_OVERHANG + gap
+        }
+        if (accessoryNatural != null) fixed += accessoryWidth + HEADER_ITEM_SPACING
+        val title = max(max(HEADER_TITLE_MIN_WIDTH, font.size), inner - fixed)
+        return HeaderRoom(inner, title, foldWidth, accessoryWidth, clearLine)
+    }
+
+    /** The title room of `section` at the list width `width` ([headerRoom]); measures the accessory like the header view does. */
+    private fun headerTitleWidth(section: Int, width: Float): Float = headerRoom(section, width, accessoryNaturalWidth(section)).titleWidth
+
+    /** The natural width of the section's accessory view in dp (measured unspecified, as `HeaderView.onMeasure` does), null with none. */
+    private fun accessoryNaturalWidth(section: Int): Float? {
+        val view = menuDataSource?.menuAccessoryViewForSection(section) ?: return null
+        view.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+        return view.measuredWidth / density
+    }
+
+    /**
+     * The section's column at the list width `width` dp: the list width minus `sectionInsets` (x and width; y and height are
+     * 0). The card, the header band and the divider span it. The one place the column comes from.
+     */
+    private fun columnAt(width: Float): CYLRect {
+        val insets = listStyle.sectionInsets
+        return CYLRect(insets.left, 0f, max(0f, width - insets.left - insets.right), 0f)
+    }
+
+    /**
+     * The card's padding around the tags: `sectionContentInsets` under `insetGrouped`, none in the plain style. It narrows the
+     * section column to the tag column and never depends on `sectionBoardInset`.
+     */
+    private fun cardInsets(): CYLEdgeInsets = if (listStyle.isInsetGrouped) listStyle.sectionContentInsets else CYLEdgeInsets.ZERO
+
+    /**
+     * The board's column (the card, the header band and the divider) at the list width `width` dp: the tag column extended
+     * outward by `sectionBoardInset` on both sides (a negative value is 0); by `sectionContentInsets` leading / trailing when it
+     * is unset, which is the section column; the section column in the plain style. A set value above the default can push the
+     * board past the list's margin.
+     */
+    private fun boardColumnAt(width: Float): CYLRect {
+        val column = columnAt(width)
+        val style = listStyle
+        if (!style.isInsetGrouped) return column
+        val tags = tagColumnAt(width)
+        val content = style.sectionContentInsets
+        val inset = style.sectionBoardInset
+        val leading = inset ?: content.left
+        val trailing = inset ?: content.right
+        return CYLRect(tags.x - leading, 0f, tags.width + leading + trailing, 0f)
+    }
+
+    /** The board's column at the current layout width (see [boardColumnAt]). */
+    fun boardColumn(@Suppress("UNUSED_PARAMETER") section: Int): CYLRect = boardColumnAt(max(0f, measuredContentWidth))
+
+    /** The section's column at the current layout width (`sectionInsets` taken off the list width). */
+    fun contentColumn(@Suppress("UNUSED_PARAMETER") section: Int): CYLRect = columnAt(max(0f, measuredContentWidth))
+
+    /**
+     * The column the tags are laid in: [contentColumn], narrowed by the card's padding under `insetGrouped`. Every tag width,
+     * row count, fold decision, height and frame takes its width and x from here.
+     */
+    fun tagColumn(@Suppress("UNUSED_PARAMETER") section: Int): CYLRect = tagColumnAt(max(0f, measuredContentWidth))
+
+    private fun tagColumnAt(width: Float): CYLRect {
+        val column = columnAt(width)
+        val card = cardInsets()
+        return CYLRect(column.x + card.left, 0f, max(0f, column.width - card.left - card.right), 0f)
+    }
+
+    private fun contentWidthFor(width: Float): Float = tagColumnAt(width).width
+
+    /**
+     * The distances from the list's leading and trailing edges to a header's title and fold control: the tags' edges inside
+     * the card (`insetGrouped`), the band's edges plus `headerContentInsets` (a plain header with a band), else
+     * `headerHorizontalInset`.
+     */
+    private fun headerEdgeInsets(): Pair<Float, Float> = headerEdgeInsetsAt(max(0f, measuredContentWidth))
+
+    private fun headerEdgeInsetsAt(width: Float): Pair<Float, Float> {
+        val style = listStyle
+        val column = columnAt(width)
+        val rest = max(0f, width - column.x - column.width)
+        if (style.isInsetGrouped) {
+            val card = cardInsets()
+            return (column.x + card.left) to (rest + card.right)
+        }
+        if (style.headerBackgroundColor != null) return (column.x + style.headerContentInsets.left) to (rest + style.headerContentInsets.right)
+        return style.headerHorizontalInset to style.headerHorizontalInset
+    }
+
+    /**
+     * The card, header band and header divider of a section, and the distances of its header title (dp, in the content's
+     * coordinates, below the title): null where the style draws none. The divider sits at the header's bottom edge inside
+     * `headerHeight`: it adds no height.
+     */
+    internal data class CYLTagListSectionFrame(
+        val section: Int,
+        val top: Float,
+        val height: Float,
+        val headerHeight: Float,
+        val card: CYLRect?,
+        val headerBand: CYLRect?,
+        val headerSeparator: CYLRect?,
+        val headerInsetLeft: Float,
+        val headerInsetRight: Float,
+    )
+
+    /** The frames of section `section` as the last layout pass computed them; null before the first one. */
+    internal fun sectionFrame(section: Int): CYLTagListSectionFrame? = content.sectionFrames.getOrNull(section)
 
     private fun widthsFor(contentWidth: Float): List<List<Float>> = titles.mapIndexed { section, items ->
         items.mapIndexed { item, title ->
@@ -767,12 +1075,19 @@ open class CYLTagListView @JvmOverloads constructor(
         }
     }
 
-    private fun heightsForItems(): List<List<Float>> {
+    private fun heightsForItems(widths: List<List<Float>> = itemWidths): List<List<Float>> {
         val listHeight = itemHeight()
         return titles.mapIndexed { section, items ->
             items.indices.map { item ->
-                val itemStyle = styleForItem(CYLIndexPath(item, section))
-                if (itemStyle === listStyle) listHeight else max(listHeight, CYLTagButton.heightForStyle(itemStyle))
+                val indexPath = CYLIndexPath(item, section)
+                val itemStyle = styleForItem(indexPath)
+                val width = widths.getOrNull(section)?.getOrNull(item) ?: 0f
+                if (itemStyle.titleMaxLines > CYLTagTitleMaxLines.SINGLE && width > 0f) {
+                    // A title that may wrap grows the tag: measured at the width it gets.
+                    val iconSize = CYLTagButton.iconSizeForImage(imageAt(indexPath), animationURLAt(indexPath) != null, itemStyle)
+                    val deletable = isDeletableAt(indexPath)
+                    max(listHeight, CYLTagButton.heightForTitleWidth(titles[section][item], iconSize, width, deletable, itemStyle))
+                } else if (itemStyle === listStyle) listHeight else max(listHeight, CYLTagButton.heightForStyle(itemStyle))
             }
         }
     }
@@ -825,7 +1140,7 @@ open class CYLTagListView @JvmOverloads constructor(
         measuredContentWidth = width
         val contentWidth = contentWidthFor(width)
         itemWidths = widthsFor(contentWidth)
-        itemHeights = heightsForItems()
+        itemHeights = heightsForItems(itemWidths)
         rows = rowsFor(itemWidths, contentWidth)
     }
 
@@ -847,9 +1162,9 @@ open class CYLTagListView @JvmOverloads constructor(
         val same = width == measuredContentWidth
         val widths = if (same) itemWidths else widthsFor(contentWidth)
         val sectionRows = if (same) rows else rowsFor(widths, contentWidth)
-        val heights = if (same) itemHeights else heightsForItems()
-        val header = headerHeight()
+        val heights = if (same) itemHeights else heightsForItems(widths)
         val insets = listStyle.sectionInsets
+        val card = cardInsets()
         var height = 0f
         for (section in sectionRows.indices) {
             var rowCount = sectionRows[section].size
@@ -860,7 +1175,8 @@ open class CYLTagListView @JvmOverloads constructor(
                 val withFold = widths[section] + inlineFoldSize(section, true).width
                 rowCount = rowsFor(listOf(withFold), contentWidth).first().size
             }
-            height += header + insets.top + insets.bottom
+            val header = headerHeight(section, width)
+            height += header + headerBoardOffset(header) + insets.bottom + card.top + card.bottom
             height += heightOfRows(rowCount, sectionRows[section], heights.getOrElse(section) { emptyList() })
             if (foldable && foldIsInFooter()) height += footerHeight()
         }
@@ -900,6 +1216,8 @@ open class CYLTagListView @JvmOverloads constructor(
 
     override fun onConfigurationChanged(newConfig: android.content.res.Configuration?) {
         super.onConfigurationChanged(newConfig)
+        // The light / dark mode may have changed: the background, card, band and divider resolve it again, no app code needed.
+        applyStyleColors()
         invalidateMeasurements()
     }
 
@@ -1167,10 +1485,136 @@ open class CYLTagListView @JvmOverloads constructor(
         canReorder() && isValid(indexPath) && (allowsReordering || sectionAllowsEditing(indexPath.section)) &&
             itemTypeAt(indexPath) != CYLMenuItemType.CYLMenuItemTypeCreate
 
-    private fun reportLongPress(indexPath: CYLIndexPath) {
+    override fun reportLongPress(indexPath: CYLIndexPath) {
         menuDelegate?.menuDidLongPressItemAtIndexPath(this, indexPath)
         val tag = tagAt(indexPath)
         if (tag != null) tagLongPressHandler?.invoke(indexPath.item, tag)
+    }
+
+    private var longPressActionValue: CYLTagLongPressAction = CYLTagLongPressActions.makeDefault()
+
+    /**
+     * What a long press on an item does: `CYLTagLongPressActions.first(reorder, report)` by default (reordering where the
+     * list can reorder, else the long press is reported). Set another built-in action, a combination or your own.
+     */
+    var longPressAction: CYLTagLongPressAction
+        get() = longPressActionValue
+        set(value) {
+            content.cancelDrag()
+            dismissCallout()
+            longPressActionValue = value
+        }
+
+    /** The item the current long press began on. */
+    private var pressedIndexPath: CYLIndexPath? = null
+
+    /** A long press began on an item: the action takes it when it can; true when it follows the finger. */
+    private fun beginLongPress(indexPath: CYLIndexPath): Boolean {
+        if (!isValid(indexPath)) return false
+        pressedIndexPath = indexPath
+        val action = longPressActionValue
+        if (!action.canBegin(this, indexPath)) {
+            pressedIndexPath = null
+            return false
+        }
+        val follows = action.begin(this, indexPath)
+        if (!follows) pressedIndexPath = null
+        return follows
+    }
+
+    private var calloutPopup: android.widget.PopupWindow? = null
+
+    // MARK: CYLTagLongPressHost
+
+    override fun subtitleForItem(indexPath: CYLIndexPath): String? = menuDataSource?.menuSubtitleForItemAtIndexPath(indexPath)
+
+    override fun showCallout(text: String, indexPath: CYLIndexPath) {
+        dismissCallout()
+        val cell = content.cellAt(indexPath) ?: return
+        val bubble = CYLTagCalloutBubble(context, text)
+        val display = android.graphics.Rect().also { getWindowVisibleDisplayFrame(it) }
+        bubble.measure(MeasureSpec.makeMeasureSpec(display.width(), MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(display.height(), MeasureSpec.AT_MOST))
+        val location = IntArray(2)
+        cell.getLocationOnScreen(location)
+        val cellCenterX = location[0] + cell.width / 2
+        val margin = px(8f)
+        val x = max(display.left + margin, min(display.right - margin - bubble.measuredWidth, cellCenterX - bubble.measuredWidth / 2))
+        // The section header above a first-row tag stays visible: the bubble goes below the tag then, where there is room.
+        val headerView = content.headerViewAt(indexPath.section)?.takeIf { it.isShown && it.height > 0 }
+        val headerLocation = IntArray(2)
+        headerView?.getLocationOnScreen(headerLocation)
+        // Above the tag; below it when there is no room or when it would cover the header.
+        val above = !CYLTagCalloutBubble.placesBelow(
+            targetTop = location[1], targetBottom = location[1] + cell.height, height = bubble.measuredHeight,
+            safeTop = display.top, bottomLimit = display.bottom, shadowMargin = px(6f),
+            headerTop = headerView?.let { headerLocation[1] }, headerBottom = headerView?.let { headerLocation[1] + it.height })
+        bubble.arrowUp = !above
+        bubble.arrowCenter = (cellCenterX - x).toFloat()
+        val y = if (above) location[1] - bubble.measuredHeight + px(6f) else location[1] + cell.height - px(6f)
+        val popup = android.widget.PopupWindow(bubble, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, false)
+        // The popup watches touches outside itself (a tap on blank space or on another view dismisses it), but the popup's own
+        // outside-dismiss never runs: it made the callout vanish when the finger that began the long press lifted. An outside event
+        // dismisses only while no gesture of the list is in progress; the list itself dismisses on its next touch down, a scroll,
+        // a reload, another long press, and when it is hidden or detached.
+        popup.isOutsideTouchable = true
+        popup.setTouchInterceptor { _, event ->
+            if (event.actionMasked != MotionEvent.ACTION_OUTSIDE) return@setTouchInterceptor false
+            if (!touchInProgress) dismissCallout()
+            true
+        }
+        popup.setBackgroundDrawable(null)
+        popup.setOnDismissListener { if (calloutPopup === popup) calloutPopup = null }
+        calloutPopup = popup
+        popup.showAtLocation(this, android.view.Gravity.NO_GRAVITY, x, y)
+        bubble.contentDescription = text
+        bubble.announceForAccessibility(text)
+    }
+
+    /** The text of the callout that shows now, or null (for tests). */
+    internal val calloutText: String? get() = (calloutPopup?.contentView as? CYLTagCalloutBubble)?.text?.toString()
+
+    /** Whether a gesture of the list is in progress (down seen, up or cancel not yet): the callout ignores outside touches then. */
+    private var touchInProgress = false
+
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> { dismissCallout(); touchInProgress = true }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> touchInProgress = false
+        }
+        return super.dispatchTouchEvent(event)
+    }
+
+    /** Hidden (this view or an ancestor, as a hidden fragment's view): the callout of a list nobody sees goes away. */
+    override fun onVisibilityChanged(changedView: View, visibility: Int) {
+        super.onVisibilityChanged(changedView, visibility)
+        if (visibility != VISIBLE) dismissCallout()
+    }
+
+    /** The window is hidden (another activity, the app in the background): the callout goes away. */
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        if (visibility != VISIBLE) dismissCallout()
+    }
+
+    override fun dismissCallout() {
+        val popup = calloutPopup ?: return
+        calloutPopup = null
+        popup.dismiss()
+    }
+
+    override fun canReorderItem(indexPath: CYLIndexPath): Boolean = canMoveItemAt(indexPath)
+
+    override fun beginReordering(indexPath: CYLIndexPath) = content.beginDrag(indexPath)
+
+    override fun endReordering(destination: CYLIndexPath?, moved: Boolean) {
+        val source = pressedIndexPath
+        pressedIndexPath = null
+        if (source == null) return
+        if (!moved || destination == null) reportLongPress(source) else moveItem(source, destination)
+    }
+
+    override fun cancelReordering() {
+        pressedIndexPath = null
     }
 
     private fun reportSelectedDrag(indexPath: CYLIndexPath) {
@@ -1340,7 +1784,7 @@ open class CYLTagListView @JvmOverloads constructor(
     /** `-removeTagsAtIndexes:`. */
     fun removeTagsAtIndexes(indexes: Collection<Int>) {
         val source = showTags()
-        for (index in indexes.toSortedSet().reversed()) {
+        for (index in indexes.distinct().sortedDescending()) {
             if (index in source.tags.indices) {
                 source.removeTagAtIndex(index)
                 removeSelection(CYLIndexPath(index, 0))
@@ -1412,6 +1856,7 @@ open class CYLTagListView @JvmOverloads constructor(
     private fun selectedCount(section: Int): Int = selection.count { it.section == section }
 
     private fun handleTap(indexPath: CYLIndexPath) {
+        dismissCallout()
         if (!isEnabledAt(indexPath)) return
         val delegate = menuDelegate
         if (delegate != null && !delegate.menuShouldSelectItemAtIndexPath(this, indexPath)) return
@@ -1455,6 +1900,8 @@ open class CYLTagListView @JvmOverloads constructor(
 
     fun canFoldSection(section: Int): Boolean {
         measureIfNeeded()
+        // Without a known width every tag is laid out in a row of its own: that is no layout, so nothing can need a fold yet.
+        if (currentWidth() <= 0f) return false
         return section in rows.indices && canFoldRowCount(rows[section].size)
     }
 
@@ -1542,6 +1989,7 @@ open class CYLTagListView @JvmOverloads constructor(
 
     private fun configureCell(cell: CYLTagListCell, indexPath: CYLIndexPath) {
         if (!isValid(indexPath)) return
+        cell.button.itemGlassBackdropSource = backdropSource
         if (cell is CYLTagCreateCell) {
             cell.configureWithName(menuDataSource?.menuTitleForItemAtIndexPath(indexPath), styleForItem(indexPath), isEnabledAt(indexPath))
             return
@@ -1559,18 +2007,22 @@ open class CYLTagListView @JvmOverloads constructor(
         cell.renamesOnTitleTap = renamable && renamesOnTitleTapWhileEditing
         cell.renameHandler = if (renamable) ({ beginRenamingItemAtIndexPath(indexPath) }) else null
         cell.additionalAccessibilityActions = accessibilityActions(indexPath)
-        menuDataSource?.menuAccessibilityHintForItemAtIndexPath(indexPath)?.let { cell.accessibilityHint = it }
+        // A screen-reader user rarely long-presses: the subtitle is the hint when the data source gives none.
+        (menuDataSource?.menuAccessibilityHintForItemAtIndexPath(indexPath) ?: subtitleForItem(indexPath))?.let { cell.accessibilityHint = it }
     }
 
     private fun configureFoldCell(cell: CYLTagFoldCell, section: Int, animated: Boolean) {
+        cell.foldButton.itemGlassBackdropSource = backdropSource
         val expanded = isSectionExpanded(section)
         cell.configureWithFoldControl(displayedFoldControl(), styleForSection(section), expanded, animated)
         cell.contentDescription = foldAccessibilityLabel(section)
         CYLAccessibilityNode.apply(cell, true, null, if (expanded) null else CYLMenuLocalizedString("CYLMenuExpandHint", "Shows every tag"), emptyList())
     }
 
-    private fun configureFoldButton(button: CYLTagFoldButton, section: Int, expanded: Boolean, animated: Boolean) {
-        button.applyFoldControl(displayedFoldControl(), listStyle.foldControlColor, expanded, animated)
+    /** `onBand`: the button sits in a header with a band, so the tint is chosen against the band color. */
+    private fun configureFoldButton(button: CYLTagFoldButton, section: Int, expanded: Boolean, animated: Boolean, onBand: Boolean = false) {
+        button.itemGlassBackdropSource = backdropSource
+        button.applyFoldControl(displayedFoldControl(), listStyle.resolvedFoldControlColor(context, onBand), expanded, animated)
         button.contentDescription = foldAccessibilityLabel(section)
         CYLAccessibilityNode.apply(button, true, null, if (expanded) null else CYLMenuLocalizedString("CYLMenuExpandHint", "Shows every tag"), emptyList())
     }
@@ -1585,6 +2037,8 @@ open class CYLTagListView @JvmOverloads constructor(
         private val foldCells = HashMap<Int, CYLTagFoldCell>()
         private val headers = HashMap<Int, HeaderView>()
         private val footers = HashMap<Int, FooterView>()
+        /** The Liquid Glass behind each section's tags while the card is glass (the library's glass drawing), by section. */
+        private val glassCards = HashMap<Int, CYLAnimatedItemView>()
         private val frames = HashMap<View, CYLRect>()
         private val sectionTops = HashMap<Int, Float>()
         private var totalHeight = 0f
@@ -1592,8 +2046,34 @@ open class CYLTagListView @JvmOverloads constructor(
         private var dragIndexPath: CYLIndexPath? = null
         private var dragStart = CYLPoint()
         private var dragMoved = false
+        /** The cell and the point the current long press began on, for the reordering action. */
+        private var pressCell: CYLTagListCell? = null
+        private var pressStart = CYLPoint()
+
+        /** Reordering picks the item up: the cell grows and follows the finger (the long-press action `reorder`). */
+        fun beginDrag(indexPath: CYLIndexPath) {
+            val cell = pressCell ?: return
+            reordering = true
+            menuDelegate?.menuDidChangeReordering(this@CYLTagListView, true)
+            dragCell = cell
+            dragIndexPath = indexPath
+            dragStart = pressStart
+            dragMoved = false
+            cell.bringToFront()
+            cell.animate().scaleX(1.1f).scaleY(1.1f).setDuration(120).start()
+            parent?.requestDisallowInterceptTouchEvent(true)
+            if (indexPath in selection) reportSelectedDrag(indexPath)
+        }
+
+        /** Puts a cell that was picked up back without moving anything. */
+        fun cancelDrag() {
+            if (dragCell != null) finishDrag(false)
+        }
 
         fun cellAt(indexPath: CYLIndexPath): CYLTagListCell? = cells[indexPath]
+
+        /** The section's header view, or null (no title row, or the section is not built). */
+        fun headerViewAt(section: Int): View? = headers[section]
 
         fun forEachTagButton(body: (CYLTagButton) -> Unit) {
             for (cell in cells.values) body(cell.button)
@@ -1607,13 +2087,95 @@ open class CYLTagListView @JvmOverloads constructor(
 
         fun layoutHeight(): Float = totalHeight
 
+        /** The card, header band and divider of each section, from the last `computeFrames`. */
+        val sectionFrames = ArrayList<CYLTagListSectionFrame>()
+
+        /**
+         * The frames of one section. `column` is the board's column ([boardColumnAt]); it and the header edges are leading-based (the column's x is the leading inset, the
+         * divider's `left` inset the leading one); right to left (`rtl`) mirrors the card, the band and the divider inside
+         * `width`, so with symmetric insets they are unchanged and with asymmetric ones they swap sides like the tags.
+         * `headerInsetLeft` / `headerInsetRight` stay the leading / trailing distances of the title.
+         */
+        private fun sectionFrameOf(
+            section: Int, top: Float, height: Float, header: Float, column: CYLRect, cardY: Float, cardBottom: Float,
+            headerEdges: Pair<Float, Float>, width: Float, rtl: Boolean,
+        ): CYLTagListSectionFrame {
+            val style = listStyle
+            fun mirrored(rect: CYLRect?): CYLRect? = if (!rtl || rect == null) rect else CYLRect(width - rect.maxX, rect.y, rect.width, rect.height)
+            val card = mirrored(if (style.isInsetGrouped) CYLRect(column.x, cardY, column.width, cardBottom - cardY) else null)
+            val band = mirrored(if (header > 0f && style.headerBackgroundColor != null) CYLRect(column.x, top, column.width, header) else null)
+            var separator: CYLRect? = null
+            if (header > 0f && style.headerSeparatorStyle == CYLHeaderSeparatorStyle.CYLHeaderSeparatorStyleLine && style.headerSeparatorThickness > 0f) {
+                val separatorInsets = style.headerSeparatorInsets
+                val left = column.x + (separatorInsets?.left ?: 0f)
+                val right = column.x + column.width - (separatorInsets?.right ?: 0f)
+                val thickness = min(style.headerSeparatorThickness, header)
+                separator = mirrored(CYLRect(left, top + header - thickness, max(0f, right - left), thickness))
+            }
+            return CYLTagListSectionFrame(section, top, height, header, card, band, separator, headerEdges.first, headerEdges.second)
+        }
+
+        /** The glass of a card: not touchable, hidden from accessibility, tinted with `sectionBackgroundColor` when it is set. */
+        private fun makeGlassCard(): CYLAnimatedItemView = CYLAnimatedItemView(context).apply {
+            isClickable = false
+            isFocusable = false
+            importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+            itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.LiquidGlass
+            itemBackgroundColor = listStyle.sectionBackgroundColor
+            itemCornerRadius = listStyle.sectionCornerRadius
+            itemGlassBackdropSource = backdropSource
+        }
+
+        /** Forwards `backdropSource` to the glass hosts already shown: the tags, the fold controls and the section boards. */
+        fun applyBackdropSource() {
+            val source = backdropSource
+            for (cell in cells.values) cell.button.itemGlassBackdropSource = source
+            for (cell in foldCells.values) cell.foldButton.itemGlassBackdropSource = source
+            for (header in headers.values) header.foldButton.itemGlassBackdropSource = source
+            for (footer in footers.values) footer.foldButton.itemGlassBackdropSource = source
+            for (board in glassCards.values) board.itemGlassBackdropSource = source
+        }
+
+        /** Invalidates the glass layer of every host shown (see `resampleGlassWhenMoved`): the tags, fold controls and boards. */
+        fun invalidateGlassHosts() {
+            for (cell in cells.values) cell.button.itemLiquidGlassView?.invalidate()
+            for (cell in foldCells.values) cell.foldButton.itemLiquidGlassView?.invalidate()
+            for (header in headers.values) header.foldButton.itemLiquidGlassView?.invalidate()
+            for (footer in footers.values) footer.foldButton.itemLiquidGlassView?.invalidate()
+            for (board in glassCards.values) board.itemLiquidGlassView?.invalidate()
+        }
+
+        init {
+            // The cards, bands and dividers are drawn behind the headers and tags (onDraw runs before the children).
+            setWillNotDraw(false)
+        }
+
+        override fun onDraw(canvas: android.graphics.Canvas) {
+            val style = listStyle
+            val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+            fun fill(rect: CYLRect?, color: Int, radius: Float) {
+                if (rect == null) return
+                paint.color = color
+                val box = android.graphics.RectF(rect.x * density, rect.y * density, rect.maxX * density, rect.maxY * density)
+                canvas.drawRoundRect(box, radius * density, radius * density, paint)
+            }
+            for (frame in sectionFrames) {
+                fill(frame.headerBand, style.headerBackgroundColor ?: CYLColor.CLEAR, style.headerCornerRadius)
+                if (glassCards.isEmpty()) fill(frame.card, style.resolvedSectionBackgroundColor(context), style.sectionCornerRadius)
+                fill(frame.headerSeparator, style.resolvedHeaderSeparatorColor(context), 0f)
+            }
+        }
+
         fun rebuild(animated: Boolean = false) {
             removeAllViews()
             cells.clear()
             foldCells.clear()
             headers.clear()
             footers.clear()
+            glassCards.clear()
+            val glassCard = listStyle.isInsetGrouped && listStyle.resolvedSectionBackgroundStyle == CYLTagBackgroundStyle.CYLTagBackgroundStyleLiquidGlass
             for (section in titles.indices) {
+                if (glassCard) glassCards[section] = makeGlassCard().also { addView(it) }
                 if (headerHeight() > 0) headers[section] = HeaderView(context, section).also { addView(it) }
                 val visible = numberOfVisibleItemsInSection(section)
                 for (item in 0 until visible) {
@@ -1654,13 +2216,21 @@ open class CYLTagListView @JvmOverloads constructor(
         private fun computeFrames() {
             frames.clear()
             sectionTops.clear()
+            sectionFrames.clear()
             val width = measuredContentWidth.coerceAtLeast(0f)
             val insets = listStyle.sectionInsets
+            val card = cardInsets()
+            val column = boardColumnAt(width)
+            val headerEdges = headerEdgeInsets()
+            // The tags' insets: the board's offset below the header plus the card's padding (the same insets when the style is plain).
+            val tagInsetsLeft = insets.left + card.left
+            val tagInsetsRight = insets.right + card.right
             val rtl = layoutDirection == LAYOUT_DIRECTION_RTL
             var y = 0f
             for (section in titles.indices) {
                 sectionTops[section] = y
-                val header = headerHeight()
+                val sectionTop = y
+                val header = headerHeight(section, width)
                 headers[section]?.let { frames[it] = CYLRect(0f, y, width, header) }
                 y += header
                 val visible = numberOfVisibleItemsInSection(section)
@@ -1678,18 +2248,25 @@ open class CYLTagListView @JvmOverloads constructor(
                     views.add(it)
                     sizes.add(inlineFoldSize(section, isSectionExpanded(section)))
                 }
-                val (itemFrames, bottom) = layout.frames(sizes, y, width, insets, listStyle.interitemSpacing, listStyle.lineSpacing, rtl)
+                val boardOffset = headerBoardOffset(header)
+                val tagInsets = CYLEdgeInsets(boardOffset + card.top, tagInsetsLeft, insets.bottom, tagInsetsRight)
+                val cardY = y + boardOffset
+                val (itemFrames, bottom) = layout.frames(sizes, y, width, tagInsets, listStyle.interitemSpacing, listStyle.lineSpacing, rtl)
                 views.forEachIndexed { index, view -> frames[view] = itemFrames[index] }
-                y = (if (sizes.isEmpty()) y + insets.top else bottom) + insets.bottom
+                val cardBottom = (if (sizes.isEmpty()) y + tagInsets.top else bottom) + card.bottom
+                y = cardBottom + insets.bottom
                 footers[section]?.let {
                     frames[it] = CYLRect(0f, y, width, footerHeight())
                     y += footerHeight()
                 }
+                val sectionFrame = sectionFrameOf(section, sectionTop, y - sectionTop, header, column, cardY, cardBottom, headerEdges, width, rtl)
+                sectionFrames.add(sectionFrame)
+                glassCards[section]?.let { glass -> sectionFrame.card?.let { frames[glass] = it } }
             }
             if (showsAddItemView() && addItemView.parent === this) {
                 // Right below the sections, inside the content (it scrolls with the items), as iOS.
                 val height = addItemView.preferredHeight / density
-                frames[addItemView] = CYLRect(insets.left, y, max(0f, width - insets.left - insets.right), height)
+                frames[addItemView] = CYLRect(if (rtl) insets.right else insets.left, y, max(0f, width - insets.left - insets.right), height)
                 y += height + insets.bottom
             }
             totalHeight = ceil(y)
@@ -1721,20 +2298,10 @@ open class CYLTagListView @JvmOverloads constructor(
                 }
 
                 override fun onLongPress(e: MotionEvent) {
-                    if (canMoveItemAt(indexPath)) {
-                        reordering = true
-                        menuDelegate?.menuDidChangeReordering(this@CYLTagListView, true)
-                        dragCell = cell
-                        dragIndexPath = indexPath
-                        dragStart = CYLPoint(e.rawX, e.rawY)
-                        dragMoved = false
-                        cell.bringToFront()
-                        cell.animate().scaleX(1.1f).scaleY(1.1f).setDuration(120).start()
-                        parent?.requestDisallowInterceptTouchEvent(true)
-                        if (indexPath in selection) reportSelectedDrag(indexPath)
-                    } else {
-                        reportLongPress(indexPath)
-                    }
+                    // The long-press action decides what this does (reordering picks the item up through beginDrag).
+                    pressCell = cell
+                    pressStart = CYLPoint(e.rawX, e.rawY)
+                    beginLongPress(indexPath)
                 }
             })
             detector.setIsLongpressEnabled(true)
@@ -1832,12 +2399,15 @@ open class CYLTagListView @JvmOverloads constructor(
             cell.translationX = 0f
             cell.translationY = 0f
             requestLayout()
-            if (!released) return
-            if (!dragMoved) {
-                reportLongPress(source)
+            if (!released) {
+                longPressActionValue.cancel(this@CYLTagListView)
                 return
             }
-            center ?: return
+            // The long-press action ends the press: a press that did not move is reported, a moved one moves the item.
+            if (!dragMoved || center == null) {
+                longPressActionValue.end(this@CYLTagListView, null, false)
+                return
+            }
             val last = max(0, numberOfVisibleItemsInSection(source.section) - 1)
             var target = source.item
             var best = Float.MAX_VALUE
@@ -1850,7 +2420,7 @@ open class CYLTagListView @JvmOverloads constructor(
                     target = indexPath.item
                 }
             }
-            moveItem(source, CYLIndexPath(min(target, last), source.section))
+            longPressActionValue.end(this@CYLTagListView, CYLIndexPath(min(target, last), source.section), true)
         }
     }
 
@@ -1858,9 +2428,10 @@ open class CYLTagListView @JvmOverloads constructor(
     private inner class HeaderView(context: Context, private val section: Int) : ViewGroup(context) {
         val iconView = ImageView(context).apply { scaleType = ImageView.ScaleType.FIT_CENTER }
         val titleLabel = TextView(context).apply {
-            maxLines = 1
+            maxLines = listStyle.headerMaxLines
             ellipsize = android.text.TextUtils.TruncateAt.END
-            gravity = android.view.Gravity.CENTER_VERTICAL
+            // START: right to left aligns the title text with the right edge, its leading one.
+            gravity = android.view.Gravity.START or android.view.Gravity.CENTER_VERTICAL
             ViewCompat.setAccessibilityHeading(this, true)
         }
         val foldButton = CYLTagFoldButton(context)
@@ -1886,6 +2457,7 @@ open class CYLTagListView @JvmOverloads constructor(
         init {
             val source = menuDataSource
             val style = listStyle
+            val onBand = style.headerBackgroundColor != null
             addView(indicatorView)
             addView(iconView)
             addView(titleLabel)
@@ -1898,15 +2470,16 @@ open class CYLTagListView @JvmOverloads constructor(
             val font = style.headerFontForTraitCollection()
             titleLabel.setTextSize(android.util.TypedValue.COMPLEX_UNIT_DIP, font.size)
             titleLabel.typeface = font.typeface
-            titleLabel.setTextColor(style.headerTextColor)
+            titleLabel.setTextColor(style.resolvedHeaderTextColor(context, onBand))
             iconView.setImageDrawable(source?.menuImageForSection(section))
+            iconView.imageTintList = android.content.res.ColorStateList.valueOf(style.resolvedTintColor(context, onBand))
             accessoryView = source?.menuAccessoryViewForSection(section)
             accessoryView?.let { (it.parent as? ViewGroup)?.removeView(it); addView(it) }
             val showsFold = foldIsInHeader() && canFoldSection(section)
             foldButton.visibility = if (showsFold) VISIBLE else GONE
             if (showsFold) {
                 val expanded = isSectionExpanded(section)
-                configureFoldButton(foldButton, section, expanded, false)
+                configureFoldButton(foldButton, section, expanded, false, onBand)
                 foldSize = foldSize(expanded)
             }
             foldButton.setOnClickListener { toggleSection(section) }
@@ -1917,7 +2490,7 @@ open class CYLTagListView @JvmOverloads constructor(
             clearButton.visibility = if (showsClear) VISIBLE else GONE
             if (showsClear) {
                 val image = (style.clearButtonImage ?: CYLMenuImage("cyl_trash"))?.mutate()
-                image?.setTint(style.clearButtonColor ?: style.headerTextColor)
+                image?.setTint(style.resolvedClearButtonColor(context, onBand))
                 clearButton.setImageDrawable(image)
                 val title = source?.menuTitleForSection(section).orEmpty()
                 val clear = CYLMenuLocalizedString("CYLMenuClearSection", "The clear button of a section")
@@ -1932,7 +2505,7 @@ open class CYLTagListView @JvmOverloads constructor(
             moreButton.visibility = if (showsMore) VISIBLE else GONE
             if (showsMore) {
                 val image = (style.moreButtonImage ?: CYLMenuImage("cyl_more") ?: CYLMenuIconDrawable(CYLMenuIconDrawable.Kind.ELLIPSIS)).mutate()
-                image.setTint(style.moreButtonColor)
+                image.setTint(style.resolvedMoreButtonColor(context, onBand))
                 moreButton.setImageDrawable(image)
                 var label = source?.menuAccessibilityLabelForMoreButtonInSection(section)
                 if (label.isNullOrEmpty()) {
@@ -1941,7 +2514,7 @@ open class CYLTagListView @JvmOverloads constructor(
                     label = if (title.isNotEmpty()) "$title $more" else more
                 }
                 moreButton.contentDescription = label
-                moreButton.tooltipText = label
+                androidx.appcompat.widget.TooltipCompat.setTooltipText(moreButton, label)
                 moreButton.setOnClickListener { menuDelegate?.menuDidTapMoreButtonInSection(this@CYLTagListView, section) }
             }
         }
@@ -1954,9 +2527,14 @@ open class CYLTagListView @JvmOverloads constructor(
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
             val width = (r - l) / density
             val height = (b - t) / density
-            val inset = listStyle.headerHorizontalInset
-            var trailing = width - inset
-            var leading = inset
+            // Everything below is laid out leading-first (as left to right); `place` mirrors it in right to left.
+            laidOutWidth = width
+            mirrors = layoutDirection == LAYOUT_DIRECTION_RTL
+            val (leadingInset, trailingInset) = headerEdgeInsets()
+            var trailing = width - trailingInset
+            var leading = leadingInset
+            // The same room the header height wrapped the title at; every width below comes from it.
+            val room = headerRoom(section, width, accessoryView?.let { it.measuredWidth / density })
             if (clearButton.visibility == VISIBLE) {
                 // A square as tall as a line of the title at the trailing inset, aligned with the title text.
                 val line = min(height, ceil(titleLabel.lineHeight / density))
@@ -1966,7 +2544,7 @@ open class CYLTagListView @JvmOverloads constructor(
                 val extra = max(0, ((44 - line) / 2 * density).roundToInt())
                 val bounds = android.graphics.Rect(clearButton.left - extra, clearButton.top - extra, clearButton.right + extra, clearButton.bottom + extra)
                 touchDelegate = android.view.TouchDelegate(bounds, clearButton)
-                trailing -= 8
+                trailing -= HEADER_ITEM_SPACING
             }
             if (moreButton.visibility == VISIBLE) {
                 val size = min(MORE_BUTTON_SIZE, if (height > 0) max(height, 30f) else MORE_BUTTON_SIZE)
@@ -1976,49 +2554,55 @@ open class CYLTagListView @JvmOverloads constructor(
                 trailing -= 4
             }
             if (foldButton.visibility == VISIBLE) {
-                val size = CYLSize(min(foldSize.width, width / 2), min(foldSize.height, height))
+                val size = CYLSize(room.foldWidth, min(foldSize.height, height))
                 val y = floor((height - size.height) / 2)
                 if (_foldControl.position == CYLMenuFoldControlPosition.HEADER_LEADING) {
-                    place(foldButton, CYLRect(leading - 6, y, size.width, size.height))
-                    leading += size.width - 6 + 4
+                    place(foldButton, CYLRect(leading - HEADER_FOLD_OVERHANG, y, size.width, size.height))
+                    leading += size.width - HEADER_FOLD_OVERHANG + HEADER_LEADING_FOLD_GAP
                 } else {
-                    trailing -= size.width - 6
+                    trailing -= size.width - HEADER_FOLD_OVERHANG
                     place(foldButton, CYLRect(trailing, y, size.width, size.height))
-                    trailing -= 8
+                    trailing -= HEADER_ITEM_SPACING
                 }
             }
             accessoryView?.let { view ->
-                val w = min(view.measuredWidth / density, width / 2)
+                val w = room.accessoryWidth
                 val h = min(max(view.measuredHeight / density, 1f), height)
                 trailing -= w
                 place(view, CYLRect(trailing, floor((height - h) / 2), w, h))
-                trailing -= 8
+                trailing -= HEADER_ITEM_SPACING
             }
             var x = leading
             if (indicatorView.visibility == VISIBLE) {
                 val bar = listStyle.headerIndicatorSize
                 place(indicatorView, CYLRect(x, floor((height - bar.height) / 2), bar.width, bar.height))
-                x += bar.width + 8
+                x += bar.width + HEADER_ITEM_SPACING
             }
             if (iconView.drawable != null && iconView.visibility == VISIBLE) {
                 place(iconView, CYLRect(x, floor((height - HEADER_ICON_SIZE) / 2), HEADER_ICON_SIZE, HEADER_ICON_SIZE))
-                x += HEADER_ICON_SIZE + 8
+                x += HEADER_ICON_SIZE + HEADER_ITEM_SPACING
             } else {
                 place(iconView, CYLRect())
             }
-            place(titleLabel, CYLRect(x, 0f, max(0f, trailing - x), height))
+            // The title is given exactly the room the height was computed for; the controls above keep their widths.
+            place(titleLabel, CYLRect(x, 0f, room.titleWidth, height))
         }
 
         /**
          * Measures `view` at the size of `frame`, then lays it out there, so a label's vertical centering uses the
          * header's height (as the iOS frames do), not its own natural height.
          */
-        private fun place(view: View, frame: CYLRect) {
+        private fun place(view: View, leadingFrame: CYLRect) {
+            val frame = if (mirrors) CYLRect(laidOutWidth - leadingFrame.maxX, leadingFrame.y, leadingFrame.width, leadingFrame.height) else leadingFrame
             val width = px(frame.maxX) - px(frame.x)
             val height = px(frame.maxY) - px(frame.y)
             view.measure(MeasureSpec.makeMeasureSpec(maxOf(0, width), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(maxOf(0, height), MeasureSpec.EXACTLY))
             view.layout(px(frame.x), px(frame.y), px(frame.x) + maxOf(0, width), px(frame.y) + maxOf(0, height))
         }
+
+        /** The header's width in dp at the last layout, and whether it was laid out right to left (`place` mirrors then). */
+        private var laidOutWidth = 0f
+        private var mirrors = false
     }
 
     /** A section footer with the fold control at the bottom. */

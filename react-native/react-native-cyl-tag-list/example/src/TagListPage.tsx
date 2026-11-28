@@ -13,6 +13,7 @@ const configuration = {
   defaultVisibleRows: 3,
   foldControl: { position: 'tail', content: 'icon' },
   style: {
+    backgroundStyle: 'liquidGlass',
     itemHeight: 36,
     imageSize: '{18, 18}',
     normal: { cornerRadius: 0, borderColor: '#D1D1D6', borderWidth: 1 },

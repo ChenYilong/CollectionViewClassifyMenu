@@ -81,6 +81,9 @@ final class CYLTagEditorAccessibilityTests: CYLTagEditorTestCase {
         XCTAssertEqual(iconOnly?.titleView.accessibilityLabel, "标题：仅图标", "An icon-only title needs a label of its own")
         let folds = styles.tagListViews.flatMap { $0.views(withIdentifier: CYLTagListAccessibilityIdentifier.foldControl) }
             .filter { !$0.isHidden && $0.window != nil }
+            // A tail fold control is a cell (the accessibility element); its inner button repeats the identifier only.
+            .filter { fold in !(fold is CYLTagFoldButton && fold.superview?.superview is CYLTagFoldCell) }
+        XCTAssertTrue(folds.contains { $0 is CYLTagFoldCell }, "The tail control (the first demo) is a cell")
         XCTAssertFalse(folds.isEmpty, "Fold controls are found by identifier")
         for fold in folds {
             XCTAssertTrue(fold.isAccessibilityElement)

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from '@ohos/hypium';
 import {
   CYLFont, CYLIndexPath, CYLMenuDataSource, CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPosition,
-  CYLTagButtonMetrics, CYLTagListState, CYLTextMeasurer
+  CYLMenuStyle, CYLSectionStyle, CYLTagButtonMetrics, CYLTagListState, CYLTextMeasurer
 } from '@cyl/classifymenu';
 
 const FIXED: CYLTextMeasurer = (text: string, font: CYLFont): number => Array.from(text).length * 10;
@@ -22,8 +22,19 @@ class CYLTailFoldSource implements CYLMenuDataSource {
   menuTitleForItem = (indexPath: CYLIndexPath): string => this.titles[indexPath.item];
 }
 
+/**
+ * The row counts below are those of a flat list (the card's padding would narrow the column and move them), so these
+ * tests opt out of the default section card.
+ */
+function plainTailStyle(): CYLMenuStyle {
+  const style = new CYLMenuStyle();
+  style.sectionStyle = CYLSectionStyle.plain;
+  return style;
+}
+
 function makeTailList(count: number): CYLTagListState {
   const list = new CYLTagListState();
+  list.style = plainTailStyle();
   list.menuDataSource = new CYLTailFoldSource(count);
   list.setLayoutWidth(320);
   list.showsSectionHeaders = false;
@@ -93,6 +104,36 @@ export default function tagListTailFoldTest() {
       expect(list.isSectionExpanded(0)).assertFalse();
       expect(list.numberOfDisplayedItems(0)).assertEqual(visible + 1);
       expect(isFoldCell(list, visible)).assertTrue();
+    });
+
+    it('showsNoHeaderFoldControlWhenTheTagsFitDefaultVisibleRowsAndNoWidthIsKnownYet', 0, () => {
+      const list = new CYLTagListState();
+      list.style = plainTailStyle();
+      list.menuDataSource = new CYLTailFoldSource(TAGS_IN_TWO_ROWS);
+      list.defaultVisibleRows = 2;
+      list.foldControl = new CYLMenuFoldControl(CYLMenuFoldControlPosition.headerTrailing, CYLMenuFoldControlContent.icon);
+      list.reloadMenuData();
+      // No width yet: the layout is unknown, so no section can need a fold.
+      expect(list.showsHeaderFoldControl(0)).assertFalse();
+      list.setLayoutWidth(320);
+      expect(list.numberOfRows(0)).assertEqual(2);
+      expect(list.showsHeaderFoldControl(0)).assertFalse();
+      list.setLayoutWidth(0);
+      expect(list.showsHeaderFoldControl(0)).assertFalse();
+    });
+
+    it('showsTheHeaderFoldControlOnlyWhenTheRowsExceedDefaultVisibleRows', 0, () => {
+      const list = new CYLTagListState();
+      list.style = plainTailStyle();
+      list.menuDataSource = new CYLTailFoldSource(TAGS_IN_THREE_ROWS);
+      list.defaultVisibleRows = 2;
+      list.foldControl = new CYLMenuFoldControl(CYLMenuFoldControlPosition.headerTrailing, CYLMenuFoldControlContent.icon);
+      list.setLayoutWidth(320);
+      list.reloadMenuData();
+      expect(list.showsHeaderFoldControl(0)).assertTrue();
+      list.setLayoutWidth(640);
+      expect(list.numberOfRows(0)).assertEqual(2);
+      expect(list.showsHeaderFoldControl(0)).assertFalse();
     });
   });
 }

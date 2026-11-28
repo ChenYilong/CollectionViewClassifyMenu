@@ -258,6 +258,11 @@ class CYLTagHeaderCell @JvmOverloads constructor(context: Context, attrs: Attrib
         set(value) {
             field = value
             button.text = CYLMenuLocalizedString(if (value?.isOpened == true) "CYLMenuCollapse" else "CYLMenuExpand", "Expand or collapse a tag group")
+            // The More / Less arrow after the title, as the classify menu's CYLRightImageButton shows it (the bundle's
+            // home_btn_more_normal while folded, home_btn_more_selected while open), 7 dp from the title.
+            button.compoundDrawablePadding = (7 * density).roundToInt()
+            button.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null,
+                CYLMenuImage(if (value?.isOpened == true) "home_btn_more_selected" else "home_btn_more_normal"), null)
             nameLabel.text = value?.groupName
             button.contentDescription = "${button.text}, ${value?.groupName.orEmpty()}"
         }

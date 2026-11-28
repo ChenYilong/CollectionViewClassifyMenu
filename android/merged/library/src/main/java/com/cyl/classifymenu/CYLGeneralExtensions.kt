@@ -318,6 +318,17 @@ fun TextView.cyl_generalStyle() {
 }
 
 /**
+ * The pressed fill of a bordered tag background: a copy of `base` (so it keeps the corner shape on every API level;
+ * `GradientDrawable.getCornerRadius` exists only from API 24) filled with the home green and without the stroke.
+ */
+private fun cyl_pressedFill(base: GradientDrawable): GradientDrawable {
+    val copy = (base.constantState?.newDrawable()?.mutate() as? GradientDrawable) ?: GradientDrawable()
+    copy.setColor(CYLHomeGreen)
+    copy.setStroke(0, Color.TRANSPARENT)
+    return copy
+}
+
+/**
  * `-cyl_homeStyle`: green title (lighter when selected, white when pressed on green) and a green border.
  */
 fun TextView.cyl_homeStyle() {
@@ -326,7 +337,7 @@ fun TextView.cyl_homeStyle() {
     val base = (background as? GradientDrawable) ?: GradientDrawable().apply { setColor(Color.WHITE) }
     base.setStroke(max(1, resources.displayMetrics.density.roundToInt()), CYLHomeGreen)
     background = StateListDrawable().apply {
-        addState(intArrayOf(android.R.attr.state_pressed), GradientDrawable().apply { setColor(CYLHomeGreen); cornerRadius = base.cornerRadius })
+        addState(intArrayOf(android.R.attr.state_pressed), cyl_pressedFill(base))
         addState(intArrayOf(), base)
     }
 }
@@ -341,7 +352,7 @@ fun TextView.cyl_redStyle() {
     val base = (background as? GradientDrawable) ?: GradientDrawable().apply { setColor(Color.WHITE) }
     base.setStroke(max(1, resources.displayMetrics.density.roundToInt()), red)
     background = StateListDrawable().apply {
-        addState(intArrayOf(android.R.attr.state_pressed), GradientDrawable().apply { setColor(CYLHomeGreen); cornerRadius = base.cornerRadius })
+        addState(intArrayOf(android.R.attr.state_pressed), cyl_pressedFill(base))
         addState(intArrayOf(), base)
     }
 }

@@ -33,7 +33,7 @@ test('the tag cloud demo: seven continents, the detailed tag and four styled tag
   assert.equal(code.tags[11].deleteIndicatorTitle, '⊗');
   assert.equal(code.style.lineSpacing, 5);
   assert.equal(code.style.interitemSpacing, 3);
-  assert.equal(code.style.normal.cornerRadius, 3, 'CYLMenuStyle(), not tagCloud()');
+  assert.equal(code.style.normal.cornerRadius, 1000, 'CYLMenuStyle(), not tagCloud(): the capsule constant');
   const map = demo.mapList();
   assert.deepEqual(map.tags.map((tag) => tag.title), ['Asia', 'Europe', 'Africa', 'Australia']);
   assert.equal(map.tags[2].identifier, 3);
@@ -52,7 +52,7 @@ test('MainActivity\'s tags, in order, with their ids', () => {
   assert.equal(tags[7].textColor, 'rgb(233, 30, 99)');
   assert.equal(tags[11].backgroundColor, 'rgb(0, 191, 255)');
   assert.equal(tags[17].borderColor, 'rgb(233, 30, 99)');
-  assert.equal(tags[19].cornerRadius, model.CORNER_RADIUS_SQUARE);
+  assert.equal(tags[19].cornerRadius, 0);
   assert.equal(tags[22].title, 'Deletable');
   assert.equal(tags[24].title, 'Detail Tag');
   assert.equal(tags[24].isDeletable, true);
@@ -86,7 +86,7 @@ test('the list, RecyclerView and hot search data', () => {
   assert.equal(hot[2].badgeText, undefined);
   const style = cloud.hotStyle();
   assert.equal(model.tagHeight(style), 38);
-  assert.equal(style.normal.cornerRadius, 0);
+  assert.equal(style.normal.cornerRadius, 1000, 'white capsules');
 });
 
 test('the five containers have the attributes of content_main.xml', () => {
@@ -110,7 +110,8 @@ test('the five containers have the attributes of content_main.xml', () => {
   assert.equal(fifth.tags[0].backgroundColor, 'rgb(255, 0, 0)');
   assert.equal(fifth.tags[1].selectedBackgroundColor, 'rgb(153, 153, 153)');
   const red = model.renderTag(fifth.tags[0], 0, { listStyle: fifth.style, theme: fifth.options.colorTheme });
-  assert.match(red.style, /background-color: rgb\(255, 0, 0\)/);
+  // The sample is a Liquid Glass list now: the red tints the glass at 75% (flat would be background-color: rgb(255, 0, 0)).
+  assert.match(red.style, /background-color:rgba\(255,0,0,0.75\)/);
 });
 
 test('the sample pictures and images exist and are small', () => {

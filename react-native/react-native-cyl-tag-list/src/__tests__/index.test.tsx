@@ -12,6 +12,16 @@ jest.mock('../CylTagListViewNativeComponent', () => {
 });
 
 import { CylTagListView, type CylTagListHandle } from '../CylTagListView.native';
+import {
+  CylFoldControlContent,
+  CylHeaderSeparatorStyle,
+  CylSectionBackgroundStyle,
+  CylSectionStyle,
+  CylTagBackgroundStyle,
+  CylTagLongPressActionName,
+  CylTagTitleMaxLinesUnlimited,
+  type CylTagListConfiguration,
+} from '../CylTagListConfiguration';
 
 describe('CylTagListView', () => {
   it('sends the configuration as JSON and the playback props as they are', () => {
@@ -27,6 +37,7 @@ describe('CylTagListView', () => {
 
   it('unwraps the native events', () => {
     const onTagTap = jest.fn();
+    const onTagLongPress = jest.fn();
     const onSelectionChange = jest.fn();
     const onContentHeightChange = jest.fn();
     const screen = render(
@@ -34,17 +45,129 @@ describe('CylTagListView', () => {
         testID="list"
         configuration={{}}
         onTagTap={onTagTap}
+        onTagLongPress={onTagLongPress}
         onSelectionChange={onSelectionChange}
         onContentHeightChange={onContentHeightChange}
       />
     );
     const host = screen.getByTestId('list');
     host.props.onTagTap({ nativeEvent: { section: 1, item: 2, title: '广州' } });
+    host.props.onTagLongPress({ nativeEvent: { section: 0, item: 4, title: '北京' } });
     host.props.onSelectionChange({ nativeEvent: { itemsJSON: '[{"section":0,"item":3,"title":"上海"}]' } });
     host.props.onContentHeightChange({ nativeEvent: { height: 180.5 } });
     expect(onTagTap).toHaveBeenCalledWith({ section: 1, item: 2, title: '广州' });
+    expect(onTagLongPress).toHaveBeenCalledWith({ section: 0, item: 4, title: '北京' });
     expect(onSelectionChange).toHaveBeenCalledWith([{ section: 0, item: 3, title: '上海' }]);
     expect(onContentHeightChange).toHaveBeenCalledWith(180.5);
+  });
+
+  it('sends the long-press action, the subtitles, the fold and the title lines to the native list as they are', () => {
+    const configuration: CylTagListConfiguration = {
+      longPressAction: [CylTagLongPressActionName.callout],
+      defaultVisibleRows: 2,
+      style: { titleMaxLines: CylTagTitleMaxLinesUnlimited },
+      sections: [
+        { title: 'Flows', items: [{ title: 'Switch states', subtitle: 'reloadData #3' }] },
+        { title: 'HUD', items: [{ title: 'Progress' }] },
+      ],
+    };
+    const screen = render(<CylTagListView testID="list" configuration={configuration} />);
+    const sent = JSON.parse(screen.getByTestId('list').props.configuration);
+    expect(sent).toEqual(configuration);
+    expect(sent.sections).toHaveLength(2);
+    expect(sent.style.titleMaxLines).toBe('unlimited');
+    expect(sent.longPressAction).toEqual(['callout']);
+  });
+
+  it('sends the typed section style keys to the native list as they are', () => {
+    const configuration: CylTagListConfiguration = {
+      style: {
+        sectionStyle: CylSectionStyle.plain,
+        sectionBackgroundColor: '#FFFFFF',
+        sectionBackgroundStyle: CylSectionBackgroundStyle.liquidGlass,
+        sectionCornerRadius: 16,
+        sectionContentInsets: [8, 12, 8, 12],
+        headerBackgroundColor: '#EFEFF4',
+        headerCornerRadius: 6,
+        headerContentInsets: { top: 0, left: 10, bottom: 0, right: 10 },
+        headerSeparatorStyle: CylHeaderSeparatorStyle.line,
+        headerSeparatorColor: '#000000',
+        headerSeparatorThickness: 1,
+        headerSeparatorInsets: '{0, 4, 0, 4}',
+        tintColor: 'systemBlue',
+        titleMaxLines: 2,
+      },
+      sections: [{ title: 'Flows', items: [{ title: 'Switch states' }] }],
+    };
+    const screen = render(<CylTagListView testID="list" configuration={configuration} />);
+    const sent = JSON.parse(screen.getByTestId('list').props.configuration);
+    expect(sent).toEqual(configuration);
+    expect(sent.style.sectionStyle).toBe('plain');
+    expect(sent.style.sectionBackgroundStyle).toBe('liquidGlass');
+    expect(sent.style.headerSeparatorStyle).toBe('line');
+    expect(sent.style.sectionContentInsets).toEqual([8, 12, 8, 12]);
+    expect(sent.style.tintColor).toBe('systemBlue');
+  });
+
+  it('names the section style values as the native parsers read them', () => {
+    expect(CylSectionStyle).toEqual({ plain: 'plain', insetGrouped: 'insetGrouped' });
+    expect(CylSectionBackgroundStyle).toEqual({ flat: 'flat', liquidGlass: 'liquidGlass' });
+    expect(CylHeaderSeparatorStyle).toEqual({ none: 'none', line: 'line' });
+  });
+
+  it('sends a configuration without section keys unchanged, so the native defaults apply (card on, divider off)', () => {
+    const configuration: CylTagListConfiguration = { sections: [{ title: 'Flows', items: [{ title: 'A' }] }] };
+    const screen = render(<CylTagListView testID="list" configuration={configuration} />);
+    const sent = JSON.parse(screen.getByTestId('list').props.configuration);
+    expect(sent).toEqual(configuration);
+    expect(sent.style).toBeUndefined();
+  });
+
+  it('sends the typed foldControl unchanged, with titleAndIconAlways', () => {
+    const configuration: CylTagListConfiguration = {
+      defaultVisibleRows: 2,
+      foldControl: {
+        position: 'tail',
+        content: CylFoldControlContent.titleAndIconAlways,
+        title: 'More',
+        collapseTitle: 'Less',
+        color: '#007AFF',
+      },
+      sections: [{ title: 'Flows', items: [{ title: 'A' }] }],
+    };
+    const screen = render(<CylTagListView testID="list" configuration={configuration} />);
+    const sent = JSON.parse(screen.getByTestId('list').props.configuration);
+    expect(sent).toEqual(configuration);
+    expect(sent.foldControl.content).toBe('titleAndIconAlways');
+    expect(CylFoldControlContent).toEqual({
+      iconAndTitle: 'iconAndTitle',
+      title: 'title',
+      icon: 'icon',
+      titleAndIconAlways: 'titleAndIconAlways',
+    });
+  });
+
+  it('sends the header keys, the fold icon keys and the tag border keys unchanged', () => {
+    const configuration: CylTagListConfiguration = {
+      foldControl: { position: 'headerTrailing', rotatesImageWhenExpanded: false, image: 'system:chevron.down' },
+      style: {
+        headerMaxLines: CylTagTitleMaxLinesUnlimited,
+        headerHeight: 44,
+        sectionBoardInset: 0,
+        headerTextColor: '#112233',
+        foldControlColor: '#445566',
+        backgroundStyle: CylTagBackgroundStyle.liquidGlass,
+        normal: { borderColor: '#FF0000', borderWidth: 1, textColor: '#FFFFFF', backgroundColor: '#00000033' },
+      },
+      sections: [{ title: 'A long section title', items: [{ title: 'A', style: { selected: { borderWidth: 2 } } }] }],
+    };
+    const screen = render(<CylTagListView testID="list" configuration={configuration} />);
+    const sent = JSON.parse(screen.getByTestId('list').props.configuration);
+    expect(sent).toEqual(configuration);
+    expect(sent.style.headerMaxLines).toBe('unlimited');
+    expect(sent.style.sectionBoardInset).toBe(0); // 0 is a set value, not "left out"
+    expect(sent.foldControl.rotatesImageWhenExpanded).toBe(false);
+    expect(CylTagBackgroundStyle).toEqual({ flat: 'flat', liquidGlass: 'liquidGlass' });
   });
 
   it('runs the playAll command on the native view', () => {

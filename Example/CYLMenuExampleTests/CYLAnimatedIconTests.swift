@@ -15,6 +15,27 @@ import CYLAnimatedItem
 
 final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
 
+    /// The `#` and `?` forms of an animation source go through the engine's shared rules (CYLAnimationSource), as on the
+    /// other platforms: the file is resolved, the options land in the fragment, an option without a value is dropped.
+    func testAnimationSourceTextSplitsOptionsAsTheEngineDoes() {
+        let file = "CYLMenuExample.bundle/Animations/Rive/icons.riv"
+        let items: [[String: Any]] = [
+            [CYLTagItemKey.title: "hash", CYLTagItemKey.animation: file + "#artboard=USER&input=active"],
+            [CYLTagItemKey.title: "query", CYLTagItemKey.animation: file + "?artboard=USER&input=active"],
+            [CYLTagItemKey.title: "both", CYLTagItemKey.animation: file + "?artboard=USER#input=active&novalue"],
+            [CYLTagItemKey.title: "plain", CYLTagItemKey.animation: file],
+        ]
+        let view = CYLTagListView(configuration: [CYLTagListKey.sections: [[CYLTagSectionKey.items: items]]])
+        let urls = (0..<items.count).map { view.menuDataSource?.menuAnimationURLForItem?(at: ip($0, 0)) }
+        XCTAssertEqual(urls[0]?.fragment, "artboard=USER&input=active")
+        XCTAssertEqual(urls[1]?.fragment, "artboard=USER&input=active", "`?options` are read as `#options`")
+        XCTAssertEqual(urls[2]?.fragment, "artboard=USER&input=active", "`?` and `#` options merge, valueless ones are dropped")
+        XCTAssertNil(urls[3]?.fragment)
+        for url in urls {
+            XCTAssertTrue(FileManager.default.fileExists(atPath: url?.path ?? ""), "The file is resolved without its options")
+        }
+    }
+
     func testAnimationOptionsAreEncodedAsCYLTabBarControllerDoes() {
         let file = URL(fileURLWithPath: "/tmp/icons.riv")
         XCTAssertEqual(file.cylAddingAnimationOptions([:]), file)
@@ -172,8 +193,8 @@ final class CYLAnimatedIconTests: CYLMenuExampleTestCase {
         let selected = tags.tagButton(at: chat)
         let normal = tags.tagButton(at: search)
         XCTAssertNotNil(normal?.animationView, "icons.riv artboard")
-        XCTAssertTrue(normal?.layer.backgroundColor == dark?.normalAppearance.backgroundColor.cgColor, "Dark tag")
-        XCTAssertTrue(selected?.layer.backgroundColor == dark?.selectedAppearance.backgroundColor.cgColor)
+        XCTAssertEqual(CYLMenuFixtures.fillRGB(of: normal), CYLMenuFixtures.rgb(dark?.normalAppearance.backgroundColor), "Dark tag")
+        XCTAssertEqual(CYLMenuFixtures.fillRGB(of: selected), CYLMenuFixtures.rgb(dark?.selectedAppearance.backgroundColor))
         XCTAssertTrue(CYLColorComponents(normal?.titleLabel.textColor).isWhite,
                       "White titles: \(String(describing: normal?.titleLabel.textColor))")
         XCTAssertTrue((tags.cell(at: chat)?.frame ?? .zero).intersects(tags.collectionView.bounds), "Scrolled to the section")

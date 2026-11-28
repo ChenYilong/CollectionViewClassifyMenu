@@ -8,6 +8,8 @@ const store = require('./store.js');
 const { t, language } = require('../../utils/i18n.js');
 
 const ORANGE = '#FF4F00'; // UIColor(red: 1, green: 0.31, blue: 0)
+/** The filter sits in the page's own layout (the product page and the review page), not in a card: the list's `plain` section style. */
+const PLAIN_SECTION_STYLE = 'plain';
 
 /**
  * reviewFilterStyle(): 12 pt titles (white 0.3, selected white, disabled white 0.7), 13 × 13 icons 3 from the title,
@@ -17,6 +19,8 @@ const ORANGE = '#FF4F00'; // UIColor(red: 1, green: 0.31, blue: 0)
 function reviewFilterStyle(overrides = {}) {
   const box = { cornerRadius: 2, borderWidth: 0.5, borderColor: '#E0E0E0', backgroundColor: '#F5F5F5' };
   return {
+    sectionStyle: PLAIN_SECTION_STYLE,
+    backgroundStyle: 'liquidGlass',
     itemHeight: 28,
     imageSize: 13,
     imageTitleSpacing: 3,

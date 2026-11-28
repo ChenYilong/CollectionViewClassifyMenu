@@ -37,6 +37,33 @@ enum CYLMenuFixtures {
     }
 
     /**
+     * The color a tag is filled with, as red, green and blue: the layer's color on a flat tag, the tint of the glass on
+     * a Liquid Glass tag (translucent, so its alpha is left out). `nil` where the tag has neither.
+     */
+    static func fillRGB(of button: CYLTagButton?) -> CYLColorComponents? {
+        var color: UIColor?
+        if #available(iOS 26.0, *), let glass = (button?.liquidGlassView as? UIVisualEffectView)?.effect as? UIGlassEffect {
+            color = glass.tintColor
+        } else if let cgColor = button?.layer.backgroundColor {
+            color = UIColor(cgColor: cgColor)
+        }
+        guard let color else { return nil }
+        var components = CYLColorComponents(color)
+        components.alpha = 1
+        return components
+    }
+
+    /**
+     * `color` as red, green and blue only, to compare with `fillRGB(of:)`.
+     */
+    static func rgb(_ color: UIColor?) -> CYLColorComponents? {
+        guard let color else { return nil }
+        var components = CYLColorComponents(color)
+        components.alpha = 1
+        return components
+    }
+
+    /**
      * A filled square, for an icon whose pixels the test controls.
      */
     static func squareImage(side: CGFloat = 18, color: UIColor = .systemRed) -> UIImage {

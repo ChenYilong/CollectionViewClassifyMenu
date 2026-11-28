@@ -35,11 +35,14 @@ import com.cyl.classifymenu.CYLTagItemImage
 import com.cyl.classifymenu.CYLTagItemSelectedImage
 import com.cyl.classifymenu.CYLTagItemTitle
 import com.cyl.classifymenu.CYLTagListView
+import com.cyl.classifymenu.example.plainSections
+import com.cyl.classifymenu.CYLMenuStyleSectionStyle
 import com.cyl.classifymenu.CYLTagListViewAllowsEmptySelection
 import com.cyl.classifymenu.CYLTagListViewSections
 import com.cyl.classifymenu.CYLTagListViewSelectedItems
 import com.cyl.classifymenu.CYLTagListViewSelectionMode
 import com.cyl.classifymenu.CYLTagListViewStyle
+import com.cyl.classifymenu.CYLMenuStyleBackgroundStyle
 import com.cyl.classifymenu.CYLTagSectionItems
 import com.cyl.classifymenu.CYLTagSectionStyle
 import com.cyl.classifymenu.CYLTagSectionTitle
@@ -136,7 +139,7 @@ class CYLTagAnimationScreen(private val context: Context) : CYLMenuScreen, CYLMe
             )
             val appearance = mapOf(CYLTagAppearanceCornerRadius to 0, CYLTagAppearanceMargin to 12, CYLTagAppearanceBorderColor to "#D1D1D6", CYLTagAppearanceBorderWidth to 1)
             val style = mapOf(
-                CYLMenuStyleImageSize to "{28, 28}", CYLMenuStyleImageTitleSpacing to 6, CYLMenuStyleItemHeight to 44, CYLMenuStyleLayoutCentered to true,
+                CYLMenuStyleSectionStyle to "plain", CYLMenuStyleBackgroundStyle to "liquidGlass", CYLMenuStyleImageSize to "{28, 28}", CYLMenuStyleImageTitleSpacing to 6, CYLMenuStyleItemHeight to 44, CYLMenuStyleLayoutCentered to true,
                 CYLMenuStyleSectionInsets to listOf(6, 16, 14, 16),
                 CYLMenuStyleNormal to appearance,
                 CYLMenuStyleSelected to appearance + mapOf(CYLTagAppearanceBackgroundColor to "#FFF1E6", CYLTagAppearanceTextColor to "#FF6A00", CYLTagAppearanceBorderColor to "#FF6A00"),

@@ -18,7 +18,7 @@ test('CYLMenuStyle() has gray bordered tags, a green selection, 30 pt tags', () 
   const style = model.defaultStyle();
   assert.equal(style.normal.backgroundColor, '#F2F2F7');
   assert.equal(style.normal.textColor, 'rgb(64, 64, 64)');
-  assert.equal(style.normal.cornerRadius, 3);
+  assert.equal(style.normal.cornerRadius, model.cylAnimatedItemCornerRadiusCapsule);
   assert.equal(style.selected.backgroundColor, 'rgb(42, 185, 160)');
   assert.deepEqual(style.normal.contentInsets, { top: 5, left: 10, bottom: 5, right: 10 });
   assert.equal(style.itemHeight, 30);
@@ -29,7 +29,7 @@ test('CYLMenuStyle() has gray bordered tags, a green selection, 30 pt tags', () 
 test('the tagCloud() and tagContainer() presets are android-tagview\'s and AndroidTagView\'s defaults', () => {
   const cloud = model.tagCloudStyle();
   assert.equal(cloud.normal.backgroundColor, 'rgb(0, 191, 255)');
-  assert.equal(cloud.normal.cornerRadius, 0);
+  assert.equal(cloud.normal.cornerRadius, 1000);
   assert.equal(cloud.normal.borderWidth, 0);
   assert.equal(cloud.highlightedBackgroundColor, 'rgba(54, 54, 54, 0.533)');
   assert.equal(cloud.interitemSpacing, 5);
@@ -46,13 +46,13 @@ test('the tagCloud() and tagContainer() presets are android-tagview\'s and Andro
 
 test('a style dictionary applies over CYLMenuStyle()', () => {
   const style = model.styleFromConfiguration({
-    normal: { backgroundColor: '#00BFFF', textColor: '#FFFFFF', borderWidth: 0, cornerRadius: 0 },
+    normal: { backgroundColor: '#00BFFF', textColor: '#FFFFFF', borderWidth: 0, cornerRadius: 1000 },
     highlightedBackgroundColor: '#88363636',
     lineSpacing: 5,
     tagContentInsets: '{3, 10, 3, 10}',
   });
   assert.equal(style.normal.backgroundColor, 'rgb(0, 191, 255)');
-  assert.equal(style.normal.cornerRadius, 0);
+  assert.equal(style.normal.cornerRadius, 1000);
   assert.equal(style.selected.backgroundColor, 'rgb(42, 185, 160)');
   assert.equal(style.lineSpacing, 5);
   assert.deepEqual(style.disabled.contentInsets, { top: 3, left: 10, bottom: 3, right: 10 });
@@ -132,15 +132,30 @@ test('imageFillsTagHeight draws the image as a circle as tall as the tag at its 
   assert.equal(model.defaultStyle().imageFillsTagHeight, false);
 });
 
-test('a tag is as tall as itemHeight or a line of its font plus its insets; 0 is a capsule', () => {
+test('a tag is as tall as itemHeight or a line of its font plus its insets', () => {
   assert.equal(model.tagHeight(model.defaultStyle()), 30);
   const cloud = model.setTagContentInsets(model.tagCloudStyle(), { top: 3, left: 10, bottom: 3, right: 10 });
   assert.equal(model.tagHeight(cloud), 23);
   assert.equal(model.tagHeight(model.tagContainerStyle()), 33);
-  assert.equal(model.cornerRadius(0, 23), 11.5);
-  assert.equal(model.cornerRadius(model.CORNER_RADIUS_SQUARE, 23), 0);
+  assert.equal(model.crossIndicatorWidth(model.tagContainerStyle()), 33);
+});
+
+test('the corner radius is points limited to half the height: 0 is square, half the height or more a capsule', () => {
+  assert.equal(model.CORNER_RADIUS_SQUARE, undefined, 'the constant is removed');
+  assert.equal(model.cornerRadius(0, 23), 0);
+  assert.equal(model.cornerRadius(6, 30), 6);
+  assert.equal(model.cornerRadius(15, 30), 15);
   assert.equal(model.cornerRadius(20, 30), 15);
-  assert.equal(model.cornerRadius(3, 30), 3);
+  assert.equal(model.cornerRadius(1000, 23), 11.5);
+  assert.equal(model.cornerRadius(-4, 30), 0);
+  assert.equal(model.cornerRadius(NaN, 30), 0);
+  const cloud = model.tagCloudStyle();
+  assert.equal(cloud.normal.cornerRadius, 1000, 'the tagCloud preset keeps its capsules');
+  const height = model.tagHeight(cloud);
+  assert.equal(model.cornerRadius(cloud.normal.cornerRadius, height), height / 2);
+  const square = model.defaultStyle();
+  square.normal.cornerRadius = 0;
+  assert.equal(model.cornerRadius(square.normal.cornerRadius, model.tagHeight(square)), 0);
   assert.equal(model.crossIndicatorWidth(model.tagContainerStyle()), 33);
 });
 

@@ -47,6 +47,23 @@ class CYLTagListConfigurationTest {
         assertEquals(9f, style.selectedAppearance.cornerRadius)
     }
 
+    /** `#` and `?` forms of an animation source go through the engine's shared rules (CYLAnimatedItemSource), as on iOS. */
+    @Test
+    fun animationSourceTextSplitsOptionsAsTheEngineDoes() {
+        val file = File(System.getProperty("java.io.tmpdir"), "icons.riv").absolutePath
+        val texts = listOf("$file#artboard=USER&input=active", "$file?artboard=USER&input=active",
+            "$file?artboard=USER#input=active&novalue", file)
+        val items = texts.mapIndexed { index, text -> mapOf(CYLTagItemTitle to "t$index", CYLTagItemAnimation to text) }
+        val list = CYLTagListView.tagListViewWithConfiguration(context, mapOf(
+            CYLTagListViewSections to listOf(mapOf(CYLTagSectionItems to items))))
+        val urls = texts.indices.map { list.menuDataSource!!.menuAnimationURLForItemAtIndexPath(CYLIndexPath(it, 0)) }
+        assertEquals("artboard=USER&input=active", urls[0]?.fragment)
+        assertEquals("artboard=USER&input=active", urls[1]?.fragment)
+        assertEquals("artboard=USER&input=active", urls[2]?.fragment)
+        assertNull(urls[3]?.fragment)
+        urls.forEach { assertEquals(file, it?.path) }
+    }
+
     @Test
     fun animationSpeedAndLoopsReachEveryTagWithoutReplacingTheStyle() {
         val list = CYLTagListView.tagListViewWithConfiguration(context, mapOf(
@@ -78,6 +95,33 @@ class CYLTagListConfigurationTest {
         assertEquals("More", custom.title)
         assertEquals(false, custom.rotatesImageWhenExpanded)
         assertNull(CYLMenuFoldControl.foldControlWithConfiguration(listOf(1)))
+    }
+
+    @Test
+    fun titleAndIconAlwaysIsTheFourthContentAndTheOldAliasesKeepTheirMeaning() {
+        fun content(name: String) = CYLMenuFoldControl.foldControlWithConfiguration(
+            mapOf(CYLMenuFoldControlKeyPosition to "footer", CYLMenuFoldControlKeyContent to name))!!.content
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentTitleAndIcon, content("titleAndIconAlways"))
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle, content("titleAndIcon"))
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle, content("iconAndTitle"))
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentTitleAndIcon,
+            CYLMenuFoldControl.foldControlWithConfiguration(mapOf(CYLMenuFoldControlKeyPosition to "footer", CYLMenuFoldControlKeyContent to 3))!!.content)
+    }
+
+    @Test
+    fun theTailFoldControlDefaultsToTheChevronIconOnly() {
+        // A fold control made with no content is the chevron icon only, on every platform; the title is opt-in.
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon, CYLMenuFoldControl().content)
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon,
+            CYLMenuFoldControl.foldControlWithConfiguration("tail")!!.content)
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon,
+            CYLMenuFoldControl.foldControlWithConfiguration(mapOf(CYLMenuFoldControlKeyPosition to "tail"))!!.content)
+        // The header controls keep icon and title; an explicit content wins everywhere.
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle,
+            CYLMenuFoldControl.foldControlWithConfiguration(mapOf(CYLMenuFoldControlKeyPosition to "headerTrailing"))!!.content)
+        assertEquals(CYLMenuFoldControlContent.CYLMenuFoldControlContentIconAndTitle,
+            CYLMenuFoldControl.foldControlWithConfiguration(mapOf(CYLMenuFoldControlKeyPosition to "tail",
+                CYLMenuFoldControlKeyContent to "iconAndTitle"))!!.content)
     }
 
     @Test

@@ -28,6 +28,119 @@ Then in WeChat DevTools: **Tools → Build npm** (工具 → 构建 npm). It cop
 <cyl-tag-list configuration="{{configuration}}" bind:tagtap="onTagTap" />
 ```
 
+## Section card, header divider and tint (the default look changed)
+
+A tag list now shows each section's tags on a rounded card by default (`sectionStyle` `insetGrouped`). If you never set
+`backgroundColor`, the list background becomes the grouped background (#F2F2F7; black in dark mode). The header divider is
+**off** by default. The header band (`headerBackgroundColor`) is off by default too.
+
+The keys go in the configuration's `style`:
+
+- Remove the card: `"sectionStyle": "plain"`.
+- Show the header divider: `headerSeparatorStyle` `line`, optionally with `headerSeparatorColor`, `headerSeparatorThickness`
+  (default 0.5) and `headerSeparatorInsets` (default 0: it spans the same left and right edges as the card and the band).
+- Optional header band: `headerBackgroundColor`, with `headerCornerRadius` and `headerContentInsets`.
+- The card: `sectionBackgroundColor`, `sectionCornerRadius` (default 10), `sectionContentInsets` (default 12), `sectionBoardInset` (how far the card, header band and divider extend beyond the tag column on both sides; unset = `sectionContentInsets` left / right, so the card spans the section column; 0 hugs the tags; a value above the default can push the card past the list margin; the tag column and the header title never move), and
+  `sectionBackgroundStyle` `flat` (default) or `liquidGlass` (falls back to flat where the platform cannot draw glass).
+- `tintColor`: the one color of the built-in header title, icon and More / Less control. Left out, it is black or white,
+  whichever is legible on the background behind them.
+- Every new color adapts to light and dark mode by itself; a color you set wins in both modes.
+### Migration: the default look changed
+
+This is a breaking visual change: a list that sets nothing now shows the rounded card and the grouped background. To get the
+old look, set `sectionStyle` to `plain`. Screenshots and tests that depend on pixel positions need updating.
+
+```js
+Page({
+  data: {
+    configuration: {
+      style: { sectionStyle: 'plain' },                       // the old look; leave `style` out for the card
+      // style: { headerSeparatorStyle: 'line', tintColor: '#007AFF' },  // the divider is opt-in
+      sections: [{ title: 'Reviews', items: [{ title: 'All' }, { title: 'Positive' }] }],
+    },
+  },
+});
+```
+
+```json
+{
+  "style": {
+    "sectionStyle": "plain",
+    "headerSeparatorStyle": "line",
+    "headerSeparatorColor": "#C6C6C8",
+    "headerSeparatorThickness": 0.5,
+    "headerSeparatorInsets": [0, 0, 0, 0],
+    "headerBackgroundColor": "#EFEFF4",
+    "sectionBackgroundStyle": "liquidGlass",
+    "tintColor": "#007AFF"
+  }
+}
+```
+
+### Corner radius
+
+A style's `normal` / `selected` / `disabled` `cornerRadius` (and a tag's `cornerRadius`) is a plain number of points,
+limited to half the tag height, as on iOS and Android: `0` is square corners, a value of half the height or more (for
+example `1000`) is a capsule. `CORNER_RADIUS_SQUARE` is removed, and `0` no longer means an automatic capsule. The
+`tagCloudStyle()` preset keeps its capsules with `1000`; the default radius is `3`.
+
+### Section card (the default look)
+
+A list that sets nothing draws each section's tags in a rounded card (`sectionStyle: 'insetGrouped'`) on the grouped list
+background (#F2F2F7, black in dark mode) with no header divider and no header band. To remove the card, set the style key
+`sectionStyle` to `plain`:
+
+```js
+configuration: { style: { sectionStyle: 'plain' }, sections: [/* ... */] }
+```
+
+The header divider is not a default; it shows only when you ask for it: `style: { headerSeparatorStyle: 'line' }`. The card
+(`sectionBackgroundColor`, `sectionCornerRadius`, `sectionContentInsets`, `sectionBackgroundStyle`), the header band
+(`headerBackgroundColor`) and the divider keys are described in `docs/tag-section-style.md` of the repository.
+
+### Fold control
+
+`defaultVisibleRows` folds a section; `foldControl: { position, content, title, collapseTitle, color }` draws the control
+(`position`: `headerTrailing`, `tail` or `footer`; the tail and the footer default to the chevron icon only, the header to
+icon and title). `content`: `icon`, `title`, `iconAndTitle` (the aliases `iconandtitle` and `titleandicon` mean this one), and
+`titleAndIconAlways`, which shows the title and the chevron in both states: "More v" folded, "Less ^" expanded (the collapse title
+and the chevron turned 180 degrees). `title` and `collapseTitle` replace the localized texts. The control is as wide as its longer
+title, so it does not jump when toggled. A control in the section header shows only on a section that can fold (an unfoldable
+section has no control and no space for it); its font is capped (20 px) and its width is at most 40% of the header, where the
+section title is truncated with an ellipsis. The gap between the section title and the header control is 8 px (iOS 8 pt,
+Android 8 dp). `rotatesImageWhenExpanded` (default `true`) turns the chevron 180 degrees when the section is expanded; `false`
+keeps it still.
+
+### Section header keys
+
+In the configuration's `style`: `headerHeight` (default 36 px; the fixed height of a one-line header, and only a minimum for a
+header that wraps or is tight to the card) and `headerMaxLines` (default `1`, one line with an ellipsis; a number above 1 or
+`"unlimited"` wraps the title and grows the header).
+
+### Internal model fields
+
+`borderColorExplicit`, `borderWidthExplicit`, `textColorExplicit` and `backgroundExplicit` in the normalized appearance
+(`model.normalize(...).style.normal` and the other states) are internal: the configuration parser sets them when the app gave
+that value, so the defaults that follow dark mode and glass apply only where the app set nothing. Do not put them in a
+configuration; they are ignored there.
+
+### Long-press callout
+
+With `longPressAction: "callout"` an item's `subtitle` shows in a bubble above the tag, or below it when there is no room
+above or the bubble would cover the section header. A tap, a fold, a rebuild or another long press hides it. The list has no
+scroller of its own, so a scroll hides it only when the page tells the component: call `onScroll()` (or `dismissCallout()`)
+from the scroller's `bindscroll` or from the page's `onPageScroll`.
+
+```js
+onScroll() { this.selectComponent('#tags').onScroll(); },
+```
+
+### Configuration keys the iOS list has and this component does not
+
+Unsupported here (ignored): `scrollEnabled` (the component draws no scroller; the page's own `scroll-view` scrolls it),
+`titleImage`, `titlePosition`, `deletable`, `deleteIndicatorTitle`, `deleteIndicatorColor`, `deleteIndicatorFont`,
+`adjustsFontForContentSizeCategory`, `foldStyle` and `id`.
+
 ### One tag on its own
 
 `cyl-tag-button` is the iOS `CYLTagButton` on its own (a search bar item, a toolbar button, a placeholder's icon): an
