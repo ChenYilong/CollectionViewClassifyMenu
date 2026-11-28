@@ -222,6 +222,18 @@ public enum CYLTagItemKey {
     public static let animationRestingProgress = "animationRestingProgress"
 
     /**
+     * A string: the badge on the item's icon (CYLTabBarController's `CYLAnimatedItemView.badgeValue`). Absent (the default) no badge, "" a
+     * dot, otherwise the text. The tag draws it on its icon itself: pass the plain icon, never an image with a badge drawn into it.
+     */
+    public static let badgeValue = "badgeValue"
+
+    /**
+     * A dictionary: the badge's style, the keys of CYLTabBarController's `CYLBadgeAttributeKey` (`animation`, `color`, `radius`,
+     * `centerOffset`, `textColor`...).
+     */
+    public static let badgeAttributes = "badgeAttributes"
+
+    /**
      * A Boolean, or "true" / "false". True by default.
      */
     public static let enabled = "enabled"
@@ -883,6 +895,14 @@ final class CYLTagListConfigurationSource: NSObject, CYLMenuDataSource {
         return CYLConfigurationValue.image(sections[section][CYLTagSectionKey.image], baseURL: baseURL)
     }
 
+    func menuBadgeValueForItem(at indexPath: IndexPath) -> String? {
+        item(at: indexPath)[CYLTagItemKey.badgeValue].map { "\($0)" }
+    }
+
+    func menuBadgeAttributesForItem(at indexPath: IndexPath) -> [String: Any]? {
+        item(at: indexPath)[CYLTagItemKey.badgeAttributes] as? [String: Any]
+    }
+
     func menuAnimationRestingProgressForItem(at indexPath: IndexPath) -> NSNumber? {
         CYLConfigurationValue.number(item(at: indexPath)[CYLTagItemKey.animationRestingProgress])
     }
@@ -1200,6 +1220,8 @@ extension CYLTag {
         let options = configuration[CYLTagItemKey.animationOptions] as? [String: Any] ?? [:]
         animationURL = Value.fileURL(configuration[CYLTagItemKey.animation], baseURL: baseURL)?
             .cylAddingAnimationOptions(options)
+        badgeValue = configuration[CYLTagItemKey.badgeValue].map { "\($0)" }
+        badgeAttributes = configuration[CYLTagItemKey.badgeAttributes] as? [String: Any]
         isEnabled = Value.bool(configuration[CYLTagItemKey.enabled]) ?? true
         isDeletable = Value.bool(configuration[CYLTagItemKey.deletable]) ?? false
         if let style = configuration[CYLTagItemKey.style] as? CYLMenuStyle {

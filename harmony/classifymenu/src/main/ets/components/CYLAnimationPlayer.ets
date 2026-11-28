@@ -3,8 +3,11 @@
  * (`CYLAnimationEngine`, `cylAnimationEngine`) and the handle a tag drives (`CYLAnimationPlayer`: play from the start,
  * stop at a progress, speed, loop). The library depends on no animation library: the icon is CYLTabBarController's
  * `CYLAnimatedItemView` (`CYLTagAnimatedIcon`), and the app supplies the views and players that play each type (the
- * example's `CYLLottiePlayer`, `CYLPAGPlayer`, `CYLRivePlayer`, `CYLGIFPlayer` and `CYLSVGAPlayer`), registered with
- * `CYLAnimatedItemEngines.register(type)` and `CYLTagAnimationBuilder.register(builder)`.
+ * example's `CYLLottiePlayer`, `CYLPAGPlayer`, `CYLGIFPlayer` and `CYLSVGAPlayer`), registered with
+ * `CYLAnimatedItemEngines.register(type)` and `CYLTagAnimationBuilder.register(builder)`. A type whose engine ships a
+ * builder for `CYLAnimatedItemView` itself (Rive: CYLTabBarController's `CYLRiveAnimationBuilder`) is registered with
+ * `CYLTagAnimationBuilder.registerItemBuilder(engine, builder)` instead; the tag passes its speed, loop switch and
+ * replay straight to `CYLAnimatedItemView`'s `animationSpeed` / `animationLoops` / `animationRestartToken`.
  *
  * The value is `asset:<rawfile path>` (or Lottie JSON text); options (`cylAddingAnimationOptions`) follow `#` as
  * "name=value&...". A player that cannot do something reports it with `supportsSpeed` / `supportsLoops` /

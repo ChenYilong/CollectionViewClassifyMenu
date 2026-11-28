@@ -436,7 +436,9 @@ export class CYLTagButton {
   /**
    * `animationView`: the live player of the animated icon, the one the app's animation view handed over with
    * `CYLTagAnimationContext.ready(player)` (the example's players expose `lottieItem`, `pagController`,
-   * `gifFrames`, `svgaMovie`), or undefined while there is none (no `animationURL`, not drawn yet, no engine).
+   * `gifFrames`, `svgaMovie`), or undefined while there is none (no `animationURL`, not drawn yet, no engine). It is
+   * always undefined for a type drawn by a component-level builder (Rive): that one is driven through
+   * `CYLAnimatedItemView`'s own props.
    */
   get animationView(): CYLAnimationPlayer | undefined {
     return this.player;
@@ -692,6 +694,17 @@ export class CYLTagButton {
       } else {
         this.updateAnimationState();
       }
+    }
+  }
+
+  /**
+   * The animated icon of a builder-drawn type has loaded: a `playAnimation()` made before that replays now.
+   */
+  itemDidLoad(): void {
+    if (this.pendingPlay) {
+      this.pendingPlay = false;
+      this.playToken++;
+      this.changed();
     }
   }
 
@@ -1203,6 +1216,10 @@ export struct CYLTagButtonComponent {
             isSelected: this.button.isSelected,
             iconWidth: this.af().width,
             iconHeight: this.af().height,
+            animationSpeed: this.button.resolvedAnimationSpeed,
+            animationLoops: this.button.animationLoops,
+            animationRestartToken: this.button.playToken,
+            onItemLoaded: () => this.button.itemDidLoad(),
             onPlayer: (player: CYLAnimationPlayer | undefined) => {
               if (player !== undefined || this.button.animationPlayer !== undefined) {
                 this.button.setAnimationPlayer(player);

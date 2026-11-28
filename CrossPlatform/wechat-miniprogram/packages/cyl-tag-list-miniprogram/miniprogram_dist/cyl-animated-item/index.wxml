@@ -1,5 +1,6 @@
 <!-- [EN] One accessibility element: an icon (animation, static image or placeholder), a title and an optional accessory. [CN] 一个无障碍元素：图标（动画、静态图片或占位图）、标题与可选的附加图标。 -->
 <view
+  style="{{itemBackgroundCss}}"
   class="cyl-animated-item {{m.axisClass}} {{bare ? 'cyl-animated-item-bare' : ''}} {{m.ariaDisabled ? 'cyl-animated-item-disabled' : ''}}"
   aria-role="{{(accessibilityHidden || m.ariaHidden) ? '' : (accessibilityRole || 'button')}}"
   aria-hidden="{{accessibilityHidden || m.ariaHidden}}"
@@ -17,17 +18,30 @@
     <text wx:else aria-hidden="true">{{accessoryText}}</text>
   </view>
   <view wx:if="{{m.showsIcon}}" class="cyl-animated-item-icon" style="{{m.iconStyle}}" aria-hidden="true">
+    <!-- [EN] Both static images stay mounted; a selection change toggles only their opacity (no node re-created, no src change). [CN] 两张静态图片都保持挂载；选中变化只切换不透明度（不重建节点，不改变 src）。 -->
+    <block wx:if="{{m.still.layered}}">
+      <view wx:if="{{m.still.normalTint}}" class="cyl-animated-item-image cyl-animated-item-tint {{m.still.normalHidden ? 'cyl-animated-item-hidden' : ''}}">
+        <image class="cyl-animated-item-tinted" src="{{m.still.normalImage}}" style="filter: drop-shadow({{m.still.normalTint}} 200px 0);" mode="aspectFit" />
+      </view>
+      <image wx:else class="cyl-animated-item-image {{m.still.normalHidden ? 'cyl-animated-item-hidden' : ''}}" src="{{m.still.normalImage}}" mode="aspectFit" />
+      <view wx:if="{{m.still.selectedTint}}" class="cyl-animated-item-image cyl-animated-item-tint {{m.still.selectedHidden ? 'cyl-animated-item-hidden' : ''}}">
+        <image class="cyl-animated-item-tinted" src="{{m.still.selectedImage}}" style="filter: drop-shadow({{m.still.selectedTint}} 200px 0);" mode="aspectFit" />
+      </view>
+      <image wx:else class="cyl-animated-item-image {{m.still.selectedHidden ? 'cyl-animated-item-hidden' : ''}}" src="{{m.still.selectedImage}}" mode="aspectFit" />
+    </block>
+    <block wx:else>
     <view wx:if="{{m.fallbackImage && m.iconTint}}" class="cyl-animated-item-image cyl-animated-item-tint {{m.fallbackHidden ? 'cyl-animated-item-hidden' : ''}}">
       <image class="cyl-animated-item-tinted" src="{{m.fallbackImage}}" style="filter: drop-shadow({{m.iconTint}} 200px 0);" mode="aspectFit" />
     </view>
     <image wx:elif="{{m.fallbackImage}}" class="cyl-animated-item-image {{m.fallbackHidden ? 'cyl-animated-item-hidden' : ''}}" src="{{m.fallbackImage}}" mode="aspectFit" />
+    </block>
     <image wx:if="{{m.gifPath}}" class="cyl-animated-item-image" src="{{m.gifPath}}" mode="aspectFit" />
     <!-- [EN] Only while resting: a canvas 2d ignores opacity, so it is removed while the GIF plays. [CN] 仅在静止时存在：canvas 2d 不受 opacity 影响，因此 GIF 播放时移除。 -->
     <canvas wx:if="{{m.gifImage && !gifImagePlaying}}" type="2d" id="cyl-gif-image-still" class="cyl-animated-item-image" />
-    <cyl-lottie-view id="cyl-animated-item-engine" wx:if="{{m.usesEngine && m.animationType === 'lottie'}}" class="cyl-animated-item-animation {{m.animationHidden ? 'cyl-animated-item-ended' : ''}}" path="{{m.animationPath}}" animation-data="{{lottieData}}" colors="{{colors}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay}}" resting-frame="{{m.restingFrame}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" bind:complete="cyl_onAnimationComplete" bind:loopcomplete="cyl_onAnimationLoopComplete" />
-    <cyl-pag-view id="cyl-animated-item-engine" wx:elif="{{m.usesEngine && m.animationType === 'pag'}}" class="cyl-animated-item-animation {{m.animationHidden ? 'cyl-animated-item-ended' : ''}}" path="{{m.animationPath}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay}}" resting-frame="{{m.restingFrame}}" wasm-path="{{pagWasmPath}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" bind:complete="cyl_onAnimationComplete" bind:loopcomplete="cyl_onAnimationLoopComplete" />
-    <cyl-rive-view id="cyl-animated-item-engine" wx:elif="{{m.usesEngine && m.animationType === 'rive'}}" class="cyl-animated-item-animation {{m.animationHidden ? 'cyl-animated-item-ended' : ''}}" path="{{m.animationPath}}" colors="{{colors}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay}}" resting-frame="{{m.restingFrame}}" wasm-path="{{riveWasmPath}}" tint="{{m.animationTint}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" bind:complete="cyl_onAnimationComplete" bind:loopcomplete="cyl_onAnimationLoopComplete" />
-    <cyl-svga-view id="cyl-animated-item-engine" wx:elif="{{m.usesEngine && m.animationType === 'svga'}}" class="cyl-animated-item-animation {{m.animationHidden ? 'cyl-animated-item-ended' : ''}}" path="{{m.animationPath}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay}}" resting-frame="{{m.restingFrame}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" bind:complete="cyl_onAnimationComplete" bind:loopcomplete="cyl_onAnimationLoopComplete" />
+    <cyl-lottie-view id="cyl-animated-item-engine" wx:if="{{m.usesEngine && m.animationType === 'lottie'}}" class="cyl-animated-item-animation {{m.animationHidden ? 'cyl-animated-item-ended' : ''}}" path="{{m.animationPath}}" animation-data="{{lottieData}}" colors="{{colors}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay && drivesAnimationPlayback}}" resting-frame="{{m.restingFrame}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" bind:complete="cyl_onAnimationComplete" bind:loopcomplete="cyl_onAnimationLoopComplete" />
+    <cyl-pag-view id="cyl-animated-item-engine" wx:elif="{{m.usesEngine && m.animationType === 'pag'}}" class="cyl-animated-item-animation {{m.animationHidden ? 'cyl-animated-item-ended' : ''}}" path="{{m.animationPath}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay && drivesAnimationPlayback}}" resting-frame="{{m.restingFrame}}" wasm-path="{{pagWasmPath}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" bind:complete="cyl_onAnimationComplete" bind:loopcomplete="cyl_onAnimationLoopComplete" />
+    <cyl-rive-view id="cyl-animated-item-engine" wx:elif="{{m.usesEngine && m.animationType === 'rive'}}" class="cyl-animated-item-animation {{m.animationHidden ? 'cyl-animated-item-ended' : ''}}" path="{{m.animationPath}}" colors="{{colors}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay && drivesAnimationPlayback}}" resting-frame="{{m.restingFrame}}" wasm-path="{{riveWasmPath}}" tint="{{m.animationTint}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" bind:complete="cyl_onAnimationComplete" bind:loopcomplete="cyl_onAnimationLoopComplete" />
+    <cyl-svga-view id="cyl-animated-item-engine" wx:elif="{{m.usesEngine && m.animationType === 'svga'}}" class="cyl-animated-item-animation {{m.animationHidden ? 'cyl-animated-item-ended' : ''}}" path="{{m.animationPath}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay && drivesAnimationPlayback}}" resting-frame="{{m.restingFrame}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" bind:complete="cyl_onAnimationComplete" bind:loopcomplete="cyl_onAnimationLoopComplete" />
     <view wx:if="{{m.hasAccessory && m.accessoryPlacement === 'topTrailing'}}" class="cyl-animated-item-accessory cyl-animated-item-accessory-corner" aria-role="button" aria-label="{{m.accessoryLabel}}" catchtap="cyl_onAccessoryTap">
       <image wx:if="{{accessoryImage}}" class="cyl-animated-item-accessory-image" src="{{accessoryImage}}" mode="aspectFit" aria-hidden="true" />
       <text wx:else aria-hidden="true">{{accessoryText}}</text>

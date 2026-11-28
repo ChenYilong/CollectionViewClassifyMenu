@@ -46,7 +46,7 @@ export {
 } from './src/main/ets/components/CYLAnimationPlayer';
 export {
   CYLTagAnimatedIcon, CYLTagAnimationBuilder, CYLTagAnimationContext, cylTagAnimationImage,
-  cylTagAnimatedIconOuterWidth, cylTagAnimatedIconOuterHeight
+  cylTagAnimatedIconOuterWidth, cylTagAnimatedIconOuterHeight, cylTagItemBuilderURL
 } from './src/main/ets/components/CYLTagAnimatedIcon';
 /**
  * CYLTabBarController's shared animated icon + title component (module `cylanimateditem`, vendored at commit 618ac11a):
