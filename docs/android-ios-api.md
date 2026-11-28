@@ -479,7 +479,7 @@ tags: [android, ios, api-parity, score]
 | `CYLTagButton.deleteIndicatorLabel` | read-only property, `CYLTagButton.kt:60` | `CYLTagButton.deleteIndicatorLabel` |
 | `CYLTagButton.badgeLabel` | read-only property, `CYLTagButton.kt:66` | `CYLTagButton.badgeLabel` |
 | `CYLTagButton.deleteIndicatorHitFrame` | property, `CYLTagButton.kt:94` | `CYLTagButton.deleteIndicatorHitFrame` |
-| `CYLTagButton.badgeValue` | property, `CYLTagButton.kt:138` | `CYLTagButton.badgeValue` |
+| `CYLTagButton.tagBadgeValue` | property, `CYLTagButton.kt:139` | `CYLTagButton.badgeValue` (the Android name differs: CYLAnimatedItemView has a final `badgeValue`) |
 | `CYLTagButton.badgeColor` | property, `CYLTagButton.kt:146` | `CYLTagButton.badgeColor` |
 | `CYLTagButton.style` | property, `CYLTagButton.kt:157` | `CYLTagButton.style` |
 | `CYLTagButton.resetAnimationSpeed` | method, `CYLTagButton.kt:237` | `CYLTagButton.resetAnimationSpeed()` |
