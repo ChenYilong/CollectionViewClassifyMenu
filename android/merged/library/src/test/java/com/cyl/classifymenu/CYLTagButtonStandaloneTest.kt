@@ -80,11 +80,11 @@ class CYLTagButtonStandaloneTest {
     fun theBadgeIsADotOrACapsuleAtTheIconsCorner() {
         val button = CYLTagButton(context, "Messages", icon())
         layOut(button, 120f, 40f)
-        assertNull(button.badgeValue)
+        assertNull(button.tagBadgeValue)
         assertEquals(View.GONE, button.badgeLabel.visibility)
         assertEquals(CYLTagBadgeDefaultColor, button.badgeColor)
 
-        button.badgeValue = ""
+        button.tagBadgeValue = ""
         layOut(button, 120f, 40f)
         assertEquals(View.VISIBLE, button.badgeLabel.visibility)
         assertEquals(8f, button.badgeFrame.width, 0.01f)
@@ -95,7 +95,7 @@ class CYLTagButtonStandaloneTest {
         button.onInitializeAccessibilityNodeInfo(info)
         assertEquals("Messages, " + CYLMenuLocalizedString("CYLTagBadgeDot"), info.contentDescription?.toString())
 
-        button.badgeValue = "99+"
+        button.tagBadgeValue = "99+"
         button.badgeColor = 0xFF0000FF.toInt()
         layOut(button, 120f, 40f)
         assertEquals("99+", button.badgeLabel.text.toString())

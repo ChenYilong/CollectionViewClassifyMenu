@@ -512,7 +512,7 @@ tags: [android, kotlin, api-parity, score]
 | `CYLTagButton` | class, `CYLTagButton.swift` | `com.cyl.classifymenu.CYLTagButton` |
 | `CYLTagButton.deleteIndicatorLabel` | property, `CYLTagButton.swift` | `CYLTagButton.deleteIndicatorLabel` |
 | `CYLTagButton.badgeLabel` | property, `CYLTagButton.swift` | `CYLTagButton.badgeLabel (same name in the Android core)` |
-| `CYLTagButton.badgeValue` | property, `CYLTagButton.swift` | `CYLTagButton.badgeValue (same name in the Android core)` |
+| `CYLTagButton.badgeValue` | property, `CYLTagButton.swift` | `CYLTagButton.tagBadgeValue` (the Android name differs: CYLAnimatedItemView has a final `badgeValue`) |
 | `CYLTagButton.badgeColor` | property, `CYLTagButton.swift` | `CYLTagButton.badgeColor (same name in the Android core)` |
 | `CYLTagButton.showsDeleteIndicator` | property, `CYLTagButton.swift` | `CYLTagButton.showsDeleteIndicator` |
 | `CYLTagButton.deleteIndicatorHitFrame` | property, `CYLTagButton.swift` | `CYLTagButton.deleteIndicatorHitFrame` |
