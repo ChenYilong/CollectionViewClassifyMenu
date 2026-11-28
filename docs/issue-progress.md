@@ -35,6 +35,17 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-29, `fix/shared-contrast-ios`, Mac session): set up claude-mem ingestion of the learn-codebase export on this Mac and continue learn-codebase
+
+- Context: the vault checkout is paused mid-rebase on `feat/harmony`, so this work uses a separate worktree of `fix/shared-contrast-ios` (pulled to 2ee1c10e). The export describes commit 03707ba2.
+- Requirements: pull; follow `docs/learn-codebase/README.md` to finish the setup (steps 4 and 5 on this computer); continue learn-codebase.
+- Prompt (verbatim): "GIT PULL THEN follow docs/learn-codebase/readme to finish setup, and continue
+  to do  learn-codebase"
+- Decisions (the owner asked the advisor to decide): the watch root is a dedicated worktree, `<home>/Developer/cvcm-learn-codebase`; commit on `fix/shared-contrast-ios` (PR #42) although 10 pull requests are open; continue the export's own TODO (run the tests, check the findings) instead of a new export.
+- `.gitignore`: compared with CYLTabBarController d55c3cf6; the only rules missing name that project's own Xcode user-state files, so nothing changed.
+- V1 and V4 are HarmonyOS and V2 is the mini program: for a Windows session. The Mac part is the iOS tests and findings 3, 8, 9 and 10.
+- Blocker for builds: `scripts/cyl-tabbar-latest-commit.sh --check` fails (the pins are older than d55c3cf6). Waiting for the owner: build at the current pins, or move the pins first.
+
 ### TODO → DONE (2026-11-29, `fix/shared-contrast-ios`, Windows session): commit the three appendix files of the learn-codebase export
 
 - **Context:** `ea8075d5` left the three `appendix-*.md` files of the export untracked. The owner changed that decision.
