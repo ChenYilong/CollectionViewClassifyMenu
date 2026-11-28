@@ -330,7 +330,7 @@ class CYLTagDataSource @JvmOverloads constructor(tags: List<CYLTag>? = null) : C
     override fun menuImageForItemAtIndexPath(indexPath: CYLIndexPath): Drawable? {
         val tag = tagAt(indexPath) ?: return null
         val badge = tag.badgeText
-        // "" (not null) is a dot, as `CYLTagButton.badgeValue` "".
+        // "" (not null) is a dot, as `CYLTagButton.tagBadgeValue` "".
         if (tag.image == null && badge != null) {
             val size = baseStyle!!.imageSize
             val side = max(size.width, size.height)

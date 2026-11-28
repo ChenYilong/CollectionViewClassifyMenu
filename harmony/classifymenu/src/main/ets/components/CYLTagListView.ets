@@ -554,6 +554,10 @@ export struct CYLTagListView {
     // As CYLTagButton: no border (and under glass no unset default border) means width 0.
     r.borderColor = CYLTagButton.itemBorderColor(style, normal);
     r.borderWidth = CYLTagButton.itemBorderWidth(style, normal);
+    // Pressed, as a tag: only a style with a highlighted color changes, by the same rule (a cleared one is no glass tint).
+    if (style.highlightedBackgroundColor !== undefined) {
+      r.highlightedBackgroundColor = CYLTagButton.itemBackgroundColor(style, normal, true);
+    }
     r.x = cell.x;
     r.y = cell.y + titleHeight;
     this.finishKey(r, 'f');
@@ -922,9 +926,16 @@ export struct CYLTagListView {
     .padding({ left: r.paddingLeft, right: r.paddingRight })
     .justifyContent(FlexAlign.Center)
     // Background, radius and border: cylanimateditem's one interface, as a tag (CYLTagButtonComponent).
-    .attributeModifier(new CYLAnimatedItemBackgroundModifier(r.itemBackgroundStyle, r.backgroundColor,
+    .attributeModifier(new CYLAnimatedItemBackgroundModifier(r.itemBackgroundStyle, this.itemBackground(r),
       r.appearanceCornerRadius, r.borderWidth, r.borderColor))
     .position({ x: r.x, y: r.y })
+    .onTouch((event: TouchEvent) => {
+      if (event.type === TouchType.Down) {
+        this.pressedKey = r.key;
+      } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+        this.pressedKey = '';
+      }
+    })
     .id(`CYLTagListFold-${r.section}`)
     .accessibilityGroup(true)
     .accessibilityText(r.accessibilityText)

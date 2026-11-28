@@ -205,6 +205,23 @@ export default function tagGlassBackgroundTest() {
       expect(tailCell(glassStyle()).itemBackgroundStyle).assertEqual(CYLAnimatedItemBackgroundStyle.flat);
     });
 
+    it('theTailCellPressedColorRuleEqualsAPressedTagInGlassAndFlat', 0, () => {
+      const control = new CYLMenuFoldControl(CYLMenuFoldControlPosition.tail, CYLMenuFoldControlContent.icon);
+      // A color, and a cleared one: under glass the latter hands over no tint, as a tag does.
+      [RED, CYLColor.CLEAR].forEach((highlighted: string) => {
+        [glassStyle(), new CYLMenuStyle()].forEach((style: CYLMenuStyle) => {
+          style.highlightedBackgroundColor = highlighted;
+          const tag = buttonWith(style);
+          tag.isHighlighted = true;
+          // The rule CYLTagListView.foldCell uses for its pressed color.
+          const inline = CYLTagFoldMetrics.inlineStyle(control, style);
+          expect(inline.highlightedBackgroundColor).assertEqual(highlighted);
+          expect(CYLColorKey(CYLTagButton.itemBackgroundColor(inline, inline.normalAppearance, true)))
+            .assertEqual(CYLColorKey(tag.backgroundColor));
+        });
+      });
+    });
+
     it('anAppearanceTellsAnExplicitBorderFromTheBuiltInDefault', 0, () => {
       const appearance = new CYLTagAppearance();
       expect(appearance.isBorderColorSet).assertFalse();

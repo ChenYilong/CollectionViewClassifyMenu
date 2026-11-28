@@ -35,6 +35,36 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-29, `fix/shared-contrast-ios`, Windows session): HarmonyOS tail fold tag does not look like the other tags
+
+- **Context:** relayed by the CYLTabBarController session (its PR #824). Its example, pinned at `9b62c229`
+  (`origin/claude/android-tag-badge-rename`), on a Mate 70 Pro emulator with Liquid Glass tags and an icon-only tail fold
+  control: normal tags are translucent glass, the fold tag is a solid white (light) or near-black (dark) capsule.
+- **Requirements:** fix it in the tag list's core: the same background, tint, border, corner radius and height as a
+  normal tag in every state; the width may stay icon-sized.
+- **Prompt (verbatim, relayed):** "鸿蒙taglist 的tail control 样式， 最后一个tag 折叠展开按钮，样式没有与 其他tag保持一样， 没有保持统一， 请修复。 通知他给taglist所在组件，修复他的core核心代码完成。"
+- **Found (from the source, not run):** at `9b62c229`, `foldCellButton` draws a flat `.backgroundColor` and `.border`, so
+  no glass. `ace9cbe3` (on this branch, not in `9b62c229`) makes it use the tags' background rules and
+  `CYLAnimatedItemBackgroundModifier`, with tests in `harmony/entry/src/test/TagGlassBackground.test.ets`. The one commit
+  of `9b62c229` that this branch lacks (an Android badge rename) merges without conflicts. Still different on this branch:
+  the fold tag shows no pressed highlight when the style sets `highlightedBackgroundColor`.
+- **Acceptance (100, pass 60):** one pinnable commit that has `ace9cbe3` and the change of `9b62c229` (50); the fold tag
+  matches a normal tag in every state, pressed included (20); HarmonyOS tests run (15); seen on an emulator, light and
+  dark (15).
+- **Owner's decision (2026-11-29):** "同意" to: stay on this branch (pull request #42), merge the change of `9b62c229`, add
+  the pressed state with a test, run the HarmonyOS tests, commit and push, and send the hash to the CYLTabBarController
+  session.
+- **Result (2026-11-29), 75/100:** `9b62c229` merged in `1ab0fb58` (50). The fold tag now takes the tags' pressed
+  background color while touched. HarmonyOS: `harmony/scripts/build.sh` succeeds (it compiles the changed view) and
+  `harmony/scripts/unit-test.sh` passes 232 of 232, the new color rule test included (15); the test checks the rule, not
+  the view's touch handling. Android `:library:testDebugUnitTest`: 306 of 307 pass;
+  `CYLTagListConfigurationTest.animationSourceTextSplitsOptionsAsTheEngineDoes` (a Windows file path comparison) also
+  fails without the merge. The dependency pins are not moved, although a newer CYLTabBarController commit exists.
+  Missing: -10, not yet equal to a tag in every state: while pressed on dark glass the icon and title are not
+  re-adapted to the highlight, and the fold tag draws no `backgroundImage`, elevation shadow or touch ripple; -15, not
+  seen on an emulator, light and dark (the CYLTabBarController session checks it after moving its pin).
+
+
 ### TODO → DONE (2026-11-29, `fix/shared-contrast-ios`, Windows session): commit the three appendix files of the learn-codebase export
 
 - **Context:** `ea8075d5` left the three `appendix-*.md` files of the export untracked. The owner changed that decision.
