@@ -8,11 +8,11 @@ project 'CYLMenuExample.xcodeproj'
 
 # The revision whose API the Example uses (feat/cross-platform-components); update together.
 CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                :commit => 'c4a1f8fda52aef766039893d8476f4b09493db23' }
+                :commit => 'ed39c20b15bc2bdcccaddabb4e15d089ff2318e1' }
 # CYLAnimatedItem, the shared animated icon + title component: its own pod in the same repository and commit, not
 # on the trunk yet (https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md).
 CYL_ANIMATED_ITEM = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                      :commit => 'c4a1f8fda52aef766039893d8476f4b09493db23' }
+                      :commit => 'ed39c20b15bc2bdcccaddabb4e15d089ff2318e1' }
 
 # The search bars of the Example (CYLSearchBarView), from the sibling CYLSearchViewController repository at the
 # revision whose API the Example uses (feat/search-bar-view); update together.
@@ -28,6 +28,8 @@ target 'CYLMenuExample' do
   # The engines of the animated icons the example plays (tags, the tab bar): one CYLAnimatedItem engine subspec per file
   # type (https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md).
   # The core (CollectionViewClassifyMenu) depends on the CYLAnimatedItem pod only and adds none.
+  pod 'CYLUtils', CYL_ANIMATED_ITEM
+  pod 'CYLBadge', CYL_ANIMATED_ITEM
   pod 'CYLAnimatedItem', CYL_ANIMATED_ITEM
   pod 'CYLAnimatedItem/LottieObjectiveC', CYL_ANIMATED_ITEM
   pod 'CYLAnimatedItem/PAG', CYL_ANIMATED_ITEM
