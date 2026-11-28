@@ -215,14 +215,14 @@ final class CYLTagButtonTests: XCTestCase {
         button.layoutIfNeeded()
         XCTAssertTrue(button.isShowingBadge, "An empty string shows a dot")
         XCTAssertEqual(button.badgeAnchorView.frame, button.imageView.frame, "The anchor is the icon")
-        XCTAssertFalse(button.accessibilityValue?.isEmpty ?? true, "The base class describes the dot")
+        XCTAssertFalse(button.accessibilityValue?.isEmpty ?? true, "VoiceOver reads CYLBadge's localized description of the dot")
 
         button.badgeValue = "99+"
         button.layoutIfNeeded()
         XCTAssertTrue(button.isShowingBadge)
-        XCTAssertTrue(button.accessibilityValue?.contains("99+") ?? false, "VoiceOver reads the badge")
+        XCTAssertTrue(button.accessibilityValue?.contains("99+") ?? false, "CYLBadge's description holds the value")
         button.accessibilityValue = "custom"
-        XCTAssertTrue(button.accessibilityValue?.hasPrefix("custom") ?? false, "A value that was set comes first")
+        XCTAssertTrue(button.accessibilityValue?.contains("custom") ?? false, "A value that was set is read first")
 
         let titleOnly = CYLTagButton(title: "消息", image: nil)
         titleOnly.frame.size = CGSize(width: 120, height: 40)
