@@ -35,7 +35,7 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
-### TODO (2026-11-29, `fix/shared-contrast-ios`, Windows session): commit the three appendix files of the learn-codebase export
+### TODO → DONE (2026-11-29, `fix/shared-contrast-ios`, Windows session): commit the three appendix files of the learn-codebase export
 
 - **Context:** `ea8075d5` left the three `appendix-*.md` files of the export untracked. The owner changed that decision.
 - **Requirements:** keep this branch (1) and the unchanged dependency pins (3); of (2), only `docs/todo/**/memory/` may
@@ -46,7 +46,9 @@ tags: [issues, ui, cocoapods, progress]
   local).
 - **Acceptance (100, pass 60):** the three files read in full and cleaned (40); committed and pushed (40); the guide, the
   `memory` rule and the export's README match the new decision (20).
-- **Result:** pending.
+- **Result (2026-11-29), 100/100:** read in full and cleaned, committed in `c7a11d39` and pushed with this entry to pull
+  request #42. Nothing under `docs/learn-codebase/` is untracked; the 61 Markdown files are all ingested. The guide, the
+  `memory` rule and the export's README now require committing every export file.
 
 
 ### TODO → DONE (2026-11-29, `fix/shared-contrast-ios`, Windows session): document how to redo the learn-codebase export, and add the `memory` rule tag
