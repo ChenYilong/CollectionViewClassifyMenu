@@ -35,6 +35,20 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-28, `claude/bold-planck-flioee`, Linux session): tag list rows as tall as their tallest tag, `maxItemHeight`
+
+- **Prompt (verbatim):** "切换最新提交所在分支阅读agent文档/ 修改taglist 布局逻辑，所有修改应在core中实现自动适应以下布局，bug截图已经附上，强制调整自适应每一行的最高高度为其中最大的一个tag的高度。此场景适应需求场景如下：当用户设置允许换行场景，以及用户自定义tag高度。比如icon高度自定义导致tag高度变高后，应调整所在行所有其他元素对齐，适应最高元素的高度。同时暴露接口允许用户设置taglist所有tag最大高度，默认为MAX 不限高度。"
+- **Prompt (English):** switch to the branch of the latest commit and read the agent documents; change the tag list layout
+  in the core so that every row adapts: all tags of a row get the height of the row's tallest tag (wrapping titles, custom
+  tag or icon heights); expose a list-wide maximum tag height, default MAX (no limit).
+- **Done (core, `CYLTagListView.swift`):** `measureItemHeights(widths:contentWidth:)` limits each height to the new
+  `CYLTagListView.maxItemHeight` (default `CGFloat.greatestFiniteMagnitude`) and stretches every tag of a row to the row's
+  tallest; `heightOfRows` and `sizeForItemAt` use the same limit. Test: `CYLTagListLayoutTests`
+  `testEveryRowIsAsTallAsItsTallestTagAndMaxItemHeightLimitsIt`.
+- **Score: 70 / 100 (pass 60).** Missing 30: not compiled or run (Linux session, no Swift toolchain), no before/after
+  screenshots (the bug screenshot named in the prompt was not attached to the conversation). TODO for the macOS session:
+  build, run the test, take the screenshots.
+
 ### TODO (2026-11-24, `feat/harmony`, Mac session chenyilong-68): advisor scores the all-platform API implementation, Sonnet implements, other sessions test
 
 - **Prompt (verbatim):** "continue TODO (missing points): advisor opus advisor点评目前全平台接口实现得分 以及下一步计划与建议。并立即让默认模型sonnet按照建议去实现。将得分优化到100转发合适任务给其他session 直接使用本机环境进行测试，iOS在macos机器，其余在windows机器。转发任务给相应session无需等待ci结果。"

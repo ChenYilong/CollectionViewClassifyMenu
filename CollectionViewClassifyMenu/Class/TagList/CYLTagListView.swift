@@ -553,6 +553,22 @@ open class CYLTagListView: UIView {
      */
     @objc open private(set) var contentHeight: CGFloat = 0
 
+    /**
+     * The tallest a tag may be, for every tag of the list; `CGFloat.greatestFiniteMagnitude` (the default) sets no limit.
+     *
+     * Rows are always as tall as their tallest tag, and every other tag of the row is stretched to that height, so a
+     * tag made taller by a bigger icon, a large font or a wrapping title (`CYLMenuStyle.titleWraps`) never leaves its
+     * row neighbours shorter. A tag that needs more than this is cut to it (a wrapping title is truncated), and the
+     * row follows. Values below 1 are treated as 1.
+     */
+    @objc open var maxItemHeight: CGFloat = CGFloat.greatestFiniteMagnitude {
+        didSet {
+            if oldValue != maxItemHeight {
+                invalidateMeasurements()
+            }
+        }
+    }
+
     // MARK: Spacing (android-tagview's lineMargin, tagMargin and textPadding…)
 
     /**
@@ -1395,7 +1411,7 @@ open class CYLTagListView: UIView {
         let measured = width == measuredWidth
         let sectionWidths = measured ? itemWidths : widths(forContentWidth: available)
         let sectionRows = measured ? rows : rows(forWidths: sectionWidths, contentWidth: available)
-        let sectionHeights = measured ? itemHeights : measureItemHeights(widths: sectionWidths)
+        let sectionHeights = measured ? itemHeights : measureItemHeights(widths: sectionWidths, contentWidth: available)
         let header = headerHeight()
         let insets = style.sectionInsets
         var height: CGFloat = 0
@@ -2115,6 +2131,20 @@ private extension CYLTagListView {
         CYLTagButton.height(for: style, traitCollection: traitCollection)
     }
 
+    /**
+     * `maxItemHeight`, at least 1.
+     */
+    var itemHeightLimit: CGFloat {
+        max(1, maxItemHeight)
+    }
+
+    /**
+     * The height of a tag with no wrapped title or own style: the list's item height, within `maxItemHeight`.
+     */
+    var cappedItemHeight: CGFloat {
+        min(itemHeight, itemHeightLimit)
+    }
+
     var foldControlIsInHeader: Bool {
         foldControl.position == .headerTrailing || foldControl.position == .headerLeading
     }
@@ -2207,9 +2237,18 @@ private extension CYLTagListView {
 
     /**
      * Each item's height; an item whose style wraps its title (`CYLMenuStyle.titleWraps`) is measured at its width in
-     * `widths`, so a long title that wraps gets a taller cell.
+     * `widths`, so a long title that wraps gets a taller cell. Each height is limited to `maxItemHeight`, then every
+     * tag of a row (rows are the ones `rows(forWidths:contentWidth:)` makes at `contentWidth`) gets the height of the
+     * row's tallest tag.
      */
-    func measureItemHeights(widths: [[CGFloat]]) -> [[CGFloat]] {
+    func measureItemHeights(widths: [[CGFloat]], contentWidth: CGFloat) -> [[CGFloat]] {
+        alignedToRows(ownItemHeights(widths: widths), widths: widths, contentWidth: contentWidth)
+    }
+
+    /**
+     * Each tag's own height, before `maxItemHeight` and the alignment of its row.
+     */
+    func ownItemHeights(widths: [[CGFloat]]) -> [[CGFloat]] {
         let listHeight = itemHeight
         return titles.enumerated().map { section, items in
             items.enumerated().map { item, title in
@@ -2229,6 +2268,28 @@ private extension CYLTagListView {
     }
 
     /**
+     * Limits each height to `maxItemHeight` and stretches every tag of a row to the row's tallest.
+     */
+    func alignedToRows(_ heights: [[CGFloat]], widths: [[CGFloat]], contentWidth: CGFloat) -> [[CGFloat]] {
+        let limit = itemHeightLimit
+        let sectionRows = rows(forWidths: widths, contentWidth: contentWidth)
+        return heights.enumerated().map { section, sectionHeights in
+            var aligned = sectionHeights.map { min($0, limit) }
+            var start = 0
+            for count in section < sectionRows.count ? sectionRows[section] : [] {
+                let end = min(start + count, aligned.count)
+                if end > start, let tallest = aligned[start..<end].max() {
+                    for index in start..<end {
+                        aligned[index] = tallest
+                    }
+                }
+                start = end
+            }
+            return aligned
+        }
+    }
+
+    /**
      * The height of the first `rowCount` rows of a section: each row as tall as its tallest item. Rows past the
      * measured ones (the inline fold cell on a row of its own) are the list's item height.
      */
@@ -2236,7 +2297,7 @@ private extension CYLTagListView {
         var total: CGFloat = 0
         var item = 0
         for row in 0..<max(0, rowCount) {
-            var rowHeight = itemHeight
+            var rowHeight = cappedItemHeight
             if row < rows.count {
                 let count = rows[row]
                 let end = min(item + count, heights.count)
@@ -2291,7 +2352,7 @@ private extension CYLTagListView {
         measuredWidth = width
         let available = contentWidth(forWidth: width)
         itemWidths = widths(forContentWidth: available)
-        itemHeights = measureItemHeights(widths: itemWidths)
+        itemHeights = measureItemHeights(widths: itemWidths, contentWidth: available)
         rows = rows(forWidths: itemWidths, contentWidth: available)
         contentHeightNeedsUpdate = true
         setNeedsLayout()
@@ -2998,7 +3059,7 @@ extension CYLTagListView: UICollectionViewDelegateFlowLayout {
            itemWidths[indexPath.section].indices.contains(indexPath.item) {
             width = itemWidths[indexPath.section][indexPath.item]
         }
-        var height = itemHeight
+        var height = cappedItemHeight
         if itemHeights.indices.contains(indexPath.section),
            itemHeights[indexPath.section].indices.contains(indexPath.item) {
             height = itemHeights[indexPath.section][indexPath.item]

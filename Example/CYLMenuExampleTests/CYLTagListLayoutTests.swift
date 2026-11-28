@@ -142,4 +142,38 @@ final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
         // The default stays centered.
         XCTAssertEqual(CYLMenuStyle().contentAlignment, .center)
     }
+
+    func testEveryRowIsAsTallAsItsTallestTagAndMaxItemHeightLimitsIt() {
+        let source = CYLMenuFixtures.source(itemCount: 12, sections: 1)
+        source.sections[0].items[1].title = "一个很长很长很长很长很长很长很长很长的标题,换行后比同一行的其他标签更高"
+        let view = showTagList(source, width: 240)
+        let style = CYLMenuStyle()
+        style.titleWraps = true
+        view.style = style
+        view.layoutIfNeeded()
+        let tags = view.probe
+        tags.layOut()
+        XCTAssertEqual(view.maxItemHeight, CGFloat.greatestFiniteMagnitude, "No limit by default")
+
+        func rowHeights() -> [CGFloat: Set<CGFloat>] {
+            var heights: [CGFloat: Set<CGFloat>] = [:]
+            for item in 0..<12 {
+                if let frame = tags.itemFrame(at: ip(item, 0)) {
+                    heights[frame.minY, default: []].insert(frame.height)
+                }
+            }
+            return heights
+        }
+        XCTAssertTrue(rowHeights().values.allSatisfy { $0.count == 1 }, "Tags of a row share one height")
+        let tallest = tags.itemFrame(at: ip(1, 0))?.height ?? 0
+        XCTAssertGreaterThan(tallest, view.style.itemHeight, "The wrapping title makes its tag taller")
+        XCTAssertEqual(tags.itemFrame(at: ip(0, 0))?.height ?? 0, tallest, accuracy: 0.5,
+                       "A short tag beside it is stretched")
+
+        view.maxItemHeight = view.style.itemHeight
+        view.layoutIfNeeded()
+        tags.layOut()
+        XCTAssertTrue(rowHeights().values.allSatisfy { $0 == [view.style.itemHeight] }, "Limited to maxItemHeight")
+        withExtendedLifetime(source) {}
+    }
 }
