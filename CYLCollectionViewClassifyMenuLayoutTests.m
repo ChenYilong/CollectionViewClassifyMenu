@@ -707,16 +707,13 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     XCTAssertEqualObjects(button.title, @"Home");
     XCTAssertTrue(button.isAccessibilityElement);
     XCTAssertTrue(CGSizeEqualToSize(button.bounds.size, button.intrinsicContentSize));
+    // The badge is CYLAnimatedItemView's (CYLBadge on badgeAnchorView), which the tag keeps on its icon.
     XCTAssertNil(button.badgeValue);
-    XCTAssertTrue(button.badgeLabel.hidden);
+    XCTAssertFalse(button.isShowingBadge);
     button.badgeValue = @"3";
-    button.badgeColor = UIColor.orangeColor;
     [button layoutIfNeeded];
-    XCTAssertFalse(button.badgeLabel.hidden);
-    XCTAssertEqualObjects(button.badgeLabel.text, @"3");
+    XCTAssertTrue(button.isShowingBadge);
     XCTAssertEqualObjects(button.accessibilityValue, @"3");
-    button.badgeColor = nil;
-    XCTAssertEqualObjects(button.badgeColor, UIColor.systemRedColor);
 
     NSURL *url = [NSURL fileURLWithPath:@"/no/such/file.json"];
     CYLTagButton *animated = [[CYLTagButton alloc] initWithTitle:nil image:image animationURL:url];
