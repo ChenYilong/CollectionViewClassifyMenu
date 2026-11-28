@@ -53,6 +53,16 @@ public final class CYLTag {
     public var animationURL: URL?
 
     /**
+     * The badge on the tag's icon: nil (the default) none, "" a dot, otherwise the text; as `menuBadgeValueForItem(at:)`.
+     */
+    public var badgeValue: String?
+
+    /**
+     * The badge's style, the keys of CYLTabBarController's `CYLBadgeAttributeKey`; as `menuBadgeAttributesForItem(at:)`.
+     */
+    public var badgeAttributes: [String: Any]?
+
+    /**
      * True by default; a disabled tag is dimmed and ignores taps.
      */
     public var isEnabled = true
@@ -287,6 +297,8 @@ public final class CYLTag {
         copy.image = image
         copy.selectedImage = selectedImage
         copy.animationURL = animationURL
+        copy.badgeValue = badgeValue
+        copy.badgeAttributes = badgeAttributes
         copy.isEnabled = isEnabled
         copy.isDeletable = isDeletable
         copy.userInfo = userInfo
@@ -498,6 +510,14 @@ open class CYLTagDataSource: NSObject, CYLMenuDataSource {
 
     open func menuAnimationURLForItem(at indexPath: IndexPath) -> URL? {
         tag(at: indexPath)?.animationURL
+    }
+
+    open func menuBadgeValueForItem(at indexPath: IndexPath) -> String? {
+        tag(at: indexPath)?.badgeValue
+    }
+
+    open func menuBadgeAttributesForItem(at indexPath: IndexPath) -> [String: Any]? {
+        tag(at: indexPath)?.badgeAttributes
     }
 
     open func menuItemIsEnabled(at indexPath: IndexPath) -> Bool {
