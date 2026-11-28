@@ -81,9 +81,14 @@ without rewriting history, which needs the owner's approval.
 | Cloud-drive and organization folder names (`OneDrive - ...`) | write `<org>` or drop the path |
 | `AppData`, temporary and scratchpad paths of the machine | remove |
 | Agent session names, claude-mem observation IDs, messages between sessions | remove |
-| Chat transcripts, context summaries, system prompt text, copies of local memory notes | do not commit |
-| Raw reading notes and appendices | keep local unless the owner approves publishing them |
-| Unverified bug or defect lists, anything that looks like a security weakness | ask the owner before publishing; label what was not run |
+| Chat transcripts, context summaries, system prompt text | remove from the export |
+| Metadata of a copied memory note (session IDs, `[[...]]` memory links) | remove, keep the technical text |
+| Raw reading notes and appendices | remove the data above, then commit them |
+| Unverified bug or defect lists | commit them, and label what was not run |
+
+**Every file of the export must be committed** (owner's decision, 2026-11-29): do not leave a file out because it holds
+private data; remove the data instead. Only the local handover notes under `docs/todo/**/memory/` stay on the computer
+(`.gitignore` lists them).
 
 Text copied from tracked source files (for example an author name in a copyright header, the owner's public GitHub
 handle in package names and URLs, or an example path with placeholders) is already public. Expect such hits, and check
@@ -242,20 +247,18 @@ path is stored again, as new records.
 1. Read [docs/instructions/git.md](../instructions/git.md) in full and follow it: `bash scripts/check-branch-pr.sh` (with
    more than two open pull requests, ask the owner first), the `.gitignore` sync, and no push to `master` / `main`.
 2. Run the scan of step 2 again.
-3. Stage only the intended files under `docs/learn-codebase/` (and the task log), never `git add -A`. Leave out what the
-   owner did not approve for publishing.
+3. Stage every file of the export under `docs/learn-codebase/` (and the task log) by path, never `git add -A`.
 4. Read `git diff --cached` (at least `--stat` and every notes or findings file) before committing.
 5. Write a `git cz` message in English with the author line from [AGENTS.md](../../AGENTS.md) and check it with
    `scripts/check-commit-message.sh`.
 
-A file that you leave out of the commit but keep in this folder is still ingested on this computer, and is not there on
-another one. Make sure that no committed file links to it.
+After the commit, `git status --short --untracked-files=all docs/learn-codebase` must list nothing.
 
 ## Checklist
 
 - [ ] Export is in `docs/learn-codebase/learn-codebase-YYYY-MM-DD/`, with the commit it describes.
-- [ ] Scan hits are fixed or explained; the owner decided on appendices and unverified findings.
+- [ ] Scan hits are fixed or explained; unverified findings are labelled.
 - [ ] No `.md` file is over 64 KB; links to split files work.
 - [ ] This project's watch root is set, the other entries are kept, the worker was restarted.
 - [ ] The ingestion check shows no missing file.
-- [ ] Only approved files are staged.
+- [ ] Every export file is committed; nothing under `docs/learn-codebase/` is left untracked.

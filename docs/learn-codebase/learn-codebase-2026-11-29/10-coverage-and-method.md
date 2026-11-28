@@ -22,6 +22,6 @@
 - Sample check: 761 files by extension, up to 12 lines each searched in the session's tool output; 32 were below 75%
   (generated/data, licenses, 11 small config files read afterwards). A sample, not proof.
 - Docs: besides README/AGENTS and the instructions, this pass did not re-read docs/. The 2026-11-27 pass
-  read several.
+  read several; see appendix-earlier-ios-memory-note.md.
 - TODO: run the tests; read the remaining docs if needed; reproduce V1, V2 and V4 on a device or emulator.
 - The repo was not changed.

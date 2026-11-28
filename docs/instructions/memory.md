@@ -10,5 +10,7 @@ Tag: `memory`. The full rules of this tag. [AGENTS.md](../../AGENTS.md) keeps th
   full** (owner's rule, 2026-11-29). The procedure is kept there.
 - The export goes into `docs/learn-codebase/learn-codebase-YYYY-MM-DD/`, not into the claude-mem deliverables folder.
 - Remove private data before claude-mem ingests the files and before they are committed; the repository is public.
+- Every file of an export is committed, after its private data is removed (owner's decision, 2026-11-29). Only
+  `docs/todo/**/memory/` stays local.
 - `CLAUDE_MEM_MEMORY_WATCH_ROOTS` is set on each computer, with the project name `CollectionViewClassifyMenu`; the
   settings file is never committed.

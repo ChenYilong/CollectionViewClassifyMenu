@@ -28,6 +28,7 @@ claude-mem 通过本机设置 `CLAUDE_MEM_MEMORY_WATCH_ROOTS` 收录本目录；
 | 11-vendored-modules.md | the copied CYLTabBarController and CYLDeallocBlockExecutor modules |
 | api-reference/ | script-generated declarations and source comments, per platform and layer |
 | file-inventory.tsv | 853 source files: path, lines, area, kind, types, header comment |
+| appendix-*.md | raw reading notes (shorthand, some lines superseded by 09), early report, 11-27 iOS core notes |
 
 file-inventory.tsv has a read_mode column (derived by path rules and updated after pass 2, not logged per file; see 10).
 api-reference/vendored-*.md cover the copied modules.
