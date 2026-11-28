@@ -11,6 +11,9 @@ CYL_ANIMATED_ITEM = { :git => 'https://github.com/ChenYilong/CYLTabBarController
                       :commit => '1cbb260ad9fd1ea45d1fab0edfc9d1e7b22cbe26' }
 
 target 'CollectionViewClassifyMenu' do
+  # As Example/Podfile, Example-Swift/Podfile and CYLTabBarController's own: its pods import each other as modules, which
+  # static libraries cannot do ("Cyclic dependency in module 'CYLBadge'").
+  use_frameworks!
   pod 'CollectionViewClassifyMenu', :path => '.'
   pod 'CYLTabBarController', CYL_TAB_BAR
   pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => '4276a6dab5a428ccc3a5f3f347eab991881fb97c' # CYLTabBarController needs ~> 1.4, not on the trunk yet (as its own Podfiles)
