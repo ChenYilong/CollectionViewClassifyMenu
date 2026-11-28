@@ -719,6 +719,22 @@ open class CYLTagListView @JvmOverloads constructor(
 
     private fun itemHeight(): Float = CYLTagButton.heightForStyle(listStyle)
 
+    /**
+     * The tallest a tag may be, for every tag of the list; `Float.MAX_VALUE` (the default) sets no limit. Rows are always
+     * as tall as their tallest tag and every other tag of the row is stretched to that height; a tag that needs more
+     * than this is cut to it. Values below 1 are treated as 1 (iOS `CYLTagListView.maxItemHeight`).
+     */
+    var maxItemHeight: Float = Float.MAX_VALUE
+        set(value) {
+            if (field == value) return
+            field = value
+            invalidateMeasurements()
+        }
+
+    private fun itemHeightLimit(): Float = max(1f, maxItemHeight)
+
+    private fun cappedItemHeight(): Float = min(itemHeight(), itemHeightLimit())
+
     private fun foldIsInHeader(): Boolean = _foldControl.position == CYLMenuFoldControlPosition.HEADER_TRAILING ||
         _foldControl.position == CYLMenuFoldControlPosition.HEADER_LEADING
 
@@ -767,13 +783,29 @@ open class CYLTagListView @JvmOverloads constructor(
         }
     }
 
-    private fun heightsForItems(): List<List<Float>> {
+    /**
+     * Each item's height (iOS `measureItemHeights(widths:contentWidth:)`): limited to `maxItemHeight`, then every tag of a
+     * row (the rows `rowsFor` makes at `contentWidth`) gets the height of the row's tallest tag.
+     */
+    private fun heightsForItems(widths: List<List<Float>>, contentWidth: Float): List<List<Float>> {
         val listHeight = itemHeight()
+        val limit = itemHeightLimit()
+        val sectionRows = rowsFor(widths, contentWidth)
         return titles.mapIndexed { section, items ->
-            items.indices.map { item ->
+            val aligned = items.indices.map { item ->
                 val itemStyle = styleForItem(CYLIndexPath(item, section))
-                if (itemStyle === listStyle) listHeight else max(listHeight, CYLTagButton.heightForStyle(itemStyle))
+                min(limit, if (itemStyle === listStyle) listHeight else max(listHeight, CYLTagButton.heightForStyle(itemStyle)))
+            }.toMutableList()
+            var start = 0
+            for (count in sectionRows.getOrElse(section) { emptyList() }) {
+                val end = min(start + count, aligned.size)
+                if (end > start) {
+                    val tallest = aligned.subList(start, end).max()
+                    for (index in start until end) aligned[index] = tallest
+                }
+                start = end
             }
+            aligned
         }
     }
 
@@ -781,7 +813,7 @@ open class CYLTagListView @JvmOverloads constructor(
         var total = 0f
         var item = 0
         for (row in 0 until rowCount) {
-            var rowHeight = itemHeight()
+            var rowHeight = cappedItemHeight()
             if (row < sectionRows.size) {
                 val count = sectionRows[row]
                 for (index in item until min(item + count, heights.size)) rowHeight = max(rowHeight, heights[index])
@@ -825,7 +857,7 @@ open class CYLTagListView @JvmOverloads constructor(
         measuredContentWidth = width
         val contentWidth = contentWidthFor(width)
         itemWidths = widthsFor(contentWidth)
-        itemHeights = heightsForItems()
+        itemHeights = heightsForItems(itemWidths, contentWidth)
         rows = rowsFor(itemWidths, contentWidth)
     }
 
@@ -847,7 +879,7 @@ open class CYLTagListView @JvmOverloads constructor(
         val same = width == measuredContentWidth
         val widths = if (same) itemWidths else widthsFor(contentWidth)
         val sectionRows = if (same) rows else rowsFor(widths, contentWidth)
-        val heights = if (same) itemHeights else heightsForItems()
+        val heights = if (same) itemHeights else heightsForItems(widths, contentWidth)
         val header = headerHeight()
         val insets = listStyle.sectionInsets
         var height = 0f
@@ -1671,7 +1703,7 @@ open class CYLTagListView @JvmOverloads constructor(
                     val cell = cells[indexPath] ?: continue
                     views.add(cell)
                     val itemWidth = itemWidths.getOrNull(section)?.getOrNull(item) ?: 0f
-                    val itemHeight = itemHeights.getOrNull(section)?.getOrNull(item) ?: itemHeight()
+                    val itemHeight = itemHeights.getOrNull(section)?.getOrNull(item) ?: cappedItemHeight()
                     sizes.add(CYLSize(max(1f, itemWidth), itemHeight))
                 }
                 foldCells[section]?.let {

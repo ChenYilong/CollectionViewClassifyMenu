@@ -12,6 +12,7 @@ import androidParityTest from './AndroidParity.test';
 import tagListEditingTest from './TagListEditing.test';
 import tagListWordPickerTest from './TagListWordPicker.test';
 import tagListTailFoldTest from './TagListTailFold.test';
+import tagListRowHeightTest from './TagListRowHeight.test';
 
 export default function testsuite() {
   localUnitTest();
@@ -28,4 +29,5 @@ export default function testsuite() {
   tagListEditingTest();
   tagListWordPickerTest();
   tagListTailFoldTest();
+  tagListRowHeightTest();
 }

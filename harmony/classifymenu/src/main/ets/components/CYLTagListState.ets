@@ -537,6 +537,7 @@ export class CYLTagListState {
   private titleImageStorage?: CYLImage;
   private titlePositionStorage: CYLMenuTitlePosition = CYLMenuTitlePosition.topLeading;
   private scrollEnabledStorage: boolean = true;
+  private maxItemHeightStorage: number = Number.MAX_VALUE;
   private contentHeightStorage: number = 0;
   private animationSpeedStorage?: number;
   private animationLoopsStorage: boolean = false;
@@ -1439,6 +1440,23 @@ export class CYLTagListState {
 
   // MARK: Size
 
+  /**
+   * The tallest a tag may be, for every tag of the list; `Number.MAX_VALUE` (the default) sets no limit. Rows are always
+   * as tall as their tallest tag and every other tag of the row is stretched to that height; a tag that needs more than
+   * this is cut to it. Values below 1 are treated as 1 (iOS `CYLTagListView.maxItemHeight`).
+   */
+  get maxItemHeight(): number {
+    return this.maxItemHeightStorage;
+  }
+
+  set maxItemHeight(value: number) {
+    if (this.maxItemHeightStorage === value) {
+      return;
+    }
+    this.maxItemHeightStorage = value;
+    this.invalidateMeasurements();
+  }
+
   /** False to embed the list in another scroll view and size it with `contentHeight`. True by default. */
   get isScrollEnabled(): boolean {
     return this.scrollEnabledStorage;
@@ -1713,7 +1731,7 @@ export class CYLTagListState {
     const measured = width === this.measuredWidth;
     const sectionWidths = measured ? this.itemWidths : this.widths(available);
     const sectionRows = measured ? this.rows : this.rowsFor(sectionWidths, available);
-    const sectionHeights = measured ? this.itemHeights : this.measureItemHeights(sectionWidths);
+    const sectionHeights = measured ? this.itemHeights : this.measureItemHeights(sectionWidths, available);
     const header = this.headerHeight();
     const insets = this.styleStorage.sectionInsets;
     let height = 0;
@@ -2583,6 +2601,16 @@ export class CYLTagListState {
     return CYLTagButtonMetrics.height(this.styleStorage, this.fontScale);
   }
 
+  /** `maxItemHeight`, at least 1. */
+  private get itemHeightLimit(): number {
+    return Math.max(1, this.maxItemHeightStorage);
+  }
+
+  /** The height of a tag with no wrapped title or own style: the list's item height, within `maxItemHeight`. */
+  private get cappedItemHeight(): number {
+    return Math.min(this.itemHeight, this.itemHeightLimit);
+  }
+
   private get foldControlIsInHeader(): boolean {
     const p = this.foldControlStorage.position;
     return p === CYLMenuFoldControlPosition.headerTrailing || p === CYLMenuFoldControlPosition.headerLeading;
@@ -2650,9 +2678,32 @@ export class CYLTagListState {
 
   /**
    * Each item's height; an item whose style wraps its title (`CYLMenuStyle.titleWraps`) is measured at its width in
-   * `widths`, so a long title that wraps gets a taller cell (iOS `measureItemHeights(widths:)`).
+   * `widths`, so a long title that wraps gets a taller cell (iOS `measureItemHeights(widths:contentWidth:)`). Each height
+   * is limited to `maxItemHeight`, then every tag of a row (the rows `rowsFor` makes at `contentWidth`) gets the height
+   * of the row's tallest tag.
    */
-  private measureItemHeights(widths: number[][] = []): number[][] {
+  private measureItemHeights(widths: number[][], contentWidth: number): number[][] {
+    const limit = this.itemHeightLimit;
+    const sectionRows = this.rowsFor(widths, contentWidth);
+    return this.ownItemHeights(widths).map((own: number[], section: number): number[] => {
+      const aligned = own.map((height: number): number => Math.min(height, limit));
+      let start = 0;
+      (sectionRows[section] ?? []).forEach((count: number) => {
+        const end = Math.min(start + count, aligned.length);
+        if (end > start) {
+          const tallest = Math.max(...aligned.slice(start, end));
+          for (let i = start; i < end; i++) {
+            aligned[i] = tallest;
+          }
+        }
+        start = end;
+      });
+      return aligned;
+    });
+  }
+
+  /** Each tag's own height, before `maxItemHeight` and the alignment of its row. */
+  private ownItemHeights(widths: number[][]): number[][] {
     const listHeight = this.itemHeight;
     return this.titles.map((items: string[], section: number): number[] => items.map((title: string,
       item: number): number => {
@@ -2673,7 +2724,7 @@ export class CYLTagListState {
     let total = 0;
     let item = 0;
     for (let row = 0; row < Math.max(0, rowCount); row++) {
-      let rowHeight = this.itemHeight;
+      let rowHeight = this.cappedItemHeight;
       if (row < rows.length) {
         const count = rows[row];
         const end = Math.min(item + count, heights.length);
@@ -2724,7 +2775,7 @@ export class CYLTagListState {
     this.measuredWidth = width > 0 ? width : -1;
     const available = this.contentWidth(width);
     this.itemWidths = this.widths(available);
-    this.itemHeights = this.measureItemHeights(this.itemWidths);
+    this.itemHeights = this.measureItemHeights(this.itemWidths, available);
     this.rows = this.rowsFor(this.itemWidths, available);
   }
 
@@ -2797,7 +2848,7 @@ export class CYLTagListState {
         cell.section = section;
         cell.item = item;
         cell.width = Math.max(1, this.itemWidths[section]?.[item] ?? 0);
-        cell.height = this.itemHeights[section]?.[item] ?? this.itemHeight;
+        cell.height = this.itemHeights[section]?.[item] ?? this.cappedItemHeight;
         cells.push(cell);
       }
       if (this.showsInlineFoldCell(section)) {
@@ -3013,6 +3064,10 @@ export class CYLTagListState {
     const showsHeaders = CYLConfigurationValue.bool(configuration[CYLTagListKey.showsSectionHeaders]);
     if (showsHeaders !== undefined) {
       this.showsSectionHeaders = showsHeaders;
+    }
+    const maxItemHeight = CYLConfigurationValue.number(configuration[CYLTagListKey.maxItemHeight]);
+    if (maxItemHeight !== undefined) {
+      this.maxItemHeight = maxItemHeight;
     }
     const scrollEnabled = CYLConfigurationValue.bool(configuration[CYLTagListKey.scrollEnabled]);
     if (scrollEnabled !== undefined) {

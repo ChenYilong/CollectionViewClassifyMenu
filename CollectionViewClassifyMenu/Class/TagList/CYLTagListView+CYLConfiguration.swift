@@ -107,6 +107,11 @@ public enum CYLTagListKey {
      * (title, image, id, deletable, enabled, style…). Replaces the list's tags (`addTags(_:)`, `tagDataSource`).
      */
     public static let tags = "tags"
+
+    /**
+     * A number: `CYLTagListView.maxItemHeight`, the tallest a tag may be; missing for no limit.
+     */
+    public static let maxItemHeight = "maxItemHeight"
 }
 
 /**
@@ -1387,6 +1392,9 @@ extension CYLTagListView {
         }
         if let value = Value.bool(configuration[Key.scrollEnabled]) {
             isScrollEnabled = value
+        }
+        if let value = Value.double(configuration[Key.maxItemHeight]) {
+            maxItemHeight = value
         }
         if let value = Value.number(configuration[Key.defaultVisibleRows]) {
             defaultVisibleRows = max(0, value.intValue)

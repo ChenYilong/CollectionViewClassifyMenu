@@ -32,6 +32,8 @@ export class CYLTagListKey {
   static readonly showsSectionHeaders: string = 'showsSectionHeaders';
   static readonly scrollEnabled: string = 'scrollEnabled';
   static readonly defaultVisibleRows: string = 'defaultVisibleRows';
+  /** A number: `maxItemHeight` (vp), the tallest a tag may be; missing for no limit. */
+  static readonly maxItemHeight: string = 'maxItemHeight';
   /** An array of index paths ({section, item}), "section-item" strings or [section, item] arrays. */
   static readonly selectedItems: string = 'selectedItems';
   /** A `CYLMenuFoldControl`, a position name, or a dictionary of `CYLMenuFoldControlKey` keys. */

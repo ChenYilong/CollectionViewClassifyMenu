@@ -41,13 +41,27 @@ tags: [issues, ui, cocoapods, progress]
 - **Prompt (English):** switch to the branch of the latest commit and read the agent documents; change the tag list layout
   in the core so that every row adapts: all tags of a row get the height of the row's tallest tag (wrapping titles, custom
   tag or icon heights); expose a list-wide maximum tag height, default MAX (no limit).
-- **Done (core, `CYLTagListView.swift`):** `measureItemHeights(widths:contentWidth:)` limits each height to the new
-  `CYLTagListView.maxItemHeight` (default `CGFloat.greatestFiniteMagnitude`) and stretches every tag of a row to the row's
-  tallest; `heightOfRows` and `sizeForItemAt` use the same limit. Test: `CYLTagListLayoutTests`
-  `testEveryRowIsAsTallAsItsTallestTagAndMaxItemHeightLimitsIt`.
-- **Score: 70 / 100 (pass 60).** Missing 30: not compiled or run (Linux session, no Swift toolchain), no before/after
-  screenshots (the bug screenshot named in the prompt was not attached to the conversation). TODO for the macOS session:
-  build, run the test, take the screenshots.
+- **Scope (owner, 2026-11-28, second message):** all platforms: iOS, Android, Flutter, React Native, mini program,
+  HarmonyOS.
+- **Done, per platform** (the key `maxItemHeight` in the configuration map/JSON, missing = no limit; values below 1 count as 1):
+
+  | Platform | Change | Test | Status |
+  | --- | --- | --- | --- |
+  | iOS core | `CYLTagListView.maxItemHeight` (default `CGFloat.greatestFiniteMagnitude`); `measureItemHeights(widths:contentWidth:)` limits each height, then every tag of a row gets the row's tallest; `heightOfRows` and `sizeForItemAt` use the same limit; `CYLTagListKey.maxItemHeight` | `CYLTagListLayoutTests.testEveryRowIsAsTallAsItsTallestTagAndMaxItemHeightLimitsIt` | not compiled (Linux) |
+  | Android core | `CYLTagListView.maxItemHeight` (default `Float.MAX_VALUE`); `heightsForItems(widths, contentWidth)` same algorithm; `CYLTagListViewMaxItemHeight` | `CYLTagListRowHeightTest` (Robolectric) | not compiled (no Android SDK here) |
+  | HarmonyOS core | `CYLTagListState.maxItemHeight` (default `Number.MAX_VALUE`); `measureItemHeights(widths, contentWidth)` same algorithm; `CYLTagListKey.maxItemHeight` | `TagListRowHeight.test.ets` (in `List.test.ets`) | not compiled (no DevEco here) |
+  | Mini program | `model.normalize` reads `maxItemHeight`; `model.listTagHeight(model, style)` limits the tag height; the list passes it to `tagLayout`. Tags of a section share one style, so rows already had one height (no wrapping, `nowrap`) | `tag-list-model.test.js` | new test passes under `node --test` (22 of 24 in the copied files pass; the 2 failures come from the relative path of the scratch copy, not from this change) |
+  | Flutter, React Native | No code of their own: they pass the configuration map/JSON to the iOS, Android and HarmonyOS cores, which the wrappers reference by local path (`Package.swift`, the local Maven repo of `android/merged`, `file:../../../harmony/classifymenu`), so the key works there once the cores are rebuilt | none yet | TODO: a Dart and a TS example/test that sets `maxItemHeight` |
+
+- **Score: 65 / 100 (pass 60).** Missing 35: no platform compiled or run except the mini program (Linux session, no Swift,
+  Android SDK or DevEco), no before/after screenshots (the bug screenshot named in the prompt was not attached to the
+  conversation), Flutter and RN have no test of their own.
+- **TODO (next sessions):** macOS: build, run `CYLTagListLayoutTests`, screenshots, regenerate the Swift API baseline and
+  parity tables with their scripts (generated tables are never edited by hand); Windows: run the Android Robolectric test
+  and the HarmonyOS `TagListRowHeight.test.ets`, rebuild the Maven repo for Flutter and RN; docs: list `maxItemHeight` in
+  the API documents under `docs/` (not read here: docs-lookup rule). Known edge case, same on all platforms: in a folded
+  section whose inline fold cell pushes a tag off the last visible row, the remaining tags keep the hidden tag's height;
+  `heightOfRows` agrees with it, so nothing overlaps.
 
 ### TODO (2026-11-24, `feat/harmony`, Mac session chenyilong-68): advisor scores the all-platform API implementation, Sonnet implements, other sessions test
 
