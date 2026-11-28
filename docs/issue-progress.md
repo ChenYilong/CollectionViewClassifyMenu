@@ -35,6 +35,52 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-29, `fix/shared-contrast-ios`, Windows session): document how to redo the learn-codebase export, and add the `memory` rule tag
+
+- **Context:** follows the entry below (the export now in `docs/learn-codebase/`).
+- **Requirements:** a new `docs/learn-codebase/README.md`: on another computer, where `/claude-mem:learn-codebase`
+  should write its export, how to set `CLAUDE_MEM_MEMORY_WATCH_ROOTS` again, and how to remove private data before the
+  export is committed. A new `memory` tag in AGENTS.md that requires reading it before running learn-codebase, with its
+  relative path. All in English; this request overrides the bilingual rule for these files.
+- **Prompt (verbatim):** "在 该根目录下 " \docs\learn-codebase"   新建一个文档， README ， 该文档需要记录，以后换了电脑， 之后， 重新使用 claude-mem 的 learn-codebase 指令的时候， 应该如何指定交付物路劲， CLAUDE_MEM_MEMORY_WATCH_ROOTS 如何重新配置，以及交付物如何删除隐私信息后提交git，结合本次经验， 总结成文档， 并在agents文件中，新建tag ，叫做 memory ， 该新建文档中， 需要在 执行 learn-codebase 之前阅读，本次新建的文档，给出相对路径的文档地址。 以上指令全英文执行，文档全英文编写。"
+- **Acceptance (100, pass 60):** README covers the output path (20), the watch root setup and check (25) and the privacy
+  pass before commit (25); its commands run on this machine (15); `memory` tag with relative links, all links resolve,
+  instruction files at most 200 lines (15).
+- **Result (2026-11-29), 100/100:** added `docs/learn-codebase/README.md` and `docs/instructions/memory.md`; the
+  `memory` tag is in AGENTS.md (table and heading), CLAUDE.md, `docs/instructions.md` and the `cyl-instructions` skill.
+  Run on this machine: the scan, the size check and the ingestion check (61 of 61 Markdown files); the settings script ran
+  against a test copy with made-up entries, not the real settings file (restart and health check were used for the entry
+  below). New relative links resolve; instruction files are at most 200 lines. Not committed yet, for the same reason as
+  the entry below.
+
+
+### TODO (2026-11-29, `fix/shared-contrast-ios`, Windows session): move the learn-codebase export into `docs/learn-codebase/` and let claude-mem ingest it
+
+- **Context:** the learn-codebase export of commit `03707ba2` (47 files) was in the claude-mem deliverables folder,
+  outside the repository. The repository is public. claude-mem's memory folder watcher reads only `.md` files of at most
+  64 KB.
+- **Requirements:** move `<home>/.claude-mem/deliverables/CollectionViewClassifyMenu` to `docs/learn-codebase/`; make
+  claude-mem ingest the new folder as project `CollectionViewClassifyMenu`.
+- **Prompt (verbatim; the user folder is written as `<home>` because the repository is public):**
+
+```text
+交付物 放到仓库 docs/learn-codebase/ 下， "<home>\.claude-mem\deliverables\CYLTableViewPlaceHolder\learn-codebase-2026-11-29\FAQ.md"
+    按照文档，建议， 将 交付物"<home>\.claude-mem\deliverables\{{git project name}}" 移动到
+    docs/learn-codebase/ ，并更新 让 claude-mem 主动收录我们本次在本git仓库内新建的文件夹 project 对应 本项目的名字也就是 {{git project name}}。
+```
+
+- **Acceptance (100, pass 60):** files moved unchanged and originals removed (30); no private data in the files (20);
+  watch root added for this project, other entries kept (20); every `.md` file ingested, checked in the database (30).
+- **Result (2026-11-29), 100/100:** 47 files moved to `docs/learn-codebase/learn-codebase-2026-11-29/` (SHA-256 equal
+  before the originals were removed). 7 `.md` files over 64 KB split into 21 parts, 61 files in all. Scan: no email
+  address, token or local user path (a second pass the same day also removed an observation ID and notes about other
+  sessions from two findings files). On this machine a second watch root was added to claude-mem's settings (the existing
+  one kept) and the worker restarted; the database then held all 60 `.md` files under project
+  `CollectionViewClassifyMenu`. Outside the criteria: `file-inventory.tsv` (not Markdown) is not ingested; the export is in English
+  apart from a short Chinese note in its README. The owner approved publishing without the three `appendix-*.md` files
+  (raw notes, short report, a copy of a memory note): they stay untracked on this computer. Not committed yet: ten pull requests are open, so the owner is asked
+  first ("Branches and pull requests").
+
 ### TODO → DONE on HarmonyOS (2026-11-25, `feat/tag-section-style`): the header divider and the section card did not share their left and right edges
 
 - **Prompt (verbatim):** "C:/w/ss_shots/ss-light.jpeg bug记录todo 将圆角背景板和头部分界线header应该左右边界对齐，图片中未对齐。该逻辑应在core中实现无需用户调整"

@@ -147,3 +147,12 @@ CollectionViewClassifyMenu.xcodeproj/xcuserdata/chenyilong.xcuserdatad/xcdebugge
 
 # Local-only handover memory (docs/todo/<week>/<weekday>/memory/): never commit or push. 本机交接记忆，不提交、不上传。
 docs/todo/*/*/memory/
+
+# From CYLTabBarController's .gitignore (f62a0bea)
+CrossPlatform/RiveViewer-miniapp/
+CrossPlatform/LottieWMC/
+CrossPlatform/harmonyos-cyltabbar/cylclassifymenu/
+Example-Android/cylclassifymenu/
+CrossPlatform/wechat-miniprogram-cyltabbar/example/cylclassifymenu-miniprogram/
+CrossPlatform/harmonyos-cyltabbar/entry/src/main/resources/rawfile/pag/
+docs/todo/**/memory/

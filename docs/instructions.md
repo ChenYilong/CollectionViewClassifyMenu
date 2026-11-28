@@ -57,6 +57,11 @@ Rules are grouped under tag headings (`## [<tag>] <title>`), the same tags as [A
 - Fix issues in the core first (AGENTS.md "Fix issues in the core first"): the core is the code published to a package registry (CocoaPods, Maven / Gradle, npm, pub.dev, ohpm); an example-layer fix is the worst option; when the core cannot fix a core defect, ask the user first and say why; record every example-layer fix and its reason in `docs/example-layer-fixes.md`.
 - Bugs (AGENTS.md "Bugs: record, screenshot, fix in CYLTabBarController's animated item"): record first, then screenshot, then fix; animation and icon + title bugs are fixed in CYLTabBarController's animated item component, not in the examples; a demo that needs more gets a new component API from CYLTabBarController.
 
+## [memory] Memory: learn-codebase exports and claude-mem
+
+- Before running `/claude-mem:learn-codebase`, read [learn-codebase/README.md](learn-codebase/README.md) in full.
+  Full rule: [instructions/memory.md](instructions/memory.md).
+
 ## [testing] Testing, parity and CI
 
 - Screenshots (English rule, AGENTS.md "CI/CD and Example screenshots"): every screenshot, from CI/CD or a local

@@ -40,3 +40,7 @@ text: after running a simulator and finishing the test or screenshots, immediate
 process (your own devices only: `xcrun simctl terminate <udid> <bundle id>`, `xcrun simctl shutdown <udid>`); start them again when
 needed. Do not leave the app or the simulator running after the task is done.
 
+## [memory] Read before running learn-codebase
+
+Before running `/claude-mem:learn-codebase`, read [docs/learn-codebase/README.md](docs/learn-codebase/README.md) in
+full, every line. Full rule: [docs/instructions/memory.md](docs/instructions/memory.md).

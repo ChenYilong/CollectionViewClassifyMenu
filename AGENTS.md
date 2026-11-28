@@ -37,6 +37,7 @@ verify the behavior and update the applicable documentation.
 | `accessibility` | accessibility everywhere | [accessibility.md](docs/instructions/accessibility.md) |
 | `docs` | documentation assets, bilingual documents | [docs.md](docs/instructions/docs.md) |
 | `git` | branches, pull requests, repository hygiene | [git.md](docs/instructions/git.md) |
+| `memory` | claude-mem: learn-codebase exports, watch roots, privacy before commit | [memory.md](docs/instructions/memory.md) |
 
 ## [workflow] Tasks and workflow
 
@@ -163,3 +164,10 @@ verify the behavior and update the applicable documentation.
 - At the end of every answer on a branch other than `master` / `main`, commit and push.
 - Never commit `._*`, `.DS_Store` or doubled-dot copies; never rewrite published history without approval.
 - Sections: [Branches and pull requests](docs/instructions/git.md#branches-and-pull-requests) · [Repository hygiene](docs/instructions/git.md#repository-hygiene).
+
+## [memory] Memory: learn-codebase exports and claude-mem
+
+- **Before running `/claude-mem:learn-codebase`, read [docs/learn-codebase/README.md](docs/learn-codebase/README.md) in
+  full**: where the export goes, how to set `CLAUDE_MEM_MEMORY_WATCH_ROOTS` on a computer, and how to remove private
+  data before committing it.
+- Sections: [Read before running learn-codebase](docs/instructions/memory.md#read-before-running-learn-codebase).
