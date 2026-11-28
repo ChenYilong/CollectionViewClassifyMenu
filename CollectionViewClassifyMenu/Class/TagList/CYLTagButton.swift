@@ -531,24 +531,6 @@ open class CYLTagButton: CYLAnimatedItemView {
     }
 
     /**
-     * The badge unless a value was set: its text, or "New" (localized) for a dot.
-     */
-    open override var accessibilityValue: String? {
-        get {
-            if let value = super.accessibilityValue {
-                return value
-            }
-            guard let badgeValue else {
-                return nil
-            }
-            return badgeValue.isEmpty ? CYLMenuLocalizedString("CYLTagBadgeDot") : badgeValue
-        }
-        set {
-            super.accessibilityValue = newValue
-        }
-    }
-
-    /**
      * For a tag made with a convenience initializer, the traits it was given plus selected and not enabled from its
      * state.
      */
