@@ -2145,6 +2145,14 @@ private extension CYLTagListView {
         menuDataSource?.menuAnimationURLForItem?(at: indexPath)
     }
 
+    func badgeValue(at indexPath: IndexPath) -> String? {
+        menuDataSource?.menuBadgeValueForItem?(at: indexPath)
+    }
+
+    func badgeAttributes(at indexPath: IndexPath) -> [String: Any]? {
+        menuDataSource?.menuBadgeAttributesForItem?(at: indexPath)
+    }
+
     func animationRestingProgress(at indexPath: IndexPath) -> CGFloat {
         CGFloat(menuDataSource?.menuAnimationRestingProgressForItem?(at: indexPath)?.doubleValue ?? 0)
     }
@@ -2941,6 +2949,9 @@ private extension CYLTagListView {
         cell.configure(title: titles[indexPath.section][indexPath.item], image: image(at: indexPath),
                        selectedImage: selectedImage(at: indexPath), animationURL: animationURL(at: indexPath),
                        style: style(forItemAt: indexPath), isSelected: selection.contains(indexPath), isEnabled: enabled)
+        // The badge is the tag's own (CYLAnimatedItemView.badgeValue): the icon is not drawn into an image with it, so it stays centred.
+        cell.button.badgeAttributes = badgeAttributes(at: indexPath)
+        cell.button.badgeValue = badgeValue(at: indexPath)
         cell.button.animationRestingProgress = animationRestingProgress(at: indexPath)
         cell.button.cylApplyListAnimationSpeed(animationSpeed)
         cell.button.animationLoops = animationLoops

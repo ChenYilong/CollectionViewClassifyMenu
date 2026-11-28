@@ -79,6 +79,19 @@ import UIKit
     optional func menuSubtitleForItem(at indexPath: IndexPath) -> String?
 
     /**
+     * The badge of an item (CYLTabBarController's `CYLAnimatedItemView.badgeValue`, docs/Animated-Item-Badge.md there): nil (the default) no
+     * badge, "" a dot, otherwise the text. The tag draws it itself on its icon: the icon stays centred and keeps its size.
+     */
+    @objc(menuBadgeValueForItemAtIndexPath:)
+    optional func menuBadgeValueForItem(at indexPath: IndexPath) -> String?
+
+    /**
+     * The badge's style, the keys of CYLTabBarController's `CYLBadgeAttributeKey` (`animation`, `color`, `radius`, `centerOffset`...).
+     */
+    @objc(menuBadgeAttributesForItemAtIndexPath:)
+    optional func menuBadgeAttributesForItem(at indexPath: IndexPath) -> [String: Any]?
+
+    /**
      * The frame (0...1) an animated icon shows while its item is not selected. Default (`nil`) 0, the first frame, as
      * a CYLTabBarController tab icon; for a file whose first frame is empty, e.g. 1 for the last.
      */
