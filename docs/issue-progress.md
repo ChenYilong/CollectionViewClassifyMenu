@@ -69,8 +69,8 @@ tags: [issues, ui, cocoapods, progress]
   (2) `CYLUtils` needs `CYLDeallocBlockExecutor ~> 1.4` (not on the trunk): `TagCollectionView/Podfile` names its source like the
   other Podfiles, and `scripts/pod-lint.sh lib` includes the CYLBadge, CYLUtils and CYLDeallocBlockExecutor podspecs.
   Not run locally (no Xcode); the next CI run is the check.
-- **Re-pin CYLTabBarController (2026-11-28, owner: "repin cyltab 最新commit"):** newest commit over every branch is `c5a18088`
-  (`feat/harmony-animated-item-engines`, was `ed39c20b`; `edeb11e6` on the other platforms). Moved: the four Podfiles and
+- **Re-pin CYLTabBarController (2026-11-28, owner: "repin cyltab 最新commit"):** newest commit over every branch is `1cbb260a`
+  (`feat/harmony-animated-item-engines`, moved from `c5a18088` while this was done; was `ed39c20b`; `edeb11e6` on the other platforms). Moved: the four Podfiles and
   `Package.swift`, the React Native and Flutter examples (Podfiles, `fetch-cyltabbar.sh`, `pubspec.yaml`), Android
   `gradle.properties`, the mini program (`fetch-cyltabbar.js`, vendored copies; `cyl-badge` and `cyl-utils` are new in the
   vendored list because `cyl-animated-item` requires them), `.gitignore`. `scripts/cyl-tabbar-latest-commit.sh --check` passes.
