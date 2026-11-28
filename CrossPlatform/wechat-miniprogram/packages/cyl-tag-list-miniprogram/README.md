@@ -64,7 +64,7 @@ The package links no animation engine. An app that plays animations gives cyl-ta
 components through the abstract nodes `cyl-lottie-view`, `cyl-pag-view`, `cyl-rive-view` and `cyl-svga-view`, which
 are forwarded to cyl-animated-item; a GIF is drawn by `<image>` and needs none. An engine component takes `path`,
 `loop`, `speed`, `autoplay` and `resting-frame`, sends `ready` once it draws the file and `error` when it cannot, and
-has `cyl_playFromStart()` (played on a tap and by `playAll()` / `playItems()` / `playAnimation()`). Until `ready`, and
+has `cylPlayFromStart()` (played on a tap and by `playAll()` / `playItems()` / `playAnimation()`). Until `ready`, and
 after `error` or without an engine, the tag shows its image, or cyl-animated-item's placeholder without one.
 
 Register where the files are, so that a configuration can name them as the iOS example does:

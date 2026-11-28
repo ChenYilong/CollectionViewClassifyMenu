@@ -7,7 +7,7 @@
  *      `cyl.animation.didStart` / `didPause` / `didResume` / `didStop`；`cylPausesAnimationsWhileUserScrolls(true)` 在任意被观察的滚动源
  *      （`LifecycleCenter`：页面通过 `controller.onPageScroll`）滚动时暂停所有正在播放的条目，滚动结束后恢复。
  */
-const { AnimationEvents, LifecycleCenter } = require('../cyl-dealloc-block-executor/index')
+const { AnimationEvents, LifecycleCenter } = require('../cyl-utils/index')
 
 const cylPlayingItems = new Set()
 let cylStopScrollObserver = null
@@ -41,7 +41,7 @@ function cylPauseAnimation(item) {
   if (!cylPlayingItems.has(item) || item.cylPausedByUser) return false
   item.cylPausedByUser = true
   const engine = item.selectComponent ? item.selectComponent('#cyl-animated-item-engine') : null
-  if (engine && typeof engine.cyl_pause === 'function') engine.cyl_pause()
+  if (engine && typeof engine.cylPause === 'function') engine.cylPause()
   cylPostAnimationEvent(item, AnimationEvents.didPause)
   return true
 }
@@ -50,7 +50,7 @@ function cylResumeAnimation(item) {
   if (!item.cylPausedByUser) return false
   item.cylPausedByUser = false
   const engine = item.selectComponent ? item.selectComponent('#cyl-animated-item-engine') : null
-  if (engine && typeof engine.cyl_play === 'function') engine.cyl_play()
+  if (engine && typeof engine.cylPlay === 'function') engine.cylPlay()
   cylPostAnimationEvent(item, AnimationEvents.didResume)
   return true
 }

@@ -69,6 +69,16 @@ tags: [issues, ui, cocoapods, progress]
   (2) `CYLUtils` needs `CYLDeallocBlockExecutor ~> 1.4` (not on the trunk): `TagCollectionView/Podfile` names its source like the
   other Podfiles, and `scripts/pod-lint.sh lib` includes the CYLBadge, CYLUtils and CYLDeallocBlockExecutor podspecs.
   Not run locally (no Xcode); the next CI run is the check.
+- **Re-pin CYLTabBarController (2026-11-28, owner: "repin cyltab 最新commit"):** newest commit over every branch is `c5a18088`
+  (`feat/harmony-animated-item-engines`, was `ed39c20b`; `edeb11e6` on the other platforms). Moved: the four Podfiles and
+  `Package.swift`, the React Native and Flutter examples (Podfiles, `fetch-cyltabbar.sh`, `pubspec.yaml`), Android
+  `gradle.properties`, the mini program (`fetch-cyltabbar.js`, vendored copies; `cyl-badge` and `cyl-utils` are new in the
+  vendored list because `cyl-animated-item` requires them), `.gitignore`. `scripts/cyl-tabbar-latest-commit.sh --check` passes.
+  Mini program: upstream renamed the component methods to `cylFoo` (370d5eb5) but its engine packages still spell them
+  `cyl_foo`, so the example's `cyl-tag-animation-view` follows the new contract and calls either spelling of the engine;
+  `npm test` 171 / 171. **Not moved: HarmonyOS** `harmony/cylanimateditem` (vendored at `3074c51d`; the upstream folder changed by
+  about 6,700 lines, so it is re-vendored and built by the Windows session, as at the previous pin). TODO Windows: re-vendor,
+  build, update `VENDORED.md`; Mac: `pod install` and the iOS build; Android, Flutter, RN: build.
 - **Score: 65 / 100 (pass 60).** Missing 35: no platform compiled or run except the mini program (Linux session, no Swift,
   Android SDK or DevEco), no before/after screenshots (the bug screenshot named in the prompt was not attached to the
   conversation), Flutter and RN have no test of their own.

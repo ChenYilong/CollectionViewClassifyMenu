@@ -15,7 +15,7 @@
  * file the library registered, "Lottie/tab_home_animate.json", "Rive/house.riv#stateMachine=…", found with the library's
  * animations.resolve), `loop`, `speed`, `autoplay`, `resting-frame` ('last' while the tag is selected, else 'first' or
  * the tag's restingProgress after "#"); `ready` once the file is drawn, `error` when it cannot be (cyl-animated-item then
- * shows the tag's image); `cyl_playFromStart()` and its siblings, used by the library's playItems() / playAll() (a tapped
+ * shows the tag's image); `cylPlayFromStart()` and its siblings, used by the library's playItems() / playAll() (a tapped
  * tag, Play all) with the playback controls of docs/example-demo-rules.md.
  */
 const animations = require('../../utils/tag-animations.js');
@@ -37,6 +37,15 @@ function rivePath(src, parameters) {
 }
 
 const ENGINES = ['lottie', 'rive', 'pag', 'svga'];
+
+/**
+ * An engine component's method as a bound function: `cyl<Name>` (the engine contract of cyl-animated-item since
+ * CYLTabBarController 370d5eb5), else `cyl_<legacy>` (the engine packages of the same commit still spell it that way).
+ */
+function engineMethod(player, name, legacy) {
+  const method = player[`cyl${name}`] || player[`cyl_${legacy}`];
+  return typeof method === 'function' ? method.bind(player) : null;
+}
 
 Component({
   properties: {
@@ -99,7 +108,7 @@ Component({
       this.loaded = true;
       this.rest();
       this.triggerEvent('ready', {});
-      if (this.data.autoplay || this.pendingPlay) this.cyl_playFromStart();
+      if (this.data.autoplay || this.pendingPlay) this.cylPlayFromStart();
     },
 
     player() {
@@ -114,17 +123,19 @@ Component({
       const resting = Number(this.parameters && this.parameters.restingProgress) || 0;
       const progress = this.data.restingFrame === 'last' ? 1 : Math.min(1, Math.max(0, resting));
       if (this.data.engine === 'lottie') {
-        const animation = player.cyl_animation && player.cyl_animation();
-        if (!animation) return;
-        const last = Math.max(0, (animation.totalFrames || 1) - 1);
-        player.cyl_goToAndStop(Math.round(last * progress), true);
-      } else if (typeof player.cyl_setProgress === 'function') {
-        player.cyl_setProgress(progress);
+        const animation = engineMethod(player, 'LottieAnimation', 'animation');
+        const frames = animation && animation();
+        if (!frames) return;
+        const last = Math.max(0, (frames.totalFrames || 1) - 1);
+        engineMethod(player, 'GoToAndStop', 'goToAndStop')(Math.round(last * progress), true);
+      } else {
+        const setProgress = engineMethod(player, 'SetProgress', 'setProgress');
+        if (setProgress) setProgress(progress);
       }
     },
 
     /** Plays from progress 0 (Play all, or a tapped tag); with `loop`, until it is turned off. */
-    cyl_playFromStart() {
+    cylPlayFromStart() {
       if (!this.loaded) {
         // The file is still loading (or the tag was just created): play when it is ready.
         this.pendingPlay = true;
@@ -132,46 +143,49 @@ Component({
       }
       this.pendingPlay = false;
       const player = this.player();
-      if (player && typeof player.cyl_playFromStart === 'function') player.cyl_playFromStart();
+      const play = player && engineMethod(player, 'PlayFromStart', 'playFromStart');
+      if (play) play();
     },
 
-    cyl_play() {
-      this.cyl_playFromStart();
+    cylPlay() {
+      this.cylPlayFromStart();
     },
 
-    cyl_pause() {
-      this.forward('cyl_pause');
+    cylPause() {
+      this.forward('Pause', 'pause');
     },
 
-    cyl_stop() {
+    cylStop() {
       this.pendingPlay = false;
       this.rest();
     },
 
-    cyl_goToAndStop(...args) {
-      this.forward('cyl_goToAndStop', args);
+    cylGoToAndStop(...args) {
+      this.forward('GoToAndStop', 'goToAndStop', args);
     },
 
-    cyl_goToAndPlay(...args) {
-      this.forward('cyl_goToAndPlay', args);
+    cylGoToAndPlay(...args) {
+      this.forward('GoToAndPlay', 'goToAndPlay', args);
     },
 
-    cyl_setProgress(...args) {
-      this.forward('cyl_setProgress', args);
+    cylSetProgress(...args) {
+      this.forward('SetProgress', 'setProgress', args);
     },
 
-    cyl_setSpeed(...args) {
-      this.forward('cyl_setSpeed', args);
+    cylSetSpeed(...args) {
+      this.forward('SetSpeed', 'setSpeed', args);
     },
 
-    cyl_animation() {
+    cylLottieAnimation() {
       const player = this.player();
-      return player && typeof player.cyl_animation === 'function' ? player.cyl_animation() : null;
+      const animation = player && engineMethod(player, 'LottieAnimation', 'animation');
+      return animation ? animation() : null;
     },
 
-    forward(method, args = []) {
+    forward(method, legacy, args = []) {
       const player = this.loaded ? this.player() : null;
-      if (player && typeof player[method] === 'function') player[method](...args);
+      const call = player && engineMethod(player, method, legacy);
+      if (call) call(...args);
     },
   },
 });

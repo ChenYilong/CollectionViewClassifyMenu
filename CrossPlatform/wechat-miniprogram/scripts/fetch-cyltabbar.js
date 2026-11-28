@@ -23,7 +23,7 @@ const fs = require('fs');
 const path = require('path');
 
 // CYL_TAB_BAR: the same commit as the React Native example (fetch-cyltabbar.sh, example/ios/Podfile).
-const COMMIT = 'edeb11e63ae4ecd37433642a118dc43ffb11387d';
+const COMMIT = 'c5a18088b3e905cc9d8a4c59d43196bc0cfba618';
 const REPOSITORY = 'https://github.com/ChenYilong/CYLTabBarController.git';
 const ROOT = path.resolve(__dirname, '..');
 const CHECKOUT = path.join(ROOT, '.deps', 'CYLTabBarController');
@@ -61,7 +61,9 @@ const PAG_HINT = 'run python3 scripts/fetch-animation-resources.py PAGResources 
 const LIBRARY = path.join(ROOT, 'packages', 'cyl-tag-list-miniprogram', 'miniprogram_dist');
 const VENDORED_SOURCE = 'CrossPlatform/wechat-miniprogram-cyltabbar';
 // cyl-dealloc-block-executor: required by cyl-animated-item since CYLTabBarController edeb11e6 (the moment bus).
-const VENDORED = ['cyl-animated-item', 'cyl-animation-placeholder', 'cyl-dealloc-block-executor'];
+// cyl-badge and cyl-utils (which needs cyl-dealloc-block-executor): required by cyl-animated-item since CYLTabBarController
+// bc4b94c1 (the item badge).
+const VENDORED = ['cyl-animated-item', 'cyl-animation-placeholder', 'cyl-dealloc-block-executor', 'cyl-badge', 'cyl-utils'];
 const VENDORED_TEST = {
   from: 'test/cyl_animated_item.test.js',
   to: path.join(ROOT, 'test', 'cyl-animated-item.upstream.test.js'),

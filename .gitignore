@@ -141,6 +141,9 @@ __pycache__/
 # hvigor writes BuildProfile.ets into each HarmonyOS module on every build (classifymenu's is tracked from before).
 harmony/**/BuildProfile.ets
 
-# From CYLTabBarController's .gitignore (c4a1f8fd), with this project's name
+# From CYLTabBarController's .gitignore (c5a18088), with this project's name
 CollectionViewClassifyMenu.xcodeproj/project.xcworkspace/xcuserdata/chenyilong.xcuserdatad/UserInterfaceState.xcuserstate
 CollectionViewClassifyMenu.xcodeproj/xcuserdata/chenyilong.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
+
+# Session memory notes of a handover stay on the local machine and are never pushed (as CYLTabBarController).
+docs/todo/**/memory/
