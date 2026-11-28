@@ -3,8 +3,7 @@
 //  CollectionViewClassifyMenu
 //
 //  Draws a CYLMenuFoldControl: a CYLTagButton (the tag view) without a border or background, with the title and the
-//  chevron after it. Expanded, it shows what the control shows expanded (only the icon, turned 180°, or the collapse
-//  title). CYLTagListView puts it below the section, in its header or among the tags.
+//  chevron after it. Expanded, it shows what the control shows expanded (the collapse title, the icon turned 180°, or only the icon). CYLTagListView puts it below the section, in its header or among the tags.
 //  Translated from Objective-C to Swift (2026, docs/Swift-Migration.md).
 //
 
@@ -21,6 +20,29 @@ open class CYLTagFoldButton: CYLTagButton {
     private static let minimumTouchWidth: CGFloat = 44
     private static let imageTitleSpacing: CGFloat = 3
     private static let rotationDuration: TimeInterval = 0.25
+
+    /**
+     * The largest content size category an uncapped control's title scales to: at the accessibility sizes the "More" control
+     * stays a control, not a banner.
+     */
+    public static let maximumUncappedContentSizeCategory = UIContentSizeCategory.accessibilityMedium
+
+    /**
+     * The footnote text style at the default size category: the style scales it itself (`adjustsFontForContentSizeCategory`),
+     * so it is not asked for the already scaled size (that scaled it twice).
+     */
+    private static let defaultFont = UIFont.preferredFont(forTextStyle: .footnote,
+                                                          compatibleWith: UITraitCollection(preferredContentSizeCategory: .large))
+
+    /**
+     * The largest content size category a size-capped control (`CYLMenuFoldControl.isSizeCapped`) scales its font to.
+     */
+    public static let maximumContentSizeCategory = UIContentSizeCategory.large
+
+    /**
+     * The widest a size-capped header control gets, as a fraction of the header's width.
+     */
+    public static let maximumHeaderWidthFraction: CGFloat = 0.4
 
     /**
      * The control last applied.
@@ -57,7 +79,28 @@ open class CYLTagFoldButton: CYLTagButton {
      * animation when `animated` (not with Reduce Motion).
      */
     open func applyFoldControl(_ foldControl: CYLMenuFoldControl, color: UIColor?, expanded: Bool, animated: Bool) {
-        apply(foldControl, style: Self.style(for: foldControl, color: color), expanded: expanded, animated: animated)
+        appliedColor = color
+        appliedInline = false
+        apply(foldControl, style: Self.style(for: foldControl, color: color, traitCollection: traitCollection),
+              expanded: expanded, animated: animated)
+    }
+
+    /**
+     * The control's font: its own, else the footnote text style scaled with Dynamic Type, for a size-capped control
+     * no larger than the footnote size of `maximumContentSizeCategory`.
+     */
+    public static func font(for foldControl: CYLMenuFoldControl, traitCollection: UITraitCollection?) -> UIFont {
+        if let font = foldControl.font {
+            return font
+        }
+        let scaled = traitCollection.map { UIFont.preferredFont(forTextStyle: .footnote, compatibleWith: $0) }
+            ?? UIFont.preferredFont(forTextStyle: .footnote)
+        guard foldControl.isSizeCapped else {
+            return scaled
+        }
+        let capTraits = UITraitCollection(preferredContentSizeCategory: maximumContentSizeCategory)
+        let cap = UIFont.preferredFont(forTextStyle: .footnote, compatibleWith: capTraits).pointSize
+        return scaled.pointSize > cap ? scaled.withSize(cap) : scaled
     }
 
     /**
@@ -68,6 +111,7 @@ open class CYLTagFoldButton: CYLTagButton {
      */
     open func applyInlineFoldControl(_ foldControl: CYLMenuFoldControl, itemStyle: CYLMenuStyle, expanded: Bool,
                                      animated: Bool) {
+        appliedInline = true
         apply(foldControl, style: Self.inlineStyle(for: foldControl, itemStyle: itemStyle), expanded: expanded,
               animated: animated)
     }
@@ -90,7 +134,7 @@ open class CYLTagFoldButton: CYLTagButton {
      */
     public static func size(for foldControl: CYLMenuFoldControl, expanded: Bool,
                             traitCollection: UITraitCollection?) -> CGSize {
-        let borderless = style(for: foldControl, color: nil)
+        let borderless = style(for: foldControl, color: nil, traitCollection: traitCollection)
         let icon = foldControl.showsImage(whenExpanded: expanded) ? foldControl.image : nil
         let contentWidth = width(forTitle: foldControl.title(whenExpanded: expanded), image: icon, style: borderless,
                                  traitCollection: traitCollection)
@@ -105,9 +149,11 @@ open class CYLTagFoldButton: CYLTagButton {
     /**
      * A borderless tag: no background, the title then the icon, in `color`.
      */
-    private static func style(for control: CYLMenuFoldControl, color: UIColor?) -> CYLMenuStyle {
+    private static func style(for control: CYLMenuFoldControl, color: UIColor?,
+                              traitCollection: UITraitCollection?) -> CYLMenuStyle {
         let style = CYLMenuStyle()
-        let font = control.font ?? UIFont.preferredFont(forTextStyle: .footnote)
+        let font = control.isSizeCapped ? font(for: control, traitCollection: traitCollection)
+            : control.font ?? defaultFont
         let tint = control.color ?? color ?? .secondaryLabel
         for state in allStates {
             let appearance = style.appearance(for: state)
@@ -123,7 +169,11 @@ open class CYLTagFoldButton: CYLTagButton {
         style.imageSize = CGSize(width: iconSide, height: iconSide)
         style.imageTitleSpacing = imageTitleSpacing
         style.layoutCentered = true
-        style.adjustsFontForContentSizeCategory = control.font == nil
+        // A capped font is already scaled and capped (the button applies it again when the size category changes).
+        style.adjustsFontForContentSizeCategory = control.font == nil && !control.isSizeCapped
+        if !control.isSizeCapped {
+            style.maximumContentSizeCategory = maximumUncappedContentSizeCategory
+        }
         style.itemHeight = minimumHeight
         return style
     }
@@ -135,16 +185,15 @@ open class CYLTagFoldButton: CYLTagButton {
         let style = itemStyle.cylCopy()
         let normal = itemStyle.normalAppearance
         // The same color as the other fold controls (CYLMenuStyle.foldControlColor), lighter than the tags' titles.
-        let tint = control.color ?? itemStyle.foldControlColor
+        let tint = control.color ?? itemStyle.resolvedFoldControlColor(inHeader: false)
         for state in [UIControl.State.selected, .disabled] {
             let appearance = style.appearance(for: state)
-            appearance.backgroundColor = normal.backgroundColor
-            appearance.borderColor = normal.borderColor
-            appearance.borderWidth = normal.borderWidth
+            appearance.backgroundColor = normal.explicitBackgroundColor
+            appearance.copyBorder(from: normal)
             appearance.cornerRadius = normal.cornerRadius
             appearance.margin = normal.margin
             appearance.font = normal.font
-            appearance.textColor = normal.textColor
+            appearance.textColor = normal.explicitTextColor
         }
         for state in allStates {
             style.setIconColor(tint, for: state)
@@ -160,6 +209,19 @@ open class CYLTagFoldButton: CYLTagButton {
         style.layoutCentered = true
         style.numberOfItemsPerRow = 0
         return style
+    }
+
+    private var appliedColor: UIColor?
+    private var appliedInline = false
+
+    open override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if let foldControl, foldControl.isSizeCapped, foldControl.font == nil,
+           previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory,
+           !appliedInline {
+            // The capped font follows Dynamic Type up to the cap (not for the inline control, which is a tag).
+            applyFoldControl(foldControl, color: appliedColor, expanded: isExpanded, animated: false)
+        }
     }
 
     private func apply(_ foldControl: CYLMenuFoldControl, style: CYLMenuStyle, expanded: Bool, animated: Bool) {

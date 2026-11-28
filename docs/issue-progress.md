@@ -35,6 +35,17 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-29, `feat/harmony`, macOS session): bring the iOS tag list style API from `44f226c4`
+
+- **Prompt (verbatim):** "yes, and fix SwiftPM" (answering: "Should I add the missing iOS style settings for the tag list (`TagList`) to `feat/harmony` in your `CollectionViewClassifyMenu` repo, then point both demos here to that commit?")
+- **Context:** CYLTabBarController's root demo and `Example-Swift-04` use `CYLMenuStyleKey.titleMaxLines`, `backgroundStyle`, `sectionStyle` and `sectionBackgroundStyle`, which `feat/harmony` lacks. The SwiftPM half of the prompt belongs to CYLTabBarController.
+- **Requirement:** port the iOS files only, as one ordinary commit (3-way merge per file, base `bb15d93a`, theirs `44f226c4`, no branch merge); keep `feat/harmony`'s engine badge.
+- **任务（中文）：** 只移植 `44f226c4` 的 iOS 文件（逐文件三方合并，不合并分支），保留 `feat/harmony` 的引擎角标；让 CYLTabBarController 的两个 Demo 可以编译。
+- **Score (pass 60):** the library builds 35; the iOS unit tests pass 35; both CYLTabBarController demos build 25; docs and checks 5.
+- **Done (2026-11-29, macOS 27.3, Xcode 27.2, iOS 27.2 simulator):** 3-way merge of the iOS core files (5 conflict hunks; `feat/harmony`'s engine badge kept). Test suites `menu`, `example` (121 + 11), `swift` (23) and `tag` (6) pass with 0 failures; the pods stay at their pins. **Score 75 / 100** (library 35, tests 35, docs and checks 5; the CYLTabBarController demos are checked there next).
+- **Behavior changes that come with the style API** (as on the `44f226c4` line): `CYLTagCornerRadiusSquare` is removed (0 is square, 1000 is a capsule); the default section style is a card (`sectionStyle = .insetGrouped`; `.plain` for the flat list); default tag and text colors follow light and dark mode; a text badge image wider than its diameter is a capsule. Six Example demo pages, their two strings and seven tests follow.
+- **TODO:** Android, HarmonyOS, the mini program, Flutter and React Native are not ported; their copy of the corner radius row string still says 0 is a capsule (the old key stays in the iOS tables for them). The about 20 test classes of the `44f226c4` line that cover the new style API are not ported.
+
 ### TODO (2026-11-28, `claude/bold-planck-flioee`, Linux session): tag list rows as tall as their tallest tag, `maxItemHeight`
 
 - **Prompt (verbatim):** "切换最新提交所在分支阅读agent文档/ 修改taglist 布局逻辑，所有修改应在core中实现自动适应以下布局，bug截图已经附上，强制调整自适应每一行的最高高度为其中最大的一个tag的高度。此场景适应需求场景如下：当用户设置允许换行场景，以及用户自定义tag高度。比如icon高度自定义导致tag高度变高后，应调整所在行所有其他元素对齐，适应最高元素的高度。同时暴露接口允许用户设置taglist所有tag最大高度，默认为MAX 不限高度。"

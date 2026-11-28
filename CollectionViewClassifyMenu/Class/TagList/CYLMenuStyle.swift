@@ -12,6 +12,16 @@
 //
 
 import UIKit
+// CYLAnimatedItemView.isLiquidGlassActive() (the rule for Liquid Glass): the module choice of CYLTagButton.swift, since Swift
+// Package Manager does not see another file's imports.
+#if canImport(CYLAnimatedItemViews)
+import CYLAnimatedItem
+import CYLAnimatedItemViews
+#elseif canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#else
+import CYLTabBarController
+#endif
 
 /**
  * Where a tag's icon goes relative to its title.
@@ -48,6 +58,22 @@ import UIKit
      * "苹果官方社区… [热]" whose title is truncated so the icon after it stays visible.
      */
     case leading
+}
+
+/**
+ * What a tag's background is made of.
+ */
+@objc public enum CYLTagBackgroundStyle: Int {
+    /**
+     * The solid color of each state's appearance (the default).
+     */
+    case flat = 0
+    /**
+     * A Liquid Glass material behind the content, tinted with the state's EXPLICIT `backgroundColor` (an unset one is ignored: frosted default), drawn only where the system
+     * draws Liquid Glass (`CYLAnimatedItemView.isLiquidGlassActive()`: iOS 26 and later, the rule of CYLTabBarController);
+     * elsewhere the style is ignored and the tag stays flat.
+     */
+    case liquidGlass
 }
 
 /**
@@ -290,10 +316,28 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var imageFillsTagHeight = false
 
     /**
-     * True: a title too wide for its row wraps onto more lines and the tag grows taller, instead of being truncated
-     * (AndroidTagView's tag_text_wrap). The list measures the taller tag at the width it gets. Default false.
+     * The most lines a title may take: a title too wide for its tag wraps onto more lines, up to this number, and the tag
+     * grows taller; beyond it the title is truncated. Default `CYLTagTitleMaxLines.single` (1, one line, truncated).
+     * `CYLTagTitleMaxLines.unlimited` shows every line. The list measures the taller tag at the width it gets. The number
+     * is the app's choice; a value below 1 is 1.
      */
-    open var titleWraps = false
+    open var titleMaxLines = CYLTagTitleMaxLines.single {
+        didSet {
+            if titleMaxLines < CYLTagTitleMaxLines.single {
+                titleMaxLines = CYLTagTitleMaxLines.single
+            }
+        }
+    }
+
+    /**
+     * True: a title too wide for its row wraps onto as many lines as it needs and the tag grows taller, instead of being
+     * truncated (AndroidTagView's tag_text_wrap): the same as `titleMaxLines` = `CYLTagTitleMaxLines.unlimited`; false:
+     * one line. The list measures the taller tag at the width it gets. Default false.
+     */
+    open var titleWraps: Bool {
+        get { titleMaxLines != CYLTagTitleMaxLines.single }
+        set { titleMaxLines = newValue ? CYLTagTitleMaxLines.unlimited : CYLTagTitleMaxLines.single }
+    }
 
     /**
      * A shadow under each tag, as Android's elevation in points (AndroidTagView's tag_elevation): offset down by half of
@@ -323,6 +367,46 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var contentAlignment: CYLTagContentAlignment = .center
 
     /**
+     * The tag background: `.flat` (the default) is the solid color of each state's appearance; `.liquidGlass` draws a
+     * Liquid Glass material behind the content, tinted with the state's explicit `backgroundColor` (an unset one is ignored, so the
+     * backdrop shows through the item's low-alpha default tint `CYLAnimatedItemView.defaultGlassTint`) and clipped to the corner radius. Where the system draws no Liquid Glass the style is ignored (`resolvedBackgroundStyle`).
+     */
+    open var backgroundStyle: CYLTagBackgroundStyle = .flat
+
+    /**
+     * The tint alpha of the default Liquid Glass in light mode, 0.10: forwards to `CYLAnimatedItemView.defaultGlassTintAlphaLight`, which owns the default
+     * (a tag or a board with no background color hands the item nil).
+     */
+    @available(*, deprecated, renamed: "CYLAnimatedItemView.defaultGlassTintAlphaLight")
+    public static let defaultGlassTintAlphaLight: CGFloat = CYLAnimatedItemView.defaultGlassTintAlphaLight
+    /**
+     * The tint alpha of the default Liquid Glass in dark mode, 0.04: forwards to `CYLAnimatedItemView.defaultGlassTintAlphaDark`.
+     */
+    @available(*, deprecated, renamed: "CYLAnimatedItemView.defaultGlassTintAlphaDark")
+    public static let defaultGlassTintAlphaDark: CGFloat = CYLAnimatedItemView.defaultGlassTintAlphaDark
+
+    /**
+     * The tint of the default Liquid Glass: forwards to `CYLAnimatedItemView.defaultGlassTint`. A tag or board with no explicit background hands the item
+     * nil instead; an explicit color is never replaced by it.
+     */
+    @available(*, deprecated, renamed: "CYLAnimatedItemView.defaultGlassTint")
+    public static var defaultGlassTint: UIColor { CYLAnimatedItemView.defaultGlassTint }
+
+    /**
+     * The background style a tag really draws: `backgroundStyle`, or `.flat` where the system draws no Liquid Glass
+     * (`CYLAnimatedItemView.isLiquidGlassActive()`, the rule of CYLTabBarController).
+     */
+    public var resolvedBackgroundStyle: CYLTagBackgroundStyle {
+        backgroundStyle == .liquidGlass && CYLAnimatedItemView.isLiquidGlassActive() ? .liquidGlass : .flat
+    }
+
+    /**
+     * The smallest size of a tag: a tag narrower or shorter than it grows to it, its content staying where
+     * `contentAlignment` puts it. `.zero` (the default) keeps the tag as large as its content and `itemHeight` make it.
+     */
+    open var minimumTagSize: CGSize = .zero
+
+    /**
      * Size of animated icons (`menuAnimationURLForItem(at:)`). `.zero` (the default) uses `imageSize`.
      */
     open var animationSize: CGSize = .zero
@@ -337,6 +421,13 @@ open class CYLMenuStyle: NSObject, NSCopying {
      * Scale the appearance fonts for Dynamic Type (capped at 2×). Defaults to true.
      */
     open var adjustsFontForContentSizeCategory = true
+
+    /**
+     * The largest content size category the fonts of this style scale to (the title never grows past what the system draws at that
+     * category); `nil` (the default) leaves only `CYLTagMetrics.maximumFontScale`. The fold control sets
+     * `CYLTagFoldButton.maximumContentSizeCategory`.
+     */
+    var maximumContentSizeCategory: UIContentSizeCategory?
 
     /**
      * Minimum tag height; grows with the font for large text sizes. 30 by default.
@@ -368,26 +459,184 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var sectionInsets = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16)
 
     /**
-     * The list's background, white by default.
+     * The list's background: `UIColor.systemBackground` by default (white in light mode, black in dark mode). Under
+     * `CYLSectionStyle.insetGrouped` a list whose background the app never set shows the grouped background instead
+     * (`resolvedBackgroundColor`). A color the app sets, a clear one included, wins in both modes.
      */
-    open var backgroundColor = UIColor.white
+    open var backgroundColor = UIColor.systemBackground {
+        didSet {
+            backgroundColorWasSet = true
+        }
+    }
+
+    /**
+     * Whether the app ever assigned `backgroundColor` (the presets' own assignments count).
+     */
+    private(set) var backgroundColorWasSet = false
+
+    // MARK: Section card, header band and header divider (docs/tag-section-style.md)
+
+    /**
+     * `.insetGrouped` (the default) puts each section's tags inside a rounded card, UITableView's inset grouped look, with the
+     * header above it; `.plain` puts the tags on the list's background. The presets that are a complete look of their own
+     * (`tagCloud()`, `tagContainer()`, `gridStyle(itemsPerRow:)`, `wordPicker()` and the tags of the classify menu and the
+     * filter) are `.plain`; in a configuration: `"sectionStyle": "plain"`.
+     */
+    open var sectionStyle: CYLSectionStyle = .insetGrouped
+
+    /**
+     * The card's color; `nil` (the default) resolves to `UIColor.secondarySystemGroupedBackground` (white; #1C1C1E in dark mode).
+     */
+    open var sectionBackgroundColor: UIColor?
+
+    /**
+     * The card's background: `.flat` (the default) is the solid `sectionBackgroundColor` (or the system card color); `.liquidGlass`
+     * is the library's Liquid Glass with the card's corner radius, tinted with `sectionBackgroundColor` when it is set. Where the system
+     * draws no glass the card is flat (`resolvedSectionBackgroundStyle`). Independent of the tags' `backgroundStyle`.
+     */
+    open var sectionBackgroundStyle: CYLTagBackgroundStyle = .flat
+
+    /**
+     * The card background really drawn: `sectionBackgroundStyle`, or `.flat` where the system draws no Liquid Glass.
+     */
+    public var resolvedSectionBackgroundStyle: CYLTagBackgroundStyle {
+        sectionBackgroundStyle == .liquidGlass && CYLAnimatedItemView.isLiquidGlassActive() ? .liquidGlass : .flat
+    }
+
+    /**
+     * The card's corner radius, 10 by default (`CYLSectionStyleMetrics.cardCornerRadius`).
+     */
+    open var sectionCornerRadius: CGFloat = CYLSectionStyleMetrics.cardCornerRadius
+
+    /**
+     * The padding inside the card around the tags (`.insetGrouped`), 12 on every side by default. In a right-to-left layout
+     * `left` is the leading side, as in `sectionInsets`.
+     */
+    open var sectionContentInsets = UIEdgeInsets(top: CYLSectionStyleMetrics.cardPadding, left: CYLSectionStyleMetrics.cardPadding,
+                                                 bottom: CYLSectionStyleMetrics.cardPadding, right: CYLSectionStyleMetrics.cardPadding)
+
+    /**
+     * How far the board (the card) extends beyond the tag column on the left and on the right: one value for both sides. The tags
+     * and the header title always share the tag column, so the board never changes the tag width. `0`: the board's edges coincide
+     * with the tags' edges. `nil` (the default): `sectionContentInsets` leading / trailing (12), the board spans the section column as
+     * before. A set value (0 included) overrides those two parts of `sectionContentInsets`; top and bottom still come from it.
+     * Configuration key: `sectionBoardInset`.
+     */
+    open var sectionBoardInset: CGFloat?
+
+    /**
+     * The header band's color; `nil` (the default) draws no band. `CYLSectionStyleColors.headerBand` (#EFEFF4, with a dark variant)
+     * is the usual one.
+     */
+    open var headerBackgroundColor: UIColor?
+
+    /**
+     * The header band's corner radius, 0 by default.
+     */
+    open var headerCornerRadius: CGFloat = 0
+
+    /**
+     * A plain header's title and fold control inset from the band's edges (`left` and `right` only), 12 by default; used only
+     * where a band is shown.
+     */
+    open var headerContentInsets = UIEdgeInsets(top: 0, left: CYLSectionStyleMetrics.headerBandPadding, bottom: 0,
+                                                right: CYLSectionStyleMetrics.headerBandPadding)
+
+    /**
+     * `.none` (the default) or `.line`: a line at the bottom of a section header, inside the header's height (it adds none).
+     */
+    open var headerSeparatorStyle: CYLHeaderSeparatorStyle = .none
+
+    /**
+     * The divider's color; `nil` (the default) resolves to `UIColor.separator` (light and dark).
+     */
+    open var headerSeparatorColor: UIColor?
+
+    /**
+     * The divider's thickness, 0.5 points by default (`CYLSectionStyleMetrics.separatorThickness`).
+     */
+    open var headerSeparatorThickness: CGFloat = CYLSectionStyleMetrics.separatorThickness
+
+    /**
+     * The divider's `left` and `right` insets from the section column's edges, 0 by default: the divider has the same edges as the
+     * card and the header band (the column's), never the title's x.
+     */
+    open var headerSeparatorInsets = UIEdgeInsets.zero
+
+    /**
+     * Whether the sections sit in cards (`sectionStyle` is `.insetGrouped`).
+     */
+    public var isInsetGrouped: Bool {
+        sectionStyle == .insetGrouped
+    }
+
+    /**
+     * The list background as drawn: the grouped background where the style is `.insetGrouped` and the app never set `backgroundColor`.
+     */
+    public var resolvedBackgroundColor: UIColor {
+        isInsetGrouped && !backgroundColorWasSet ? CYLSectionStyleColors.groupedBackground : backgroundColor
+    }
+
+    /**
+     * The card's color as drawn.
+     */
+    public var resolvedSectionBackgroundColor: UIColor {
+        sectionBackgroundColor ?? CYLSectionStyleColors.card
+    }
+
+    /**
+     * The divider's color as drawn.
+     */
+    public var resolvedHeaderSeparatorColor: UIColor {
+        headerSeparatorColor ?? CYLSectionStyleColors.separator
+    }
 
     // MARK: Section headers
 
     /**
      * Minimum header height, 36 by default; it grows with the font.
      */
-    open var headerHeight: CGFloat = 36
+    open var headerHeight: CGFloat = 36 {
+        didSet {
+            headerHeightWasSet = true
+        }
+    }
 
     /**
-     * Header font, the system font of 14 points by default (scaled for Dynamic Type).
+     * Whether the app ever assigned `headerHeight`. Under `.insetGrouped` with no header divider an unset height is not a minimum:
+     * the header is sized to its text.
      */
-    open var headerFont = UIFont.systemFont(ofSize: 14)
+    private(set) var headerHeightWasSet = false
 
     /**
-     * Header title color, gray by default.
+     * The most lines a section header's title may take: a title too wide for the room left of the fold / More / clear controls
+     * wraps onto more lines, up to this number, and the header grows taller (the title's height plus 12 pt, never below
+     * `headerHeight`); beyond it the title is truncated. Default `CYLHeaderTitleMaxLines.single` (1: the header frames are
+     * unchanged). `CYLHeaderTitleMaxLines.unlimited` shows every line. A value below 1 is 1.
      */
-    open var headerTextColor = UIColor.gray
+    open var headerMaxLines = CYLHeaderTitleMaxLines.single {
+        didSet {
+            if headerMaxLines < CYLHeaderTitleMaxLines.single {
+                headerMaxLines = CYLHeaderTitleMaxLines.single
+            }
+        }
+    }
+
+    /**
+     * Header font, the system table header look by default: the system font of 17 points, semibold (scaled for Dynamic Type).
+     */
+    open var headerFont = UIFont.systemFont(ofSize: 17, weight: .semibold)
+
+    /**
+     * Header title color: the dynamic label color by default (`UIColor.label`, resolved per trait collection, so dark mode works), the one
+     * tint of the list's own texts and icons together with `foldControlColor`, `moreButtonColor` and `clearButtonColor`.
+     */
+    open var headerTextColor = UIColor.label {
+        didSet {
+            headerTextColorWasSet = true
+        }
+    }
+    private(set) var headerTextColorWasSet = false
 
     /**
      * Space before the header's title and after its controls, 16 by default.
@@ -397,9 +646,14 @@ open class CYLMenuStyle: NSObject, NSCopying {
     // MARK: Fold controls
 
     /**
-     * The fold controls' color, gray by default (a control's own color wins).
+     * The fold controls' color: the dynamic label color by default (`UIColor.label`; a control's own color wins), visible in dark mode and on glass.
      */
-    open var foldControlColor = UIColor.gray
+    open var foldControlColor = UIColor.label {
+        didSet {
+            foldControlColorWasSet = true
+        }
+    }
+    private(set) var foldControlColorWasSet = false
 
     /**
      * Defaults to the localized "More" from CYLClassifyMenuResources.bundle.
@@ -426,9 +680,72 @@ open class CYLMenuStyle: NSObject, NSCopying {
     open var moreButtonImage: UIImage?
 
     /**
-     * The color of the More button. Defaults to the secondary label color.
+     * The color of the More button: the dynamic label color by default (`UIColor.label`).
      */
-    open var moreButtonColor = UIColor.secondaryLabel
+    open var moreButtonColor = UIColor.label {
+        didSet {
+            moreButtonColorWasSet = true
+        }
+    }
+    private(set) var moreButtonColorWasSet = false
+
+    // MARK: The tint of the built-in views
+
+    /**
+     * The one color of every built-in view that is not a tag: the header title, the section icon, the fold and More controls (text,
+     * icon, arrow). `nil` (the default) resolves against what is behind them (`resolvedTintColor(onHeaderBand:)`). A color set here wins in
+     * both modes; a `headerTextColor`, `foldControlColor`, `moreButtonColor` or `clearButtonColor` set on its own wins over it.
+     */
+    open var tintColor: UIColor?
+
+    /**
+     * The default tint of the built-in views, a dynamic color resolved with the traits of the view that shows it: `tintColor` when set;
+     * else black or white by the luminance of the opaque background behind the view (`CYLTintContrast.luminanceThreshold`): the header
+     * band's color when `onHeaderBand` and a band is shown, else the list's `resolvedBackgroundColor`; else (a transparent list) the
+     * system mode, `UIColor.label`.
+     */
+    public func resolvedTintColor(onHeaderBand: Bool) -> UIColor {
+        if let tintColor {
+            return tintColor
+        }
+        let candidates = [onHeaderBand ? headerBackgroundColor : nil, resolvedBackgroundColor].compactMap { $0 }
+        return UIColor { traits in
+            for candidate in candidates {
+                if let tint = CYLTintContrast.tint(on: candidate, traits: traits) {
+                    return tint
+                }
+            }
+            return UIColor.label.resolvedColor(with: traits)
+        }
+    }
+
+    /**
+     * The header title's (and section icon's) color as drawn.
+     */
+    public var resolvedHeaderTextColor: UIColor {
+        headerTextColorWasSet ? headerTextColor : resolvedTintColor(onHeaderBand: true)
+    }
+
+    /**
+     * The fold control's color as drawn; `inHeader` when the control sits in the section header (on the band).
+     */
+    public func resolvedFoldControlColor(inHeader: Bool) -> UIColor {
+        foldControlColorWasSet ? foldControlColor : resolvedTintColor(onHeaderBand: inHeader)
+    }
+
+    /**
+     * The More button's color as drawn (the button sits in the header).
+     */
+    public var resolvedMoreButtonColor: UIColor {
+        moreButtonColorWasSet ? moreButtonColor : resolvedTintColor(onHeaderBand: true)
+    }
+
+    /**
+     * The clear button's color as drawn: `clearButtonColor`, else the header title's (the button sits in the header).
+     */
+    public var resolvedClearButtonColor: UIColor {
+        clearButtonColor ?? resolvedHeaderTextColor
+    }
 
     // MARK: - Initializers
 
@@ -438,17 +755,14 @@ open class CYLMenuStyle: NSObject, NSCopying {
     public required override init() {
         let hairline = 1 / max(1, UIScreen.main.scale)
         normalAppearance = CYLTagAppearance()
-        normalAppearance.borderColor = UIColor(white: 0.82, alpha: 1)
-        normalAppearance.borderWidth = hairline
+        normalAppearance.applyBuiltInBorder(color: UIColor(white: 0.82, alpha: 1), width: hairline)
         selectedAppearance = CYLTagAppearance()
         selectedAppearance.backgroundColor = Self.appTintColor
         selectedAppearance.textColor = .white
-        selectedAppearance.borderColor = Self.appTintColor
-        selectedAppearance.borderWidth = hairline
+        selectedAppearance.applyBuiltInBorder(color: Self.appTintColor, width: hairline)
         disabledAppearance = CYLTagAppearance()
         disabledAppearance.textColor = UIColor(white: 0.7, alpha: 1)
-        disabledAppearance.borderColor = UIColor(white: 0.88, alpha: 1)
-        disabledAppearance.borderWidth = hairline
+        disabledAppearance.applyBuiltInBorder(color: UIColor(white: 0.88, alpha: 1), width: hairline)
         super.init()
     }
 
@@ -467,7 +781,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
             appearance.borderWidth = 0
             // android-tagview's layoutBorderColor: a tag that sets only a border width gets a white border.
             appearance.borderColor = .white
-            appearance.cornerRadius = 0
+            appearance.cornerRadius = cylAnimatedItemCornerRadiusCapsule
             appearance.font = UIFont.systemFont(ofSize: 14)
         }
         style.disabledAppearance.backgroundColor = blue.withAlphaComponent(0.4)
@@ -477,6 +791,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         style.lineSpacing = 5
         style.itemHeight = 0
         style.backgroundColor = .clear
+        style.sectionStyle = .plain
         return style
     }
 
@@ -509,6 +824,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         style.rippleColor = UIColor(white: 0xEE / 255, alpha: 1)
         style.rippleAlpha = 128 / 255
         style.backgroundColor = .clear
+        style.sectionStyle = .plain
         return style
     }
 
@@ -539,6 +855,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         style.itemHeight = 32
         style.interitemSpacing = 24
         style.lineSpacing = 18
+        style.sectionStyle = .plain
         return style
     }
 
@@ -574,6 +891,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         style.lineSpacing = 10
         style.sectionInsets = UIEdgeInsets(top: 12, left: 24, bottom: 12, right: 24)
         style.backgroundColor = .clear
+        style.sectionStyle = .plain
         return style
     }
 
@@ -633,7 +951,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         let style = Self.compactTagStyle()
         for appearance in style.allAppearances {
             appearance.backgroundColor = .clear
-            appearance.cornerRadius = CYLTagCornerRadiusSquare
+            appearance.cornerRadius = 0
         }
         style.normalAppearance.backgroundImage = Self.stretchableImage(named: "btn_slide_normal")
         style.normalAppearance.textColor = UIColor(red: 96 / 255, green: 147 / 255, blue: 130 / 255, alpha: 1)
@@ -652,7 +970,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
             appearance.backgroundColor = .clear
             appearance.borderWidth = 0
             appearance.borderColor = nil
-            appearance.cornerRadius = CYLTagCornerRadiusSquare
+            appearance.cornerRadius = 0
             appearance.textColor = textColor
             appearance.font = UIFont.systemFont(ofSize: fontSize)
             appearance.contentInsets = UIEdgeInsets(top: 0, left: leadingInset, bottom: 0, right: 0)
@@ -680,6 +998,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
         style.imageSize = CGSize(width: 16, height: 16)
         style.itemHeight = 30
         style.backgroundColor = .clear
+        style.sectionStyle = .plain
         return style
     }
 
@@ -712,12 +1031,12 @@ open class CYLMenuStyle: NSObject, NSCopying {
 
     /**
      * Like `UITabBarItem.setTitleTextAttributes(_:for:)`: `.font` and `.foregroundColor` set the state's appearance
-     * font and text color (their defaults when missing).
+     * font and text color (their defaults when missing: a missing `.foregroundColor` resets the text color to unset, the class built-in).
      */
     open func setTitleTextAttributes(_ attributes: [NSAttributedString.Key: Any]?, for state: UIControl.State) {
         let appearance = appearance(for: state)
         appearance.font = attributes?[.font] as? UIFont ?? CYLTagAppearance.defaultFont
-        appearance.textColor = attributes?[.foregroundColor] as? UIColor ?? CYLTagAppearance.defaultTextColor
+        appearance.textColor = attributes?[.foregroundColor] as? UIColor
     }
 
     /**
@@ -725,7 +1044,7 @@ open class CYLMenuStyle: NSObject, NSCopying {
      */
     open func titleTextAttributes(for state: UIControl.State) -> [NSAttributedString.Key: Any] {
         let appearance = appearance(for: state)
-        return [.font: appearance.font, .foregroundColor: appearance.textColor]
+        return [.font: appearance.font, .foregroundColor: appearance.textColor as UIColor]
     }
 
     /**
@@ -737,11 +1056,17 @@ open class CYLMenuStyle: NSObject, NSCopying {
     }
 
     /**
-     * The effective icon tint for a state.
+     * The effective icon tint for a state: the explicit icon color, else the effective text color (explicit, else the class built-in).
      */
     open func iconColor(for state: UIControl.State) -> UIColor {
-        let appearance = appearance(for: state)
-        return appearance.iconColor ?? appearance.textColor
+        appearance(for: state).iconColor
+    }
+
+    /**
+     * The icon color set for a state (`setIconColor`), nil when unset (the icon follows the text color).
+     */
+    open func explicitIconColor(for state: UIControl.State) -> UIColor? {
+        appearance(for: state).explicitIconColor
     }
 
     /**
@@ -805,30 +1130,53 @@ open class CYLMenuStyle: NSObject, NSCopying {
         copy.imagePositionAdjustment = imagePositionAdjustment
         copy.imagePlacement = imagePlacement
         copy.imageFillsTagHeight = imageFillsTagHeight
-        copy.titleWraps = titleWraps
+        copy.titleMaxLines = titleMaxLines
         copy.elevation = elevation
         copy.deleteIndicatorImage = deleteIndicatorImage
         copy.layoutCentered = layoutCentered
         copy.animationSize = animationSize
         copy.animationSpeed = animationSpeed
         copy.adjustsFontForContentSizeCategory = adjustsFontForContentSizeCategory
+        copy.maximumContentSizeCategory = maximumContentSizeCategory
         copy.itemHeight = itemHeight
         copy.interitemSpacing = interitemSpacing
         copy.lineSpacing = lineSpacing
         copy.sectionInsets = sectionInsets
         copy.backgroundColor = backgroundColor
+        copy.backgroundColorWasSet = backgroundColorWasSet
+        copy.sectionStyle = sectionStyle
+        copy.sectionBackgroundColor = sectionBackgroundColor
+        copy.sectionBackgroundStyle = sectionBackgroundStyle
+        copy.sectionCornerRadius = sectionCornerRadius
+        copy.sectionContentInsets = sectionContentInsets
+        copy.sectionBoardInset = sectionBoardInset
+        copy.headerBackgroundColor = headerBackgroundColor
+        copy.headerCornerRadius = headerCornerRadius
+        copy.headerContentInsets = headerContentInsets
+        copy.headerSeparatorStyle = headerSeparatorStyle
+        copy.headerSeparatorColor = headerSeparatorColor
+        copy.headerSeparatorThickness = headerSeparatorThickness
+        copy.headerSeparatorInsets = headerSeparatorInsets
         copy.headerHeight = headerHeight
+        copy.headerHeightWasSet = headerHeightWasSet
+        copy.headerMaxLines = headerMaxLines
         copy.headerFont = headerFont
         copy.headerTextColor = headerTextColor
+        copy.headerTextColorWasSet = headerTextColorWasSet
+        copy.tintColor = tintColor
         copy.headerHorizontalInset = headerHorizontalInset
         copy.foldControlColor = foldControlColor
+        copy.foldControlColorWasSet = foldControlColorWasSet
         copy.foldChevronImage = foldChevronImage
         copy.expandTitle = expandTitle
         copy.collapseTitle = collapseTitle
         copy.numberOfItemsPerRow = numberOfItemsPerRow
         copy.contentAlignment = contentAlignment
+        copy.backgroundStyle = backgroundStyle
+        copy.minimumTagSize = minimumTagSize
         copy.moreButtonImage = moreButtonImage
         copy.moreButtonColor = moreButtonColor
+        copy.moreButtonColorWasSet = moreButtonColorWasSet
         copy.highlightedBackgroundColor = highlightedBackgroundColor
         copy.deleteIndicatorTitle = deleteIndicatorTitle
         copy.deleteIndicatorColor = deleteIndicatorColor
@@ -870,8 +1218,13 @@ open class CYLMenuStyle: NSObject, NSCopying {
         guard adjustsFontForContentSizeCategory else {
             return font
         }
-        return UIFontMetrics.default.scaledFont(for: font, maximumPointSize: font.pointSize * CYLTagMetrics.maximumFontScale,
-                                                compatibleWith: traitCollection)
+        var maximumPointSize = font.pointSize * CYLTagMetrics.maximumFontScale
+        if let category = maximumContentSizeCategory {
+            let capped = UIFontMetrics.default.scaledValue(for: font.pointSize,
+                                                           compatibleWith: UITraitCollection(preferredContentSizeCategory: category))
+            maximumPointSize = min(maximumPointSize, capped)
+        }
+        return UIFontMetrics.default.scaledFont(for: font, maximumPointSize: maximumPointSize, compatibleWith: traitCollection)
     }
 }
 
@@ -895,4 +1248,164 @@ public extension UIColor {
      */
     @objc(cyl_appTintColor)
     static let cylAppTint = UIColor(red: 42 / 255, green: 185 / 255, blue: 160 / 255, alpha: 1)
+}
+
+/**
+ * How a section's tags sit in the list (`CYLMenuStyle.sectionStyle`).
+ */
+@objc public enum CYLSectionStyle: Int {
+    /**
+     * The tags sit on the list's background (the opt-out of the default card).
+     */
+    case plain = 0
+    /**
+     * The tags sit inside a rounded card, UITableView's inset grouped look, the header above it (the default).
+     */
+    case insetGrouped
+}
+
+/**
+ * The line at the bottom of a section header (`CYLMenuStyle.headerSeparatorStyle`).
+ */
+@objc public enum CYLHeaderSeparatorStyle: Int {
+    /**
+     * No line (the default).
+     */
+    case none = 0
+    /**
+     * A line at the header's bottom edge.
+     */
+    case line
+}
+
+/**
+ * The contrast rule of the default tint: black on a light background, white on a dark one (WCAG relative luminance).
+ */
+public enum CYLTintContrast {
+
+    /**
+     * The WCAG relative luminance (0 black, 1 white; sRGB linearised) above which a background counts as light and gets the dark
+     * tint: 0.179, where black and white have the same contrast ratio (the value HarmonyOS, Android and the mini program use).
+     */
+    public static let luminanceThreshold: CGFloat = 0.179
+
+    /**
+     * The WCAG relative luminance of an sRGB color.
+     */
+    public static func relativeLuminance(red: CGFloat, green: CGFloat, blue: CGFloat) -> CGFloat {
+        func linear(_ value: CGFloat) -> CGFloat {
+            let clamped = min(max(value, 0), 1)
+            return clamped <= 0.03928 ? clamped / 12.92 : pow((clamped + 0.055) / 1.055, 2.4)
+        }
+        return 0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue)
+    }
+
+    /**
+     * Black or white for `background` resolved with `traits`; `nil` when the background is not opaque (it shows what is behind it).
+     */
+    static func tint(on background: UIColor, traits: UITraitCollection) -> UIColor? {
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        guard background.resolvedColor(with: traits).getRed(&red, green: &green, blue: &blue, alpha: &alpha), alpha >= 1 else {
+            return nil
+        }
+        return relativeLuminance(red: red, green: green, blue: blue) > luminanceThreshold ? .black : .white
+    }
+}
+
+/**
+ * The named lengths of the section style, in points.
+ */
+public enum CYLSectionStyleMetrics {
+
+    /**
+     * The corner radius of a section card.
+     */
+    public static let cardCornerRadius: CGFloat = 10
+
+    /**
+     * The padding between a section card and its tags.
+     */
+    public static let cardPadding: CGFloat = 12
+
+    /**
+     * The padding between a header band and its title, leading and trailing.
+     */
+    public static let headerBandPadding: CGFloat = 12
+
+    /**
+     * The thickness of the header divider: one hairline.
+     */
+    public static let separatorThickness: CGFloat = 0.5
+
+    /**
+     * The padding around a header title that is sized to its text (4 above, 4 below), under `.insetGrouped` with no divider.
+     */
+    public static let headerBoardTitlePadding: CGFloat = 8
+
+    /**
+     * The gap between such a header and the board.
+     */
+    public static let headerBoardSpacing: CGFloat = 4
+}
+
+/**
+ * The colors of the section style: dynamic colors, resolved with the traits of the view that shows them.
+ */
+public enum CYLSectionStyleColors {
+
+    /**
+     * The section card: white; #1C1C1E in dark mode.
+     */
+    public static let card = UIColor.secondarySystemGroupedBackground
+
+    /**
+     * The header band: #EFEFF4 (the TagCollectionView header); #2C2C2E in dark mode.
+     */
+    public static let headerBand = UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 0x2C / 255, green: 0x2C / 255, blue: 0x2E / 255, alpha: 1)
+            : UIColor(red: 0xEF / 255, green: 0xEF / 255, blue: 0xF4 / 255, alpha: 1)
+    }
+
+    /**
+     * The list background under `.insetGrouped`: #F2F2F7; black in dark mode.
+     */
+    public static let groupedBackground = UIColor.systemGroupedBackground
+
+    /**
+     * The header divider: the system separator color.
+     */
+    public static let separator = UIColor.separator
+}
+
+/**
+ * The line limits of a tag's title (`CYLMenuStyle.titleMaxLines`): named values, never a literal at a call site.
+ */
+public enum CYLTagTitleMaxLines {
+
+    /**
+     * One line, the default: a title too wide for its tag is truncated.
+     */
+    public static let single = 1
+
+    /**
+     * No limit: a title wraps onto as many lines as it needs (the MAX of the line counts).
+     */
+    public static let unlimited = Int.max
+}
+
+/**
+ * The line limits of a section header's title (`CYLMenuStyle.headerMaxLines`): named values, never a literal at a call site.
+ */
+public enum CYLHeaderTitleMaxLines {
+
+    /**
+     * One line, the default: a title too wide for its header is truncated.
+     */
+    public static let single = 1
+
+    /**
+     * No limit: a title wraps onto as many lines as it needs.
+     */
+    public static let unlimited = Int.max
 }

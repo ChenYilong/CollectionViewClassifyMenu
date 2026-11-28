@@ -85,6 +85,13 @@ import UIKit
     optional func menuBadgeAttributesForItem(at indexPath: IndexPath) -> [String: Any]?
 
     /**
+     * The item's subtitle, shown in a callout with an arrow on a long press when the list's `longPressAction` includes
+     * `CYLTagLongPressActions.callout` (a longer description of a short title). `nil` or empty: none.
+     */
+    @objc(menuSubtitleForItemAtIndexPath:)
+    optional func menuSubtitleForItem(at indexPath: IndexPath) -> String?
+
+    /**
      * The frame (0...1) an animated icon shows while its item is not selected. Default (`nil`) 0, the first frame, as
      * a CYLTabBarController tab icon; for a file whose first frame is empty, e.g. 1 for the last.
      */

@@ -49,6 +49,15 @@ import UIKit
 open class CYLTagButton: CYLAnimatedItemView {
 
     private static let states: [UIControl.State] = [.normal, .selected, .disabled]
+
+    /**
+     * The space between the border and the content, left and right, that the shape asks for: `cylAnimatedItemLiquidGlassContentInset` for a
+     * Liquid Glass style where the glass is really drawn (the same condition as the capsule), else 0 (CYLAnimatedItemView's
+     * `itemContentHorizontalInset` left unset gives the same). The effective inset is the larger of this and the appearance's.
+     */
+    static func contentInset(for style: CYLMenuStyle) -> CGFloat {
+        CYLAnimatedItemView.resolvedContentHorizontalInset(nil, style: style.backgroundStyle == .liquidGlass ? .liquidGlass : .flat)
+    }
     private static let disabledAnimationAlpha: CGFloat = 0.4
 
     /**
@@ -82,17 +91,6 @@ open class CYLTagButton: CYLAnimatedItemView {
     open override var selectedImage: UIImage? {
         didSet {
             updateAppearance()
-        }
-    }
-
-    /**
-     * The frame (0...1) of the animated icon shown while not selected (the base class's). Default 0, the first frame.
-     */
-    open override var animationRestingProgress: CGFloat {
-        didSet {
-            if oldValue != animationRestingProgress {
-                updateAnimationState()
-            }
         }
     }
 
@@ -216,6 +214,8 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
     }
 
+    // `isAnimationEngineAvailable` is CYLAnimatedItemView's (inherited): a runtime check for an engine in the app.
+
     private var styleStorage = CYLMenuStyle()
     /**
      * True for a tag made with a convenience initializer: on its own, it is an accessibility element whose traits
@@ -225,6 +225,15 @@ open class CYLTagButton: CYLAnimatedItemView {
     private var followsStyleAnimationSpeed = true
     private var isApplyingStyleAnimationSpeed = false
     private let backgroundImageView = UIImageView()
+
+    /**
+     * The Liquid Glass layer behind the content (CYLAnimatedItemView's `itemLiquidGlassView`) while
+     * `drawsLiquidGlass`; `nil` when the tag is flat.
+     */
+    @available(*, deprecated, renamed: "itemLiquidGlassView")
+    public var liquidGlassView: UIView? {
+        itemLiquidGlassView
+    }
     /**
      * The cross of `CYLMenuStyle.deleteIndicatorLineWidth`.
      */
@@ -292,30 +301,55 @@ open class CYLTagButton: CYLAnimatedItemView {
         layer.addSublayer(crossLayer)
         layer.masksToBounds = true
         self.iconSize = animationSize
+        // What the tag used to do by hand is now the item's options (the defaults of the item keep tab bar items as they were).
+        itemDisabledAnimationAlpha = Self.disabledAnimationAlpha
+        showsLastFrameWhenSelected = true
+        respectsReduceMotion = true
+        disabledWinsImage = true
+        showsOutlineWhenIncreaseContrast = true
         applyStyleAnimationSpeed()
+        for role in Self.indicatorRoles {
+            register(role)
+        }
         updateAppearance()
     }
+
+    // MARK: - Delete indicator colors
+
+    /**
+     * The delete indicator's elements as color roles of the item (`CYLAnimatedItemColorRole`): the item resolves their colors by its one precedence chain
+     * and adapts the explicit ones in dark mode on drawn glass or a flat fill (a tag without a fill is not adapted) by the role's kind (label: title 4.5:1; cross and editing icons: icon 3:1). Built-ins are not adapted.
+     * Each hook takes the item as a parameter, so a role holds no reference to its tag.
+     */
+    private static let indicatorRoles: [CYLAnimatedItemColorRole] = [
+        CYLAnimatedItemColorRole(id: "tag.deleteIndicatorLabel", kind: .title, adaptsBuiltIn: false) { item, resolved in
+            (item as? CYLTagButton)?.deleteIndicatorLabel.textColor = resolved.color
+        },
+        CYLAnimatedItemColorRole(id: "tag.deleteIndicatorCross", kind: .icon, adaptsBuiltIn: false) { item, resolved in
+            (item as? CYLTagButton)?.crossLayer.strokeColor = resolved.color?.resolvedColor(with: item.traitCollection).cgColor
+        },
+        // [EN] `style.deleteIndicatorImage` is a template image in a plain image view: it takes the role color (an icon, 3:1) instead of the app tint.
+        // [CN] `style.deleteIndicatorImage` 是普通图片视图中的模板图片：使用角色颜色（图标，3:1），而不是应用 tint。
+        CYLAnimatedItemColorRole(id: "tag.deleteIndicatorImage", kind: .icon, adaptsBuiltIn: false) { item, resolved in
+            (item as? CYLTagButton)?.deleteIndicatorImageView.tintColor = resolved.color?.resolvedColor(with: item.traitCollection)
+        },
+        // The editing icons (rename, delete) are items themselves; they take the color as their subclass built-in.
+        CYLAnimatedItemColorRole(id: "tag.editingIcons", kind: .icon, adaptsBuiltIn: false) { item, resolved in
+            guard let tag = item as? CYLTagButton,
+                  (tag.showsDeleteIndicator && tag.showsRenameIndicator) || tag.editingIndicatorsViewIsLoaded else { return }
+            for icon in tag.editingIndicatorsView.itemViews {
+                icon.applyIconTintColor(resolved.color)
+            }
+        },
+    ]
 
     // MARK: - Animation
 
     /**
-     * Plays the animated icon, as a tab icon plays when the tab is tapped; with Reduce Motion it shows the state's
-     * frame instead. Without an engine (or a file that cannot play) it does nothing.
-     */
-    open override func playAnimation() {
-        if UIAccessibility.isReduceMotionEnabled {
-            updateAnimationState()
-            return
-        }
-        super.playAnimation()
-    }
-
-    /**
-     * Builds the animation view again (a new file or size) and shows the state's frame.
+     * Builds the animation view again (a new file or size) and shows the state's frame (the base class does, `showsLastFrameWhenSelected`).
      */
     open override func reloadAnimation() {
         super.reloadAnimation()
-        updateAnimationState()
         updateAppearance()
     }
 
@@ -353,7 +387,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         if style.fillsTagHeight(withIconSize: iconSize) {
             // The image is as wide as the tag is tall, from the leading edge; the title and the indicator follow it.
             let side = height(forTitle: title, iconSize: .zero, style: style, traitCollection: traitCollection)
-            return states.reduce(0) { width, state in
+            return states.reduce(style.minimumTagSize.width) { width, state in
                 let font = style.titleFont(for: state, traitCollection: traitCollection)
                 let titleWidth = displayed.isEmpty ? 0
                     : ceil((displayed as NSString).size(withAttributes: [.font: font]).width) + style.imageTitleSpacing
@@ -362,10 +396,10 @@ open class CYLTagButton: CYLAnimatedItemView {
                     : showsDeleteIndicator
                     ? style.imageTitleSpacing + deleteIndicatorWidth(for: state, style: style, traitCollection: traitCollection)
                     : 0
-                return max(width, ceil(side + titleWidth + delete + style.appearance(for: state).contentInsets.right))
+                return max(width, ceil(side + titleWidth + delete + max(style.appearance(for: state).contentInsets.right, contentInset(for: style))))
             }
         }
-        var width: CGFloat = 0
+        var width = style.minimumTagSize.width
         for state in states {
             let appearance = style.appearance(for: state)
             let font = style.titleFont(for: state, traitCollection: traitCollection)
@@ -387,7 +421,8 @@ open class CYLTagButton: CYLAnimatedItemView {
                 content += style.imageTitleSpacing
                     + deleteIndicatorWidth(for: state, style: style, traitCollection: traitCollection)
             }
-            width = max(width, ceil(content + appearance.contentInsets.left + appearance.contentInsets.right))
+            let sideInset = contentInset(for: style)
+            width = max(width, ceil(content + max(appearance.contentInsets.left, sideInset) + max(appearance.contentInsets.right, sideInset)))
         }
         return width
     }
@@ -413,7 +448,7 @@ open class CYLTagButton: CYLAnimatedItemView {
      */
     public static func height(for style: CYLMenuStyle, traitCollection: UITraitCollection?) -> CGFloat {
         let iconHeight = style.imagePlacement.cylIsVertical ? max(style.imageSize.height, style.animationSize.height) : 0
-        return states.reduce(style.itemHeight) { height, state in
+        return states.reduce(max(style.itemHeight, style.minimumTagSize.height)) { height, state in
             let insets = style.appearance(for: state).contentInsets
             let font = style.titleFont(for: state, traitCollection: traitCollection)
             let stacked = iconHeight > 0 ? iconHeight + style.imageTitleSpacing : 0
@@ -432,7 +467,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         let hasTitle = !style.displayedTitle(forTitle: title).isEmpty
         // An image that fills the tag's height takes the height of the rest.
         let iconSize = style.fillsTagHeight(withIconSize: iconSize) ? .zero : iconSize
-        return states.reduce(style.itemHeight) { height, state in
+        return states.reduce(max(style.itemHeight, style.minimumTagSize.height)) { height, state in
             let insets = style.appearance(for: state).contentInsets
             let line = hasTitle ? ceil(style.titleFont(for: state, traitCollection: traitCollection).lineHeight) : 0
             var content = max(line, iconSize.height)
@@ -457,9 +492,11 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
         return states.reduce(single) { height, state in
             let insets = style.appearance(for: state).contentInsets
-            var room = width - insets.left - insets.right
+            let sideInset = contentInset(for: style)
+            let left = max(insets.left, sideInset)
+            var room = width - left - max(insets.right, sideInset)
             if style.fillsTagHeight(withIconSize: iconSize) {
-                room -= single - insets.left + style.imageTitleSpacing
+                room -= single - left + style.imageTitleSpacing
             } else if iconSize.width > 0 {
                 room -= iconSize.width + style.imageTitleSpacing
             }
@@ -470,9 +507,17 @@ open class CYLTagButton: CYLAnimatedItemView {
             let text = (displayed as NSString).boundingRect(with: CGSize(width: max(1, room), height: .greatestFiniteMagnitude),
                                                             options: [.usesLineFragmentOrigin, .usesFontLeading],
                                                             attributes: [.font: font], context: nil)
-            return max(height, ceil(text.height) + insets.top + insets.bottom)
+            // The title takes at most titleMaxLines lines: the wrapped height stops there.
+            // Counted in the lines the text really takes, so a line height that differs by a rounding cannot cut a line.
+            let textLines = max(1, (text.height / font.lineHeight).rounded())
+            let lines = style.titleMaxLines == CYLTagTitleMaxLines.unlimited ? text.height
+                : text.height * min(textLines, CGFloat(style.titleMaxLines)) / textLines
+            return max(height, ceil(lines) + insets.top + insets.bottom)
         }
     }
+
+    /// UIKit's `numberOfLines` value for "as many lines as it needs".
+    private static let uiKitUnlimitedLines = 0
 
     // MARK: - Overrides
 
@@ -495,8 +540,14 @@ open class CYLTagButton: CYLAnimatedItemView {
     /**
      * The content's size without the current appearance's content insets (the base class's measuring hook).
      */
+    /// The appearance's insets with left and right at least `resolvedItemContentHorizontalInset` (14 on a drawn Liquid Glass tag, 0 on flat).
+    private func effectiveInsets(_ insets: UIEdgeInsets) -> UIEdgeInsets {
+        let side = resolvedItemContentHorizontalInset
+        return UIEdgeInsets(top: insets.top, left: max(insets.left, side), bottom: insets.bottom, right: max(insets.right, side))
+    }
+
     open override func contentSizeThatFits(_ size: CGSize) -> CGSize {
-        let insets = styleStorage.appearance(for: currentState).contentInsets
+        let insets = effectiveInsets(styleStorage.appearance(for: currentState).contentInsets)
         let size = intrinsicContentSize
         return CGSize(width: max(0, size.width - insets.left - insets.right),
                       height: max(0, size.height - insets.top - insets.bottom))
@@ -554,9 +605,6 @@ open class CYLTagButton: CYLAnimatedItemView {
 
     open override var isSelected: Bool {
         didSet {
-            if oldValue != isSelected {
-                updateAnimationState()
-            }
             updateAppearance()
         }
     }
@@ -580,11 +628,34 @@ open class CYLTagButton: CYLAnimatedItemView {
      * the icon frame: the base class shows the static image (or its placeholder) until the animation shows.
      */
     open override func layoutContent(in rect: CGRect) {
+        layOutContentLeftToRight(in: rect)
+        guard mirrorsContent else {
+            return
+        }
+        // The content was placed from the left edge: in a right-to-left layout it starts at the right edge.
+        for view in [titleLabel, imageView, animationView].compactMap({ $0 }) where !view.frame.isEmpty {
+            view.frame.origin.x = bounds.width - view.frame.maxX
+        }
+    }
+
+    /**
+     * Whether the icon and the title are mirrored (placed from the right edge). The section headers set it on their title and fold
+     * control while their own layout direction is right-to-left; the tags keep the placement they have always had.
+     */
+    var mirrorsContent = false {
+        didSet {
+            if oldValue != mirrorsContent {
+                setNeedsLayout()
+            }
+        }
+    }
+
+    private func layOutContentLeftToRight(in rect: CGRect) {
         var width = bounds.width
         let height = bounds.height
         let style = styleStorage
         let state = currentState
-        let insets = style.appearance(for: state).contentInsets
+        let insets = effectiveInsets(style.appearance(for: state).contentInsets)
         backgroundImageView.frame = bounds
         let deleteWidth = layOutDeleteIndicator(state: state, insets: insets)
         let indicatorFirst = showsDeleteIndicator && style.deleteIndicatorPlacement == .leading
@@ -679,9 +750,9 @@ open class CYLTagButton: CYLAnimatedItemView {
             placeImageView(.zero)
             layOutBadge(anchor: showsTitle ? titleLabel.frame : bounds.inset(by: insets))
         }
-        // 0 is automatic: a capsule, as for CYLBadgeAppearance.
-        let radius = style.appearance(for: state).cornerRadius
-        layer.cornerRadius = radius > 0 ? (radius <= CYLTagCornerRadiusSquare ? 0 : min(radius, height / 2)) : height / 2
+        // Points, limited to half the height: 0 is square, half the height or more a capsule.
+        // CYLAnimatedItemView applies it (limited to half the height) with the background and the border.
+        itemCornerRadius = style.appearance(for: state).cornerRadius
         updateElevationPath()
     }
 
@@ -706,7 +777,15 @@ open class CYLTagButton: CYLAnimatedItemView {
         guard let image else {
             return .zero
         }
-        return style.imageSize == .zero ? image.size : style.imageSize
+        if style.imageSize == .zero {
+            return image.size
+        }
+        // A badge capsule keeps the style's height; a wider one widens its slot, so the tag grows instead of the image
+        // overlapping the title.
+        if image.cylIsBadgeImage {
+            return CGSize(width: max(style.imageSize.width, image.size.width), height: style.imageSize.height)
+        }
+        return style.imageSize
     }
 
     /**
@@ -784,8 +863,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         } else {
             titleLabel.frame = .zero
         }
-        let radius = style.appearance(for: currentState).cornerRadius
-        layer.cornerRadius = radius > 0 ? (radius <= CYLTagCornerRadiusSquare ? 0 : min(radius, height / 2)) : height / 2
+        itemCornerRadius = style.appearance(for: currentState).cornerRadius
         updateElevationPath()
     }
 
@@ -935,42 +1013,42 @@ open class CYLTagButton: CYLAnimatedItemView {
         isApplyingStyleAnimationSpeed = false
     }
 
-    /**
-     * Selected: the last frame (a selected tab's icon); otherwise the resting progress (the first frame by default).
-     */
-    private func updateAnimationState() {
-        guard animationView != nil else {
-            return
-        }
-        if isSelected {
-            showAnimationLastFrame()
-        } else {
-            stopAnimation()
-        }
-    }
-
     private func updateAppearance() {
         let style = styleStorage
         let state = currentState
         let appearance = style.appearance(for: state)
-        // The base class chooses the icon (the image, the selected image or its placeholder) and hides it while the
-        // animation shows; only a disabled selected tag shows `image`, as before (disabled wins over selected).
-        if let shown = imageView.image, shown === image || shown === selectedImage {
-            let icon = state == .selected && selectedImage != nil ? selectedImage : image
-            if icon !== shown {
-                imageView.image = icon
-            }
-        }
-        animationView?.alpha = state == .disabled ? Self.disabledAnimationAlpha : 1
-        imageView.tintColor = style.iconColor(for: state)
+        // The base class chooses the icon (the image, the selected image or its placeholder; disabled wins over selected, `disabledWinsImage`),
+        // dims the animation while disabled (`itemDisabledAnimationAlpha`) and shows the state's frame (`showsLastFrameWhenSelected`).
+        // Colors go to the item by its channels. Precedence (the item's): its own `itemAppearance` > the style's EXPLICIT colors (`setSubclassTitleColor` /
+        // `setSubclassIconColor`) > the stack's > this class's built-ins (`applyTitleTintColor` / `applyIconTintColor`: the effective colors) > the component's.
+        // The item adapts the explicit ones in dark mode on drawn glass or a flat fill (and not the built-ins; a tag with no fill is not adapted). The tag never sets `animationTint` or `itemAppearance`.
         titleLabel.text = style.displayedTitle(forTitle: title)
         titleLabel.font = style.titleFont(for: state, traitCollection: traitCollection)
-        titleLabel.textColor = appearance.textColor
 
-        let pressed = isHighlighted && state != .disabled && style.highlightedBackgroundColor != nil
-        // Pressed, as android-tagview's layoutColorPress.
-        let background = pressed ? style.highlightedBackgroundColor : appearance.backgroundColor
-        layer.backgroundColor = background?.cgColor
+        // The background is CYLAnimatedItemView's: flat color, or Liquid Glass tinted with it where the system draws it. Where glass is drawn only an
+        // EXPLICIT color tints it; an unset one is nil, so the item's default tint applies. The pressed color (`style.highlightedBackgroundColor`) is the
+        // item's `itemHighlightedBackgroundColor`. Flat (also where the system draws no glass) keeps the effective color.
+        itemBackgroundStyle = style.backgroundStyle == .liquidGlass ? .liquidGlass : .flat
+        let drawsGlass = drawsLiquidGlass
+        itemBackgroundColor = drawsGlass ? appearance.explicitBackgroundColor : appearance.backgroundColor
+        itemHighlightedBackgroundColor = style.highlightedBackgroundColor
+        // A selected Liquid Glass tag keeps its full color (tint alpha 1, still glass); the other states tint at the item's default share.
+        itemGlassTintAlpha = state == .selected ? 1 : nil
+        for tagState in Self.states {
+            let stateAppearance = style.appearance(for: tagState)
+            setSubclassTitleColor(stateAppearance.explicitTextColor, for: tagState)
+            setSubclassIconColor(style.explicitIconColor(for: tagState), for: tagState)
+        }
+        applyTitleTintColor(appearance.textColor)
+        applyIconTintColor(style.iconColor(for: state))
+        // The delete indicator's elements: the style's `deleteIndicatorColor`, else the state's explicit text color, is explicit (the item adapts it in dark mode on
+        // drawn glass or a flat fill); the state's text color is the built-in (as it is).
+        for role in Self.indicatorRoles {
+            for tagState in Self.states {
+                setSubclassColor(style.deleteIndicatorColor ?? style.appearance(for: tagState).explicitTextColor, for: tagState, role: role)
+            }
+            applyBuiltInColor(appearance.textColor, role: role)
+        }
         backgroundImageView.image = appearance.backgroundImage
         backgroundImageView.isHidden = appearance.backgroundImage == nil
             || (isHighlighted && style.highlightedBackgroundColor != nil)
@@ -985,14 +1063,10 @@ open class CYLTagButton: CYLAnimatedItemView {
         deleteIndicatorImageView.isHidden = !showsDeleteIndicator || indicatorImage == nil || editingIcons
         if editingIcons || editingIndicatorsViewIsLoaded {
             editingIndicatorsView.isHidden = !editingIcons
-            let color = style.deleteIndicatorColor ?? appearance.textColor
-            for icon in editingIndicatorsView.itemViews {
-                icon.imageView.tintColor = color
-            }
         }
-        // A wrapping title (CYLMenuStyle.titleWraps) takes as many lines as it needs.
-        titleLabel.numberOfLines = style.titleWraps ? 0 : 1
-        titleLabel.lineBreakMode = style.titleWraps ? .byWordWrapping : .byTruncatingTail
+        // A title that may wrap (CYLMenuStyle.titleMaxLines) takes that many lines (UIKit counts 0 as "as many as it needs").
+        titleLabel.numberOfLines = style.titleMaxLines == CYLTagTitleMaxLines.unlimited ? Self.uiKitUnlimitedLines : style.titleMaxLines
+        titleLabel.lineBreakMode = style.titleMaxLines == CYLTagTitleMaxLines.unlimited ? .byWordWrapping : .byTruncatingTail
         applyElevation()
         deleteIndicatorLabel.accessibilityLabel = showsDeleteIndicator ? CYLMenuLocalizedString("CYLMenuDeleteTag") : nil
         let placement: CYLAnimatedItemAccessoryPlacement = style.deleteIndicatorPlacement == .leading ? .leading : .trailing
@@ -1001,7 +1075,6 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
         crossLayer.isHidden = !showsDeleteIndicator || !drawsCross || editingIcons
         crossLayer.lineWidth = style.deleteIndicatorLineWidth
-        crossLayer.strokeColor = (style.deleteIndicatorColor ?? appearance.textColor)?.cgColor
         let imageRadius = style.imageCornerRadius
         if !style.imageFillsTagHeight {
             // (An image that fills the tag's height is a circle: layOutTagHeightImage rounds it.)
@@ -1013,16 +1086,12 @@ open class CYLTagButton: CYLAnimatedItemView {
             }
         }
         deleteIndicatorLabel.font = style.deleteIndicatorFont(for: state, traitCollection: traitCollection)
-        deleteIndicatorLabel.textColor = style.deleteIndicatorColor ?? appearance.textColor
-        var borderColor = appearance.borderColor
-        var borderWidth = borderColor != nil ? appearance.borderWidth : 0
-        if UIAccessibility.isDarkerSystemColorsEnabled {
-            // Increase Contrast: a visible outline in the text color.
-            borderColor = state == .selected ? (appearance.borderColor ?? appearance.textColor) : appearance.textColor
-            borderWidth = max(1, appearance.borderWidth)
-        }
-        layer.borderColor = borderColor?.cgColor
-        layer.borderWidth = borderWidth
+        // Under drawn glass only an explicit border is handed over (the built-in one would hide the shared glass rim); flat keeps the effective border.
+        let borderColor = drawsGlass ? appearance.glassBorderColor : appearance.borderColor
+        let borderWidth = borderColor != nil ? (drawsGlass ? appearance.glassBorderWidth : appearance.borderWidth) : 0
+        // Increase Contrast: the item draws the outline (`showsOutlineWhenIncreaseContrast`).
+        itemBorderColor = borderColor
+        itemBorderWidth = borderWidth
         invalidateIntrinsicContentSize()
         setNeedsLayout()
     }

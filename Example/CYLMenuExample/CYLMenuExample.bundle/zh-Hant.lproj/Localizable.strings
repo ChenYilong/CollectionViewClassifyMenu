@@ -90,6 +90,8 @@
 "设置背景色 backgroundColor（selected）" = "設定背景色 backgroundColor（selected）";
 "设置边框颜色 borderColor" = "設定邊框顏色 borderColor";
 "设置边框宽度 borderWidth" = "設定邊框寬度 borderWidth";
+"设置圆角 cornerRadius（0 为直角，1000 为胶囊）" = "設定圓角 cornerRadius（0 為直角，1000 為膠囊）";
+/* Kept for the Android and mini program rows, which still use the old rule. */
 "设置圆角 cornerRadius（0 为胶囊）" = "設定圓角 cornerRadius（0 為膠囊）";
 "设置内边距 margin" = "設定內邊距 margin";
 "重置 reset" = "重設 reset";

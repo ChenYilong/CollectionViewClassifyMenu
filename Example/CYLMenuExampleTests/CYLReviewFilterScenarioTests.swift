@@ -130,31 +130,37 @@ final class CYLReviewFilterScenarioTests: CYLMenuExampleTestCase {
         tags.layOut()
         XCTAssertTrue(filter.canFoldSection(0))
         let total = filter.menuDataSource?.menuNumberOfItems(inSection: 0) ?? 0
-        let folded = tags.numberOfItems(inSection: 0)
-        XCTAssertLessThan(folded, total, "Folded to two rows")
-        let footer = tags.footer(inSection: 0)
-        guard let chevron = tags.footerFoldButton(inSection: 0) else {
-            return XCTFail("The footer has a fold control")
+        let visible = filter.numberOfVisibleItems(inSection: 0)
+        XCTAssertLessThan(visible, total, "Folded to two rows")
+        func chevron() -> CYLTagButton? {
+            (tags.cell(at: ip(filter.numberOfVisibleItems(inSection: 0), 0)) as? CYLTagFoldCell)?.foldButton
         }
-        XCTAssertEqual(filter.foldControl.position, .footer)
-        XCTAssertEqual(filter.foldControl.content, .icon, "Taobao: the chevron alone")
-        XCTAssertTrue(chevron.imageView.transform.isIdentity, "Points down while folded")
+        guard let folded = chevron() else {
+            return XCTFail("The last tag is the fold control")
+        }
+        XCTAssertEqual(filter.foldControl.position, .tail, "Examples: the tail fold control")
+        XCTAssertEqual(filter.foldControl.content, .icon, "Icon only, no More / Less")
+        XCTAssertNil(folded.title, "No text")
+        XCTAssertNil(tags.footer(inSection: 0), "No footer: the chevron is among the tags")
+        XCTAssertEqual(tags.numberOfItems(inSection: 0), visible + 1, "The visible tags, then the chevron")
+        XCTAssertTrue(folded.imageView.transform.isIdentity, "Points down while folded")
         let foldedHeight = filter.frame.height
         captureScreen(named: "test-scenario1-review-filter-folded")
 
-        chevron.sendActions(for: .touchUpInside)
+        tags.tap(item: visible, section: 0)
         controller.view.layoutIfNeeded()
+        tags.layOut()
         XCTAssertTrue(filter.isSectionExpanded(0))
-        XCTAssertEqual(tags.numberOfItems(inSection: 0), total, "Every row is shown")
-        XCTAssertTrue(tags.footer(inSection: 0) === footer, "The footer stays, so its chevron can turn")
-        XCTAssertEqual(chevron.imageView.transform.a, -1, accuracy: 0.01, "Turned 180°")
+        XCTAssertEqual(tags.numberOfItems(inSection: 0), total + 1, "Every tag, then the chevron")
+        XCTAssertEqual(chevron()?.imageView.transform.a ?? 0, -1, accuracy: 0.01, "Turned 180°")
         XCTAssertGreaterThan(filter.frame.height, foldedHeight)
         captureScreen(named: "test-scenario1-review-filter-expanded")
 
-        chevron.sendActions(for: .touchUpInside)
+        tags.tap(item: total, section: 0)
         controller.view.layoutIfNeeded()
-        XCTAssertEqual(tags.numberOfItems(inSection: 0), folded)
-        XCTAssertEqual(chevron.imageView.transform.a, 1, accuracy: 0.01)
+        tags.layOut()
+        XCTAssertEqual(tags.numberOfItems(inSection: 0), visible + 1)
+        XCTAssertEqual(chevron()?.imageView.transform.a ?? 0, 1, accuracy: 0.01)
         XCTAssertEqual(filter.frame.height, foldedHeight, accuracy: 1)
     }
 

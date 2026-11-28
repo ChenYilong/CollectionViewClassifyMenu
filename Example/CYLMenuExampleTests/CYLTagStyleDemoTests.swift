@@ -27,15 +27,17 @@ final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
         XCTAssertNotNil(firstTag()?.imageView.image)
         XCTAssertGreaterThan(firstTag()?.title?.count ?? 0, 0)
 
-        // A tap on the cornerRadius row: 0 makes capsules.
+        // A tap on the cornerRadius row: 1000 makes capsules (0 is square).
         let cornerSection = actions.firstIndex { $0.contains("cornerRadius") } ?? 0
         let cornerRow = IndexPath(row: actions[cornerSection].firstIndex(of: "cornerRadius") ?? 0, section: cornerSection)
         demo.tableView.delegate?.tableView?(demo.tableView, didSelectRowAt: cornerRow)
-        XCTAssertEqual(demo.tagListView.style.normalAppearance.cornerRadius, 0)
+        XCTAssertEqual(demo.tagListView.style.normalAppearance.cornerRadius, 1000)
         XCTAssertEqual(firstTag()?.layer.cornerRadius ?? -1, (firstTag()?.bounds.height ?? 0) / 2, accuracy: 0.5)
 
         demo.performAction("iconColor.normal")
-        XCTAssertEqual(firstTag()?.imageView.tintColor, demo.style.iconColor(for: .normal))
+        // The component hands the animation / icon a color resolved with the item's own traits (live switches re-resolve it).
+        XCTAssertEqual(firstTag()?.imageView.tintColor?.resolvedColor(with: firstTag()?.traitCollection ?? UITraitCollection()),
+                       demo.style.iconColor(for: .normal).resolvedColor(with: firstTag()?.traitCollection ?? UITraitCollection()))
         captureScreen(named: "test-style-demo-capsule-icon-color")
 
         demo.performAction("content.iconOnly")
@@ -44,7 +46,7 @@ final class CYLTagStyleDemoTests: CYLMenuExampleTestCase {
 
         demo.performAction("reset")
         XCTAssertEqual(demo.content, .iconAndTitle)
-        XCTAssertEqual(demo.tagListView.style.normalAppearance.cornerRadius, 3)
+        XCTAssertEqual(demo.tagListView.style.normalAppearance.cornerRadius, cylAnimatedItemCornerRadiusCapsule)
     }
 
     func testStyleDemoShowsAnimatedIconsAndOpensTheConfigurationDemo() {
