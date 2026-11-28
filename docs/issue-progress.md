@@ -35,7 +35,7 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
-### TODO (2026-11-29, `fix/shared-contrast-ios`, Windows session): document how to redo the learn-codebase export, and add the `memory` rule tag
+### TODO → DONE (2026-11-29, `fix/shared-contrast-ios`, Windows session): document how to redo the learn-codebase export, and add the `memory` rule tag
 
 - **Context:** follows the entry below (the export now in `docs/learn-codebase/`).
 - **Requirements:** a new `docs/learn-codebase/README.md`: on another computer, where `/claude-mem:learn-codebase`
@@ -50,11 +50,10 @@ tags: [issues, ui, cocoapods, progress]
   `memory` tag is in AGENTS.md (table and heading), CLAUDE.md, `docs/instructions.md` and the `cyl-instructions` skill.
   Run on this machine: the scan, the size check and the ingestion check (61 of 61 Markdown files); the settings script ran
   against a test copy with made-up entries, not the real settings file (restart and health check were used for the entry
-  below). New relative links resolve; instruction files are at most 200 lines. Not committed yet, for the same reason as
-  the entry below.
+  below). New relative links resolve; instruction files are at most 200 lines. Committed in `ea8075d5`.
 
 
-### TODO (2026-11-29, `fix/shared-contrast-ios`, Windows session): move the learn-codebase export into `docs/learn-codebase/` and let claude-mem ingest it
+### TODO → DONE (2026-11-29, `fix/shared-contrast-ios`, Windows session): move the learn-codebase export into `docs/learn-codebase/` and let claude-mem ingest it
 
 - **Context:** the learn-codebase export of commit `03707ba2` (47 files) was in the claude-mem deliverables folder,
   outside the repository. The repository is public. claude-mem's memory folder watcher reads only `.md` files of at most
@@ -78,8 +77,8 @@ tags: [issues, ui, cocoapods, progress]
   one kept) and the worker restarted; the database then held all 60 `.md` files under project
   `CollectionViewClassifyMenu`. Outside the criteria: `file-inventory.tsv` (not Markdown) is not ingested; the export is in English
   apart from a short Chinese note in its README. The owner approved publishing without the three `appendix-*.md` files
-  (raw notes, short report, a copy of a memory note): they stay untracked on this computer. Not committed yet: ten pull requests are open, so the owner is asked
-  first ("Branches and pull requests").
+  (raw notes, short report, a copy of a memory note): they stay untracked on this computer. Committed in `ea8075d5` after the owner chose to stay on this branch
+  (pull request #42, ten pull requests open) and to leave the dependency pins unchanged.
 
 ### TODO → DONE on HarmonyOS (2026-11-25, `feat/tag-section-style`): the header divider and the section card did not share their left and right edges
 
