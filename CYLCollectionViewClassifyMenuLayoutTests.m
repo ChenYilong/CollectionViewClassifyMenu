@@ -712,8 +712,14 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     XCTAssertFalse(button.isShowingBadge);
     button.badgeValue = @"3";
     [button layoutIfNeeded];
+    // CYLBadge shows the badge on a later run loop turn while its host is not laid out yet (cyl_isReady), so wait for it.
+    NSDate *deadline = [NSDate dateWithTimeIntervalSinceNow:5];
+    while (!button.isShowingBadge && deadline.timeIntervalSinceNow > 0) {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    }
     XCTAssertTrue(button.isShowingBadge);
-    XCTAssertEqualObjects(button.accessibilityValue, @"3");
+    // The value is the badge description CYLUtils localizes ("3 new messages" in English), not the bare number.
+    XCTAssertTrue([button.accessibilityValue containsString:@"3"], @"%@", button.accessibilityValue);
 
     NSURL *url = [NSURL fileURLWithPath:@"/no/such/file.json"];
     CYLTagButton *animated = [[CYLTagButton alloc] initWithTitle:nil image:image animationURL:url];
