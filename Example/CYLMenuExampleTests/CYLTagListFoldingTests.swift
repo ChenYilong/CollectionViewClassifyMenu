@@ -97,26 +97,25 @@ final class CYLTagListFoldingTests: CYLMenuExampleTestCase {
     // MARK: Inline fold cell
 
     func testInlineFoldCellIsAsTallAsItsRowLikeAnyOtherTag() {
-        let source = CYLMenuFixtures.source(itemCount: 14, sections: 1)
-        source.sections[0].items[1].title = "一个很长很长很长很长很长很长很长很长的标题,换行后比同一行的其他标签更高"
-        let view = showTagList(source, width: 320)
-        let style = CYLMenuStyle()
-        style.titleWraps = true
-        view.style = style
+        // Every tag has its own, taller style; the fold cell's natural height is the list's (30), so it is stretched.
+        let view = CYLTagListView(frame: .zero)
         view.foldControl = CYLMenuFoldControl(position: .tail, content: .icon)
         view.defaultVisibleRows = 2
-        view.reloadMenuData()
+        view.addTags((0..<30).map { CYLTag(title: "Tag \(String(format: "%02d", $0))") })
+        let tall = CYLMenuStyle()
+        tall.itemHeight = 80
+        view.tags.forEach { $0.style = tall }
+        show(view, size: CGSize(width: 320, height: 700))
         view.layoutIfNeeded()
         let tags = view.probe
         tags.layOut()
         let visible = view.numberOfVisibleItems(inSection: 0)
+        XCTAssertLessThan(visible, 30)
         let fold = tags.itemFrame(at: ip(visible, 0))
-        let tallest = tags.itemFrame(at: ip(1, 0))?.height ?? 0
-        XCTAssertGreaterThan(tallest, view.style.itemHeight, "The wrapping title makes its row taller")
-        XCTAssertEqual(fold?.height ?? 0, tallest, accuracy: 0.5, "The fold cell is stretched like any tag of its row")
+        XCTAssertGreaterThanOrEqual(fold?.height ?? 0, 80, "The fold cell is stretched like any tag of its row")
         for item in 0..<visible {
             if let frame = tags.itemFrame(at: ip(item, 0)), frame.minY == fold?.minY {
-                XCTAssertEqual(frame.height, tallest, accuracy: 0.5, "The fold cell's row is as tall as the row's tallest")
+                XCTAssertEqual(frame.height, fold?.height ?? -1, accuracy: 0.5, "The fold cell's row shares one height")
             }
         }
         view.maxItemHeight = view.style.itemHeight
@@ -124,7 +123,6 @@ final class CYLTagListFoldingTests: CYLMenuExampleTestCase {
         tags.layOut()
         XCTAssertEqual(tags.itemFrame(at: ip(view.numberOfVisibleItems(inSection: 0), 0))?.height ?? 0,
                        view.style.itemHeight, accuracy: 0.5, "maxItemHeight limits the fold cell too")
-        withExtendedLifetime(source) {}
     }
 
     /// The fold cell joins the last visible row first; a tag it pushes out is no member of that row, so its (taller)

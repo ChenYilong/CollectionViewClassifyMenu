@@ -144,12 +144,14 @@ final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
     }
 
     func testEveryRowIsAsTallAsItsTallestTagAndMaxItemHeightLimitsIt() {
-        let source = CYLMenuFixtures.source(itemCount: 12, sections: 1)
-        source.sections[0].items[1].title = "一个很长很长很长很长很长很长很长很长的标题,换行后比同一行的其他标签更高"
-        let view = showTagList(source, width: 240)
-        let style = CYLMenuStyle()
-        style.titleWraps = true
-        view.style = style
+        // A tag of its own, taller style (a custom tag or icon height). A wrapping title (`titleWraps`) is as wide as the
+        // content, so it never shares a row: the tall style is what makes row-mates differ.
+        let view = CYLTagListView(frame: .zero)
+        view.addTags((0..<12).map { CYLTag(title: "Tag \(String(format: "%02d", $0))") })
+        let tall = CYLMenuStyle()
+        tall.itemHeight = 80
+        view.tags[1].style = tall
+        show(view, size: CGSize(width: 240, height: 700))
         view.layoutIfNeeded()
         let tags = view.probe
         tags.layOut()
@@ -166,7 +168,7 @@ final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
         }
         XCTAssertTrue(rowHeights().values.allSatisfy { $0.count == 1 }, "Tags of a row share one height")
         let tallest = tags.itemFrame(at: ip(1, 0))?.height ?? 0
-        XCTAssertGreaterThan(tallest, view.style.itemHeight, "The wrapping title makes its tag taller")
+        XCTAssertGreaterThanOrEqual(tallest, 80, "The own style makes its tag taller")
         XCTAssertEqual(tags.itemFrame(at: ip(0, 0))?.height ?? 0, tallest, accuracy: 0.5,
                        "A short tag beside it is stretched")
 
@@ -174,6 +176,5 @@ final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
         view.layoutIfNeeded()
         tags.layOut()
         XCTAssertTrue(rowHeights().values.allSatisfy { $0 == [view.style.itemHeight] }, "Limited to maxItemHeight")
-        withExtendedLifetime(source) {}
     }
 }

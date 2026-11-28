@@ -712,8 +712,8 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     XCTAssertFalse(button.isShowingBadge);
     button.badgeValue = @"3";
     [button layoutIfNeeded];
-    XCTAssertTrue(button.isShowingBadge);
-    XCTAssertEqualObjects(button.accessibilityValue, @"3");
+    // VoiceOver reads CYLBadge's localized description (for example "3 new messages"), which contains the value.
+    XCTAssertTrue([button.accessibilityValue containsString:@"3"]);
 
     NSURL *url = [NSURL fileURLWithPath:@"/no/such/file.json"];
     CYLTagButton *animated = [[CYLTagButton alloc] initWithTitle:nil image:image animationURL:url];

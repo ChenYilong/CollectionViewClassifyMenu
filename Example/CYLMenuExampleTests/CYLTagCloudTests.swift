@@ -178,10 +178,11 @@ final class CYLTagCloudTests: CYLMenuExampleTestCase {
         blueCell?.isHighlighted = false
         XCTAssertEqual(blue?.layer.backgroundColor, normal)
 
-        // tagTextSize: a larger text makes that tag taller than the others.
+        // tagTextSize: a larger text makes that tag taller, and the tags of its row are as tall (rows follow their tallest tag).
         let small = probe.itemFrame(at: ip(0, 0))?.height ?? 0
         let large = probe.itemFrame(at: ip(2, 0))?.height ?? 0
-        XCTAssertGreaterThan(large, small)
+        XCTAssertGreaterThan(large, list.style.itemHeight)
+        XCTAssertEqual(small, large, accuracy: 0.5, "Tags of a row are stretched to the tallest")
         XCTAssertEqual(probe.tagButton(at: ip(2, 0))?.titleLabel.font.pointSize ?? 0, 22, accuracy: 6, "scaled for Dynamic Type")
 
         // background: drawn behind the title.
