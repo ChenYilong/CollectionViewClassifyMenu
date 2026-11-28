@@ -151,6 +151,7 @@ final class CYLWordPickerSheetViewController: UIViewController, CYLMenuDelegate 
 
         let list = CYLTagListView()
         list.style = .wordPicker()
+        list.style.backgroundStyle = .liquidGlass
         list.colorTheme = CYLTagColorTheme.none
         list.selectionMode = .multiple
         list.allowsSmearSelection = true

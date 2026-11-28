@@ -106,17 +106,30 @@ final class CYLTagButtonTests: XCTestCase {
         appearance.backgroundColor = .red
         appearance.reset()
         XCTAssertEqual(appearance.backgroundColor, CYLTagAppearance.defaultBackgroundColor, "reset restores the default")
-        XCTAssertEqual(CYLTagAppearance.defaultBackgroundColor, UIColor.white)
+        let light = UITraitCollection(userInterfaceStyle: .light)
+        let dark = UITraitCollection(userInterfaceStyle: .dark)
+        XCTAssertEqual(CYLTagAppearance.defaultBackgroundColor.resolvedColor(with: light), UIColor.white.resolvedColor(with: light),
+                       "light mode: white, as before")
+        XCTAssertEqual(CYLTagAppearance.defaultBackgroundColor.resolvedColor(with: dark), UIColor.secondarySystemBackground.resolvedColor(with: dark),
+                       "dark mode: the secondary system background, so the dynamic label tint stays readable")
+        XCTAssertEqual(CYLTagAppearance.defaultTextColor.resolvedColor(with: dark), UIColor.label.resolvedColor(with: dark))
+        XCTAssertEqual(CYLTagAppearance.defaultTextColor.resolvedColor(with: light), UIColor(white: 0.25, alpha: 1).resolvedColor(with: light))
         appearance.reset()
         XCTAssertEqual(appearance.margin, 10)
 
         let style = CYLMenuStyle()
-        style.normalAppearance.cornerRadius = 0
+        style.normalAppearance.cornerRadius = 1000
         style.normalAppearance.borderColor = .green
         style.normalAppearance.borderWidth = 2
         style.normalAppearance.backgroundColor = .cyan
         let button = CYLMenuFixtures.tagButton(title: "首页", image: nil, style: style)
-        XCTAssertEqual(button.layer.cornerRadius, 15, accuracy: 0.01, "0 is an automatic capsule")
+        XCTAssertEqual(button.layer.cornerRadius, 15, accuracy: 0.01, "a radius of half the height or more is a capsule")
+        style.normalAppearance.cornerRadius = 0
+        let square = CYLMenuFixtures.tagButton(title: "首页", image: nil, style: style)
+        XCTAssertEqual(square.layer.cornerRadius, 0, "0 is square corners, no special meaning")
+        style.normalAppearance.cornerRadius = 6
+        let rounded = CYLMenuFixtures.tagButton(title: "首页", image: nil, style: style)
+        XCTAssertEqual(rounded.layer.cornerRadius, 6, accuracy: 0.01, "a plain number of points")
         XCTAssertEqual(button.layer.borderWidth, 2)
         XCTAssertTrue(button.layer.borderColor == UIColor.green.cgColor)
         XCTAssertTrue(button.layer.backgroundColor == UIColor.cyan.cgColor)
@@ -201,45 +214,34 @@ final class CYLTagButtonTests: XCTestCase {
                            + insets.top + insets.bottom), accuracy: 0.5, "No spacing for the missing icon")
     }
 
+    /// The badge is the base class's (`CYLAnimatedItemView.badgeValue`, drawn by CYLBadge on `badgeAnchorView`); the tag
+    /// keeps `badgeAnchorView` on its icon, or on its title when it has no icon, and VoiceOver reads the value.
     func testTagButtonBadge() {
         let button = CYLTagButton(title: "消息", image: UIImage(systemName: "message"))
         button.frame.size = CGSize(width: 120, height: 40)
         button.layoutIfNeeded()
         XCTAssertNil(button.badgeValue)
-        XCTAssertTrue(button.badgeLabel.isHidden, "nil hides the badge")
+        XCTAssertFalse(button.isShowingBadge, "nil hides the badge")
         XCTAssertNil(button.accessibilityValue)
-        XCTAssertEqual(button.badgeColor, .systemRed, "The default color")
 
         button.badgeValue = ""
         button.layoutIfNeeded()
-        XCTAssertFalse(button.badgeLabel.isHidden)
-        XCTAssertNil(button.badgeLabel.text, "A dot has no text")
-        XCTAssertEqual(button.badgeLabel.frame.size, CGSize(width: 8, height: 8))
-        let icon = button.imageView.frame
-        XCTAssertEqual(button.badgeLabel.frame.midX, icon.maxX, accuracy: 1, "At the icon's trailing edge")
-        XCTAssertEqual(button.badgeLabel.frame.midY, icon.minY, accuracy: 1, "At the icon's top edge")
-        XCTAssertEqual(button.accessibilityValue, CYLMenuLocalizedString("CYLTagBadgeDot"))
-        XCTAssertFalse(button.accessibilityValue?.isEmpty ?? true)
+        XCTAssertTrue(button.isShowingBadge, "An empty string shows a dot")
+        XCTAssertEqual(button.badgeAnchorView.frame, button.imageView.frame, "The anchor is the icon")
+        XCTAssertFalse(button.accessibilityValue?.isEmpty ?? true, "VoiceOver reads CYLBadge's localized description of the dot")
 
         button.badgeValue = "99+"
-        button.badgeColor = .blue
         button.layoutIfNeeded()
-        XCTAssertEqual(button.badgeLabel.text, "99+")
-        XCTAssertEqual(button.badgeLabel.backgroundColor, .blue)
-        XCTAssertGreaterThan(button.badgeLabel.frame.width, button.badgeLabel.frame.height, "A capsule")
-        XCTAssertTrue(button.bounds.contains(button.badgeLabel.frame), "Kept inside the tag")
-        XCTAssertEqual(button.accessibilityValue, "99+")
+        XCTAssertTrue(button.isShowingBadge)
+        XCTAssertTrue(button.accessibilityValue?.contains("99+") ?? false, "CYLBadge's description holds the value")
         button.accessibilityValue = "custom"
-        XCTAssertEqual(button.accessibilityValue, "custom", "A value that was set wins")
-        button.badgeColor = nil
-        XCTAssertEqual(button.badgeColor, .systemRed, "nil restores the default")
+        XCTAssertTrue(button.accessibilityValue?.contains("custom") ?? false, "A value that was set is read first")
 
         let titleOnly = CYLTagButton(title: "消息", image: nil)
+        titleOnly.frame.size = CGSize(width: 120, height: 40)
         titleOnly.badgeValue = "1"
         titleOnly.layoutIfNeeded()
-        XCTAssertEqual(titleOnly.badgeLabel.frame.minX, min(titleOnly.titleLabel.frame.maxX
-                       - titleOnly.badgeLabel.frame.height / 2, titleOnly.bounds.width - titleOnly.badgeLabel.frame.width),
-                       accuracy: 1, "At the title's corner when there is no icon")
+        XCTAssertEqual(titleOnly.badgeAnchorView.frame, titleOnly.titleLabel.frame, "The anchor is the title when there is no icon")
     }
 
     func testTagButtonConvenienceInitializers() {

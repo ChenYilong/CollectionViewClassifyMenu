@@ -97,3 +97,17 @@ test('animation types come from cyl-animated-item: SVGA, and *.bin files named b
   // A loadable SVGA path reaches cyl-animated-item (it was '' and the icon slot was not drawn).
   assert.equal(animationURL('/assets/tab/svga/tab_activity.svga.bin'), '/assets/tab/svga/tab_activity.svga.bin');
 });
+
+test('maxItemHeight limits every tag of the list; missing means no limit', () => {
+  const unlimited = model.normalize(configuration('none'));
+  assert.equal(unlimited.maxItemHeight, Number.MAX_VALUE);
+  const natural = model.tagHeight(unlimited.style);
+  assert.equal(model.listTagHeight(unlimited, unlimited.style), natural);
+  const limited = model.normalize(configuration('none', { maxItemHeight: 20 }));
+  assert.equal(model.listTagHeight(limited, limited.style), 20);
+  assert.ok(20 < natural, 'the limit is below the natural height');
+  assert.equal(model.normalize(configuration('none', { maxItemHeight: 0 })).maxItemHeight, 1, 'at least 1');
+  const layout = model.tagLayout(limited.style, { title: 'a', enabled: true }, 'normal', { kind: 'none' }, 10, 10,
+    model.listTagHeight(limited, limited.style));
+  assert.equal(layout.height, 20);
+});

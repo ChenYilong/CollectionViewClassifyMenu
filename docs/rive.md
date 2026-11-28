@@ -40,6 +40,7 @@
 | 中文 | English |
 |:---|:---|
 | 待办：在真实的 HarmonyOS 设备上运行动效页面（GPU 渲染器）。 | TODO: run the animation screen on a real HarmonyOS device (GPU renderer). |
+| 阻塞于：Windows 会话（HarmonyOS）与所有者（真机），见 2026-11-24 的交接。 | Blocked on: Windows session (HarmonyOS) and the owner (the real device), see the 2026-11-24 hand-over. |
 | 已完成（决定「加上 Rive」）：Flutter 和 React Native 的 iOS / Android 示例已接入 Rive（`1f1221c`）。 | Done (decided 「加上 Rive」): the Flutter and React Native iOS / Android examples link Rive (`1f1221c`). |
 | 已完成（2026-11-19）：Flutter 和 React Native 示例的 Rive 行在 iOS 模拟器（Mac 会话）和 Android 模拟器（Windows 会话）上均能绘制、播放并循环；截图和详情见下文“模拟器上的 Rive 检查”。 | Done (2026-11-19): the Rive row of the Flutter and React Native examples draws, plays and loops on the iOS simulator (Mac session) and the Android emulator (Windows session); screenshots and details in "Rive checks on simulators" below. |
 

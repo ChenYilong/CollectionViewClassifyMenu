@@ -49,7 +49,7 @@ import UIKit
  */
 @objc public enum CYLMenuFoldControlContent: Int {
     /**
-     * "更多 ⌄"; expanded, only the icon, turned.
+     * "更多 ⌄"; expanded, the collapse title and the icon, turned ("收起 ⌃").
      */
     case iconAndTitle = 0
     /**
@@ -60,6 +60,11 @@ import UIKit
      * "⌄"; expanded, the same icon, turned.
      */
     case icon
+    /**
+     * "更多 ⌄" collapsed and "收起 ⌃" expanded: the title and the icon in both states (the icon turned 180° when
+     * expanded). In a configuration file: "titleAndIconAlways" ("titleAndIcon" is an older alias of `.iconAndTitle`).
+     */
+    case titleAndIcon
 }
 
 /**
@@ -172,7 +177,7 @@ open class CYLMenuFoldControl: NSObject, NSCopying {
         switch content {
         case .iconAndTitle:
             return !expanded
-        case .title:
+        case .title, .titleAndIcon:
             return true
         case .icon:
             return false
@@ -187,6 +192,14 @@ open class CYLMenuFoldControl: NSObject, NSCopying {
             return nil
         }
         return expanded ? collapseTitle : title
+    }
+
+    /**
+     * Whether the control is size-capped (its font stops at the footnote size of the `.large` content size category,
+     * its width at 40% of the header): the header controls and `.titleAndIcon`.
+     */
+    open var isSizeCapped: Bool {
+        position == .headerTrailing || position == .headerLeading || content == .titleAndIcon
     }
 
     /**

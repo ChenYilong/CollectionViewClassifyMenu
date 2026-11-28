@@ -64,6 +64,74 @@ import UIKit
     case truncate
 }
 
+// MARK: - Header room
+
+/**
+ * The widths inside a section header, one model for the layout (`CYLTagListHeaderView`) and the height (`headerHeight(forSection:)`):
+ * INNER WIDTH is the header's width between its leading and trailing insets; the views are separated by `spacing`; the fold control
+ * is `min(natural width of its wider state, cap x inner)` (cap 0.4 alone, 0.3 with More / clear / an accessory view, the same width
+ * collapsed and expanded); an accessory view is at most 0.3 of the inner width; only the title shrinks, to
+ * `max(one em, inner - the fixed parts - the spacings)`, or the inner width when nothing else is shown.
+ */
+struct CYLTagListHeaderRoom {
+
+    /**
+     * The gap between two adjacent header views.
+     */
+    static let spacing: CGFloat = 8
+    /**
+     * The fold control's cap as a fraction of the inner width: alone, and next to More / clear / an accessory view.
+     */
+    static let foldFractionAlone: CGFloat = 0.4
+    static let foldFractionShared: CGFloat = 0.3
+    /**
+     * The accessory view's cap as a fraction of the inner width.
+     */
+    static let accessoryFraction: CGFloat = 0.3
+    /**
+     * The control's own margin: its content lines up with the title, so it takes this much less than its width.
+     */
+    static let foldMargin: CGFloat = 6
+
+    let foldWidth: CGFloat
+    let accessoryWidth: CGFloat
+    let titleWidth: CGFloat
+
+    /**
+     * - `foldNaturalWidth`: the wider of the fold control's two states; `nil`: no fold control in this header.
+     * - `moreExtent`, `clearSide`, `accessoryNaturalWidth`: the width each takes; `nil`: not shown.
+     * - `indicatorWidth`: the indicator bar's width; `nil`: none.
+     */
+    init(inner: CGFloat, indicatorWidth: CGFloat?, foldNaturalWidth: CGFloat?, moreExtent: CGFloat?, clearSide: CGFloat?,
+         accessoryNaturalWidth: CGFloat?, em: CGFloat) {
+        let spacing = Self.spacing
+        let shares = moreExtent != nil || clearSide != nil || accessoryNaturalWidth != nil
+        var fixed: CGFloat = 0
+        if let indicatorWidth {
+            fixed += indicatorWidth + spacing
+        }
+        if let moreExtent {
+            fixed += moreExtent + spacing
+        }
+        if let clearSide {
+            fixed += clearSide + spacing
+        }
+        var accessory: CGFloat = 0
+        if let accessoryNaturalWidth {
+            accessory = min(accessoryNaturalWidth, inner * Self.accessoryFraction)
+            fixed += accessory + spacing
+        }
+        var fold: CGFloat = 0
+        if let foldNaturalWidth {
+            fold = min(foldNaturalWidth, inner * (shares ? Self.foldFractionShared : Self.foldFractionAlone))
+            fixed += fold - Self.foldMargin + spacing
+        }
+        foldWidth = fold
+        accessoryWidth = accessory
+        titleWidth = max(em, inner - fixed)
+    }
+}
+
 // MARK: - Header
 
 /**
@@ -78,6 +146,13 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
      */
     static let moreButtonSize: CGFloat = 44
     static let iconSize: CGFloat = 16
+
+    /**
+     * What the More button takes at the trailing edge: its touch target less the part that sticks out so the icon lines up with the inset.
+     */
+    static func moreExtent(iconWidth: CGFloat) -> CGFloat {
+        moreButtonSize - floor((moreButtonSize - iconWidth) / 2)
+    }
 
     /**
      * The section's icon and title: the same component as the tags, so a section icon can be anything a tag icon can.
@@ -111,7 +186,28 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
      */
     var foldSize: CGSize = .zero
     var foldAtLeadingEdge = false
-    var horizontalInset: CGFloat = 0
+    /**
+     * The distances from the header's leading and trailing edges to the title and the controls.
+     */
+    var leadingInset: CGFloat = 0
+    var trailingInset: CGFloat = 0
+    /**
+     * The header band (`CYLMenuStyle.headerBackgroundColor`) and the divider, as distances from the header's own edges
+     * (left, right); `nil`: not shown.
+     */
+    var bandEdges: (left: CGFloat, right: CGFloat)? {
+        didSet {
+            setNeedsLayout()
+        }
+    }
+    var separatorEdges: (left: CGFloat, right: CGFloat)? {
+        didSet {
+            setNeedsLayout()
+        }
+    }
+    var separatorThickness: CGFloat = 0
+    @objc let bandView = UIView()
+    @objc let separatorView = UIView()
     var indicatorSize: CGSize = .zero
     var section = 0
     var accessoryView: UIView? {
@@ -155,6 +251,13 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
         clearButton.contentHorizontalAlignment = .fill
         clearButton.contentVerticalAlignment = .fill
         clearButton.addTarget(self, action: #selector(clearTapped), for: .touchUpInside)
+        for decoration in [bandView, separatorView] {
+            decoration.isHidden = true
+            decoration.isAccessibilityElement = false
+            decoration.isUserInteractionEnabled = false
+            addSubview(decoration)
+        }
+        bandView.layer.cornerCurve = .continuous
         addSubview(clearButton)
         indicatorView.isHidden = true
         addSubview(indicatorView)
@@ -175,53 +278,78 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
         super.layoutSubviews()
         let width = bounds.width
         let height = bounds.height
-        var trailing = width - horizontalInset
-        var leading = horizontalInset
+        let rightToLeft = effectiveUserInterfaceLayoutDirection == .rightToLeft
+        titleButton.mirrorsContent = rightToLeft
+        foldButton.mirrorsContent = rightToLeft
+        layOutLeadingToTrailing(width: width, height: height)
+        guard rightToLeft else {
+            return
+        }
+        // Everything above was placed from the left edge (the band's and the divider's `left` is the leading side): in a right-to-left
+        // layout each view takes the mirrored position.
+        for view in [bandView, separatorView, indicatorView, titleButton, foldButton, moreButton, clearButton, accessoryView]
+            .compactMap({ $0 }) where !view.isHidden {
+            view.frame.origin.x = width - view.frame.maxX
+        }
+    }
+
+    private func layOutLeadingToTrailing(width: CGFloat, height: CGFloat) {
+        layoutDecorations(width: width, height: height)
+        let spacing = CYLTagListHeaderRoom.spacing
+        let inner = max(0, width - leadingInset - trailingInset)
+        let moreSize = min(Self.moreButtonSize, height > 0 ? max(height, 30) : Self.moreButtonSize)
+        let moreIconWidth = moreButton.currentImage?.size.width ?? 22
+        let clearSide = min(height, ceil(titleButton.titleLabel.font?.lineHeight ?? 17))
+        let room = CYLTagListHeaderRoom(
+            inner: inner, indicatorWidth: indicatorView.isHidden ? nil : indicatorSize.width,
+            foldNaturalWidth: foldButton.isHidden ? nil : foldSize.width,
+            moreExtent: moreButton.isHidden ? nil : Self.moreExtent(iconWidth: moreIconWidth),
+            clearSide: clearButton.isHidden ? nil : ceil(titleButton.titleLabel.font?.lineHeight ?? 17),
+            accessoryNaturalWidth: accessoryView.map { $0.sizeThatFits(CGSize(width: inner, height: .greatestFiniteMagnitude)).width },
+            em: titleButton.titleLabel.font?.pointSize ?? 17)
+        var trailing = width - trailingInset
+        var leading = leadingInset
         if !moreButton.isHidden {
             // A 44 pt touch target whose icon lines up with the trailing inset.
-            let size = min(Self.moreButtonSize, height > 0 ? max(height, 30) : Self.moreButtonSize)
-            let iconWidth = moreButton.currentImage?.size.width ?? 22
-            trailing += floor((size - iconWidth) / 2)
-            trailing -= size
-            moreButton.frame = CGRect(x: trailing, y: floor((height - size) / 2), width: size, height: size)
-            trailing -= 4
+            moreButton.frame = CGRect(x: trailing + floor((moreSize - moreIconWidth) / 2) - moreSize, y: floor((height - moreSize) / 2),
+                                      width: moreSize, height: moreSize)
+            trailing -= Self.moreExtent(iconWidth: moreIconWidth) + spacing
         }
         if !clearButton.isHidden {
             // A square as tall as a line of the title, at the trailing inset; aligned with the title text below.
-            let side = min(height, ceil(titleButton.titleLabel.font?.lineHeight ?? 17))
-            trailing -= side
-            clearButton.frame = CGRect(x: trailing, y: floor((height - side) / 2), width: side, height: side)
-            trailing -= 8
+            trailing -= clearSide
+            clearButton.frame = CGRect(x: trailing, y: floor((height - clearSide) / 2), width: clearSide, height: clearSide)
+            trailing -= spacing
         }
         if !foldButton.isHidden {
-            let size = CGSize(width: min(foldSize.width, width / 2), height: min(foldSize.height, height))
+            let size = CGSize(width: room.foldWidth, height: min(foldSize.height, height))
             let y = floor((height - size.height) / 2)
             // The control's own margin lines its content up with the title.
             if foldAtLeadingEdge {
-                foldButton.frame = CGRect(x: leading - 6, y: y, width: size.width, height: size.height)
-                leading += size.width - 6 + 4
+                foldButton.frame = CGRect(x: leading - CYLTagListHeaderRoom.foldMargin, y: y, width: size.width, height: size.height)
+                leading += size.width - CYLTagListHeaderRoom.foldMargin + spacing
             } else {
-                trailing -= size.width - 6
+                trailing -= size.width - CYLTagListHeaderRoom.foldMargin
                 foldButton.frame = CGRect(x: trailing, y: y, width: size.width, height: size.height)
-                trailing -= 8
+                trailing -= spacing
             }
         }
         if let accessoryView {
-            var size = accessoryView.sizeThatFits(CGSize(width: width / 2, height: height))
-            size.width = min(size.width, width / 2)
+            var size = accessoryView.sizeThatFits(CGSize(width: room.accessoryWidth, height: height))
+            size.width = room.accessoryWidth
             size.height = min(max(size.height, 1), height)
             trailing -= size.width
             accessoryView.frame = CGRect(x: trailing, y: floor((height - size.height) / 2), width: size.width,
                                          height: size.height)
-            trailing -= 8
+            trailing -= spacing
         }
         var x = leading
         if !indicatorView.isHidden {
             indicatorView.frame = CGRect(x: x, y: floor((height - indicatorSize.height) / 2),
                                          width: indicatorSize.width, height: indicatorSize.height)
-            x += indicatorSize.width + 8
+            x += indicatorSize.width + spacing
         }
-        titleButton.frame = CGRect(x: x, y: 0, width: max(0, trailing - x), height: height)
+        titleButton.frame = CGRect(x: x, y: 0, width: room.titleWidth, height: height)
         if !clearButton.isHidden {
             // The rule: the clear button's top and bottom are the title text's (the element to its left).
             titleButton.layoutIfNeeded()
@@ -231,6 +359,25 @@ private final class CYLTagListHeaderView: UICollectionReusableView {
                                            height: text.height)
             }
         }
+    }
+
+    /**
+     * The band behind the title and the divider at the bottom edge, inside the header's height.
+     */
+    private func layoutDecorations(width: CGFloat, height: CGFloat) {
+        bandView.isHidden = bandEdges == nil
+        if let edges = bandEdges {
+            bandView.frame = CGRect(x: edges.left, y: 0, width: max(0, width - edges.left - edges.right), height: height)
+        }
+        separatorView.isHidden = separatorEdges == nil
+        if let edges = separatorEdges {
+            let thickness = min(separatorThickness, height)
+            separatorView.frame = CGRect(x: edges.left, y: height - thickness, width: max(0, width - edges.left - edges.right),
+                                         height: thickness)
+        }
+        // Behind the title and the controls, the divider on the band.
+        sendSubviewToBack(separatorView)
+        sendSubviewToBack(bandView)
     }
 
     @objc private func clearTapped() {
@@ -553,6 +700,22 @@ open class CYLTagListView: UIView {
      */
     @objc open private(set) var contentHeight: CGFloat = 0
 
+    /**
+     * The tallest a tag may be, for every tag of the list; `CGFloat.greatestFiniteMagnitude` (the default) sets no limit.
+     *
+     * Rows are always as tall as their tallest tag, and every other tag of the row is stretched to that height, so a
+     * tag made taller by a bigger icon, a large font or a wrapping title (`CYLMenuStyle.titleWraps`) never leaves its
+     * row neighbours shorter. A tag that needs more than this is cut to it (a wrapping title is truncated), and the
+     * row follows. Values below 1 are treated as 1.
+     */
+    @objc open var maxItemHeight: CGFloat = CGFloat.greatestFiniteMagnitude {
+        didSet {
+            if oldValue != maxItemHeight {
+                invalidateMeasurements()
+            }
+        }
+    }
+
     // MARK: Spacing (android-tagview's lineMargin, tagMargin and textPadding…)
 
     /**
@@ -793,6 +956,29 @@ open class CYLTagListView: UIView {
     @objc open var removesItemsOnDelete = true
 
     // MARK: Long press and reordering
+
+    /**
+     * What a long press on an item does: `CYLTagLongPressActions.first([reorder, report])` by default (reordering where
+     * the list can reorder, else the long press is reported). Set another built-in action, a combination or your own
+     * (docs/tag-long-press-action.md). Setting it cancels a press in progress and hides the callout.
+     */
+    open var longPressAction: CYLTagLongPressAction = CYLTagLongPressActions.makeDefault() {
+        didSet {
+            oldValue.cancel(host: self)
+            if isReordering {
+                cancelReordering()
+            }
+            dismissCallout()
+        }
+    }
+
+    /// The callout of a long press that shows now (`CYLTagLongPressHost.showCallout`).
+    private var calloutView: CYLTagCalloutView?
+    /// KVO on the contentOffset of the list's scroll view and its ancestors while the callout shows; removed on dismiss.
+    private var calloutScrollObservations: [NSKeyValueObservation] = []
+    /// A tap anywhere in the window dismisses the callout (also on the list's empty area, the bars and other screens' views).
+    private var calloutDismissTap: UITapGestureRecognizer?
+    private let calloutTapDelegate = CYLTagCalloutTapDelegate()
 
     /**
      * A long press on an item without moving it: `menu(_:didLongPressItemAt:)`, then this (onTagLongClick).
@@ -1194,6 +1380,16 @@ open class CYLTagListView: UIView {
      * Each item's height: the list's item height, or more for an item whose own font needs it.
      */
     private var itemHeights: [[CGFloat]] = []
+    /**
+     * Each item's own height (before `maxItemHeight` and the row alignment), for the sections whose rows change with the
+     * inline fold cell (`displayedHeights(inSection:)`).
+     */
+    private var ownHeights: [[CGFloat]] = []
+    /**
+     * `displayedHeights(inSection:)` per section, with the number of visible items and the fold state it was made for;
+     * dropped with every measurement.
+     */
+    private var displayedHeightCache: [Int: (visible: Int, expanded: Bool, heights: [CGFloat], rows: [Int])] = [:]
     private var rows: [[Int]] = []
     private var selection = Set<IndexPath>()
     private var expandedSections = IndexSet()
@@ -1249,13 +1445,13 @@ open class CYLTagListView: UIView {
 
     public override init(frame: CGRect) {
         collectionView = UICollectionView(frame: CGRect(origin: .zero, size: frame.size),
-                                          collectionViewLayout: CYLCollectionViewLeftAlignedLayout())
+                                          collectionViewLayout: CYLTagListLayout())
         super.init(frame: frame)
         commonInit()
     }
 
     public required init?(coder: NSCoder) {
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: CYLCollectionViewLeftAlignedLayout())
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: CYLTagListLayout())
         super.init(coder: coder)
         commonInit()
     }
@@ -1336,6 +1532,9 @@ open class CYLTagListView: UIView {
         collectionView.register(CYLTagListFooterView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                                 withReuseIdentifier: ReuseIdentifier.footer)
+        (collectionView.collectionViewLayout as? CYLTagListLayout)?.cardProvider = { [weak self] section in
+            self?.cardSpec(forSection: section)
+        }
         addSubview(collectionView)
         longPressRecognizer.addTarget(self, action: #selector(handleLongPress(_:)))
         collectionView.addGestureRecognizer(longPressRecognizer)
@@ -1367,6 +1566,7 @@ open class CYLTagListView: UIView {
      * Reads everything from the data source again. Selections and expanded sections that are still in range are kept.
      */
     @objc open func reloadMenuData() {
+        dismissCallout()
         let source = menuDataSource
         if let tagSource = tagDataSourceStorage, source === tagSource {
             // A tag's look may have changed.
@@ -1395,28 +1595,62 @@ open class CYLTagListView: UIView {
         let measured = width == measuredWidth
         let sectionWidths = measured ? itemWidths : widths(forContentWidth: available)
         let sectionRows = measured ? rows : rows(forWidths: sectionWidths, contentWidth: available)
-        let sectionHeights = measured ? itemHeights : measureItemHeights(widths: sectionWidths)
-        let header = headerHeight()
-        let insets = style.sectionInsets
+        let sectionOwnHeights = measured ? ownHeights : ownItemHeights(widths: sectionWidths)
+        let sectionHeights = measured ? itemHeights
+            : alignedToRows(sectionOwnHeights, widths: sectionWidths, contentWidth: available)
+        let insets = tagInsets(atWidth: width)
         var height: CGFloat = 0
         for section in sectionRows.indices {
             var rowCount = sectionRows[section].count
             let foldable = canFold(rowCount: rowCount)
             if foldable && !expandedSections.contains(section) {
                 rowCount = defaultVisibleRows
-            } else if foldable && foldControlIsInline {
-                // Expanded, the inline fold cell follows the last item and may start a row of its own.
-                let withFold = sectionWidths[section] + [inlineFoldSize(inSection: section, expanded: true).width]
-                rowCount = rows(forWidths: [withFold], contentWidth: available).first?.count ?? 0
             }
-            height += header + insets.top + insets.bottom
-            height += heightOfRows(rowCount, rows: sectionRows[section],
-                                   heights: section < sectionHeights.count ? sectionHeights[section] : [])
+            height += headerHeight(forSection: section, width: width, canFold: foldable) + insets.top + insets.bottom
+            if foldable && foldControlIsInline {
+                // The fold cell is a tag of its row: the displayed rows (visible items and the cell) set the height.
+                let expanded = expandedSections.contains(section)
+                let fold = inlineFoldSize(inSection: section, expanded: expanded)
+                let total = sectionWidths[section].count
+                let visible = expanded ? total
+                    : collapsedItemCount(widths: sectionWidths[section], rows: sectionRows[section], total: total,
+                                         contentWidth: available, foldWidth: fold.width)
+                height += rowsHeight(displayedLayout(widths: sectionWidths[section],
+                                                     ownHeights: section < sectionOwnHeights.count ? sectionOwnHeights[section] : [],
+                                                     visible: visible, fold: fold, contentWidth: available))
+            } else {
+                height += heightOfRows(rowCount, rows: sectionRows[section],
+                                       heights: section < sectionHeights.count ? sectionHeights[section] : [])
+            }
             if foldable && foldControlIsInFooter {
                 height += footerHeight
             }
         }
         return ceil(height) + titleHeight(forWidth: width)
+    }
+
+    /**
+     * The section column at the current width: the list width minus `sectionInsets` (x and width; y and height are 0). The card,
+     * the header band and the divider span it.
+     */
+    open func contentColumn(inSection section: Int) -> CGRect {
+        column(atWidth: collectionView.bounds.width)
+    }
+
+    /**
+     * The board (the card) of `.insetGrouped`: the tag column widened by `CYLMenuStyle.sectionBoardInset` on each side, which is
+     * `contentColumn(inSection:)` when the inset is unset. The header band and the divider span it too. Plain: `contentColumn(inSection:)`.
+     */
+    open func boardColumn(inSection section: Int) -> CGRect {
+        boardColumn(atWidth: collectionView.bounds.width)
+    }
+
+    /**
+     * The column the tags are laid in: `contentColumn(inSection:)` narrowed by the card's padding under `.insetGrouped`. Tag
+     * widths, rows, fold decisions, heights and frames all come from it.
+     */
+    open func tagColumn(inSection section: Int) -> CGRect {
+        tagColumn(atWidth: collectionView.bounds.width)
     }
 
     // MARK: - Tags
@@ -1737,6 +1971,10 @@ open class CYLTagListView: UIView {
     @objc(canFoldSection:)
     open func canFoldSection(_ section: Int) -> Bool {
         measureIfNeeded()
+        // Without a known width every tag is laid out in a row of its own: that is no layout, so nothing can need a fold yet.
+        guard collectionView.bounds.width > 0 else {
+            return false
+        }
         return rows.indices.contains(section) && canFold(rowCount: rows[section].count)
     }
 
@@ -1762,24 +2000,33 @@ open class CYLTagListView: UIView {
         guard rows.indices.contains(section), canFoldSection(section), !isSectionExpanded(section) else {
             return total
         }
+        let foldWidth = foldControlIsInline && itemWidths.indices.contains(section)
+            ? inlineFoldSize(inSection: section, expanded: false).width : nil
+        return collapsedItemCount(widths: itemWidths.indices.contains(section) ? itemWidths[section] : [],
+                                  rows: rows[section], total: total, contentWidth: contentWidth(forWidth: measuredWidth),
+                                  foldWidth: foldWidth)
+    }
+
+    /**
+     * The items a collapsed section shows: its first `defaultVisibleRows` rows; with the inline fold cell (`foldWidth`),
+     * the last of those rows keeps only the items that leave the cell the room (it joins that row first), so the hidden
+     * items are no members of any displayed row.
+     */
+    func collapsedItemCount(widths: [CGFloat], rows: [Int], total: Int, contentWidth: CGFloat, foldWidth: CGFloat?) -> Int {
         var visible = 0
         var lastRowCount = 0
-        for count in rows[section].prefix(defaultVisibleRows) {
+        for count in rows.prefix(defaultVisibleRows) {
             lastRowCount = count
             visible += count
         }
         visible = min(visible, total)
-        if foldControlIsInline && lastRowCount > 0 && itemWidths.indices.contains(section) {
-            // The inline fold cell ends the last visible row: hide the items it needs the room of.
-            let widths = itemWidths[section]
+        if let foldWidth = foldWidth, lastRowCount > 0 {
             let spacing = style.interitemSpacing
-            let available = contentWidth(forWidth: measuredWidth)
-            let foldWidth = inlineFoldSize(inSection: section, expanded: false).width
             var used: CGFloat = 0
             for item in (visible - lastRowCount)..<visible {
                 used += (item > visible - lastRowCount ? spacing : 0) + widths[item]
             }
-            while lastRowCount > 1 && used + spacing + foldWidth > available {
+            while lastRowCount > 1 && used + spacing + foldWidth > contentWidth {
                 used -= widths[visible - 1] + spacing
                 lastRowCount -= 1
                 visible -= 1
@@ -1809,7 +2056,7 @@ open class CYLTagListView: UIView {
             top = header.frame.minY
         } else if collectionView.numberOfItems(inSection: section) > 0,
                   let item = layout.layoutAttributesForItem(at: indexPath) {
-            top = item.frame.minY - style.sectionInsets.top
+            top = item.frame.minY - tagInsets(atWidth: collectionView.bounds.width).top
         }
         guard let top else {
             return
@@ -1944,6 +2191,14 @@ private extension CYLTagListView {
         menuDataSource?.menuAnimationURLForItem?(at: indexPath)
     }
 
+    func badgeValue(at indexPath: IndexPath) -> String? {
+        menuDataSource?.menuBadgeValueForItem?(at: indexPath)
+    }
+
+    func badgeAttributes(at indexPath: IndexPath) -> [String: Any]? {
+        menuDataSource?.menuBadgeAttributesForItem?(at: indexPath)
+    }
+
     func animationRestingProgress(at indexPath: IndexPath) -> CGFloat {
         CGFloat(menuDataSource?.menuAnimationRestingProgressForItem?(at: indexPath)?.doubleValue ?? 0)
     }
@@ -2026,8 +2281,8 @@ private extension CYLTagListView {
 private extension CYLTagListView {
 
     func applyStyleColors() {
-        backgroundColor = styleStorage.backgroundColor
-        collectionView.backgroundColor = styleStorage.backgroundColor
+        backgroundColor = styleStorage.resolvedBackgroundColor
+        collectionView.backgroundColor = styleStorage.resolvedBackgroundColor
         if let layout = collectionView.collectionViewLayout as? CYLCollectionViewLeftAlignedLayout,
            layout.rowAlignment != styleStorage.rowAlignment {
             layout.rowAlignment = styleStorage.rowAlignment
@@ -2107,6 +2362,20 @@ private extension CYLTagListView {
         CYLTagButton.height(for: style, traitCollection: traitCollection)
     }
 
+    /**
+     * `maxItemHeight`, at least 1.
+     */
+    var itemHeightLimit: CGFloat {
+        max(1, maxItemHeight)
+    }
+
+    /**
+     * The height of a tag with no wrapped title or own style: the list's item height, within `maxItemHeight`.
+     */
+    var cappedItemHeight: CGFloat {
+        min(itemHeight, itemHeightLimit)
+    }
+
     var foldControlIsInHeader: Bool {
         foldControl.position == .headerTrailing || foldControl.position == .headerLeading
     }
@@ -2158,22 +2427,182 @@ private extension CYLTagListView {
         CYLTagFoldButton.size(for: foldControl, expanded: expanded, traitCollection: traitCollection)
     }
 
+    /**
+     * The fold control in a header: the wider of the two states' widths (the header does not change when the section folds), the height of `expanded`.
+     */
+    func headerFoldSize(expanded: Bool) -> CGSize {
+        let size = foldSize(expanded: expanded)
+        return CGSize(width: max(foldSize(expanded: false).width, foldSize(expanded: true).width), height: size.height)
+    }
+
     var footerHeight: CGFloat {
         max(Self.footerHeight, foldSize(expanded: false).height)
     }
 
-    func headerHeight() -> CGFloat {
-        // A fold control at the top needs the header, also when section titles are hidden.
-        let foldHeight = foldControlIsInHeader ? foldSize(expanded: false).height : 0
+    func headerHeight(foldable: Bool) -> CGFloat {
+        // A fold control at the top needs the header, also when section titles are hidden, but only in a section that
+        // can fold (the footer control's rule).
+        let foldHeight = foldControlIsInHeader && foldable ? foldSize(expanded: false).height : 0
         guard showsSectionHeaders else {
             return foldHeight
         }
         let font = style.headerFont(for: traitCollection)
+        if sizesHeaderToText {
+            return max(style.headerHeightWasSet ? style.headerHeight : 0, ceil(font.lineHeight) + CYLSectionStyleMetrics.headerBoardTitlePadding,
+                       foldHeight)
+        }
         return max(style.headerHeight, ceil(font.lineHeight) + 12, foldHeight)
     }
 
+    /**
+     * Whether the header is sized to its text and the board starts `CYLSectionStyleMetrics.headerBoardSpacing` below it: under
+     * `.insetGrouped` with no header divider (the divider needs the old reservation) and with section headers shown.
+     */
+    var sizesHeaderToText: Bool {
+        showsSectionHeaders && style.sectionStyle == .insetGrouped && style.headerSeparatorStyle == .none
+    }
+
+    /**
+     * The header of `section` at the list width `width`: `headerHeight(foldable:)`, or, when `CYLMenuStyle.headerMaxLines` allows more than
+     * one line, tall enough for the title wrapped to the room left of the indicator and the fold / More / clear controls, plus 12 pt
+     * of padding; never below `headerHeight(foldable:)`. `canFold`: the section shows a fold control.
+     */
+    func headerHeight(forSection section: Int, width: CGFloat, canFold: Bool) -> CGFloat {
+        let base = headerHeight(foldable: canFold)
+        guard showsSectionHeaders, style.headerMaxLines != CYLHeaderTitleMaxLines.single,
+              let title = menuDataSource?.menuTitle(forSection: section), !title.isEmpty else {
+            return base
+        }
+        let source = menuDataSource
+        let edges = headerEdgeInsets(atWidth: width)
+        let font = style.headerFont(for: traitCollection)
+        var moreExtent: CGFloat?
+        if showsMoreButton(inSection: section) {
+            let image = style.moreButtonImage ?? UIImage(systemName: "ellipsis")
+            moreExtent = CYLTagListHeaderView.moreExtent(iconWidth: image?.size.width ?? 22)
+        }
+        let inner = max(0, width - edges.leading - edges.trailing)
+        let room = CYLTagListHeaderRoom(
+            inner: inner, indicatorWidth: style.headerIndicatorColor == nil ? nil : style.headerIndicatorSize.width,
+            foldNaturalWidth: foldControlIsInHeader && canFold ? headerFoldSize(expanded: false).width : nil,
+            moreExtent: moreExtent,
+            clearSide: source?.menuShowsClearButton?(forSection: section) == true ? ceil(font.lineHeight) : nil,
+            accessoryNaturalWidth: source?.menuAccessoryView?(forSection: section)
+                .map { $0.sizeThatFits(CGSize(width: inner, height: .greatestFiniteMagnitude)).width },
+            em: font.pointSize)
+        let icon = source?.menuImage?(forSection: section) == nil ? CGSize.zero
+            : CGSize(width: CYLTagListHeaderView.iconSize, height: CYLTagListHeaderView.iconSize)
+        let text = CYLTagButton.height(forTitle: title, iconSize: icon, width: max(1, room.titleWidth), showsDeleteIndicator: false,
+                                       style: headerTitleStyle(), traitCollection: traitCollection)
+        return max(base, ceil(text) + (sizesHeaderToText ? CYLSectionStyleMetrics.headerBoardTitlePadding : 12))
+    }
+
+    /**
+     * The one column function: the section column at the list width `width`, the list width minus `sectionInsets` (x and width; y and
+     * height are 0). The card, the header band and the divider span it.
+     */
+    func column(atWidth width: CGFloat) -> CGRect {
+        let insets = style.sectionInsets
+        return CGRect(x: insets.left, y: 0, width: max(0, width - insets.left - insets.right), height: 0)
+    }
+
+    /**
+     * The board's column: the tag column widened by `sectionBoardInset` on both sides; the section column when the inset is unset or
+     * the style is plain (no board).
+     */
+    func boardColumn(atWidth width: CGFloat) -> CGRect {
+        let column = column(atWidth: width)
+        guard style.sectionStyle == .insetGrouped, let inset = style.sectionBoardInset else {
+            return column
+        }
+        let tags = tagColumn(atWidth: width)
+        let extra = max(0, inset)
+        return CGRect(x: tags.minX - extra, y: 0, width: tags.width + 2 * extra, height: 0)
+    }
+
+    /**
+     * The card's padding around the tags: `sectionContentInsets` under `.insetGrouped`, else none.
+     */
+    var cardInsets: UIEdgeInsets {
+        style.sectionStyle == .insetGrouped ? style.sectionContentInsets : .zero
+    }
+
+    /**
+     * The column the tags are laid in: the section column, narrowed by the card's padding. Every tag width, row count, fold decision,
+     * height and frame takes its width and x from here.
+     */
+    func tagColumn(atWidth width: CGFloat) -> CGRect {
+        let column = column(atWidth: width)
+        let card = cardInsets
+        return CGRect(x: column.minX + card.left, y: 0, width: max(0, column.width - card.left - card.right), height: 0)
+    }
+
+    /**
+     * The flow layout's section insets: the tag column's edges, and the section's top and bottom insets plus the card's.
+     */
+    func tagInsets(atWidth width: CGFloat) -> UIEdgeInsets {
+        let tagColumn = tagColumn(atWidth: width)
+        let card = cardInsets
+        let top = sizesHeaderToText ? CYLSectionStyleMetrics.headerBoardSpacing : style.sectionInsets.top
+        return UIEdgeInsets(top: top + card.top, left: tagColumn.minX,
+                            bottom: style.sectionInsets.bottom + card.bottom, right: width - tagColumn.maxX)
+    }
+
     func contentWidth(forWidth width: CGFloat) -> CGFloat {
-        max(0, width - style.sectionInsets.left - style.sectionInsets.right)
+        tagColumn(atWidth: width).width
+    }
+
+    func cardSpec(forSection section: Int) -> CYLTagListCardSpec? {
+        guard style.sectionStyle == .insetGrouped else {
+            return nil
+        }
+        return CYLTagListCardSpec(column: boardColumn(atWidth: collectionView.bounds.width), padding: cardInsets,
+                                  color: style.resolvedSectionBackgroundColor, glassTint: style.sectionBackgroundColor,
+                                  usesGlass: style.resolvedSectionBackgroundStyle == .liquidGlass, cornerRadius: style.sectionCornerRadius)
+    }
+
+    /**
+     * The distances from the list's leading and trailing edges to a header's title and fold control: the tags' edges inside the card
+     * (`.insetGrouped`), the band's edges plus `headerContentInsets` (a plain header with a band), else `headerHorizontalInset`.
+     */
+    func headerEdgeInsets(atWidth width: CGFloat) -> (leading: CGFloat, trailing: CGFloat) {
+        let column = column(atWidth: width)
+        let rest = max(0, width - column.maxX)
+        if style.sectionStyle == .insetGrouped {
+            let card = cardInsets
+            return (column.minX + card.left, rest + card.right)
+        }
+        if style.headerBackgroundColor != nil {
+            return (column.minX + style.headerContentInsets.left, rest + style.headerContentInsets.right)
+        }
+        return (style.headerHorizontalInset, style.headerHorizontalInset)
+    }
+
+    /**
+     * Gives a header its insets, band and divider.
+     */
+    func configureHeaderSectionStyle(_ header: CYLTagListHeaderView) {
+        let width = collectionView.bounds.width
+        let edges = headerEdgeInsets(atWidth: width)
+        header.leadingInset = edges.leading
+        header.trailingInset = edges.trailing
+        let column = boardColumn(atWidth: width)
+        let rest = max(0, width - column.maxX)
+        if let color = style.headerBackgroundColor {
+            header.bandEdges = (column.minX, rest)
+            header.bandView.backgroundColor = color
+            header.bandView.layer.cornerRadius = style.headerCornerRadius
+        } else {
+            header.bandEdges = nil
+        }
+        if style.headerSeparatorStyle == .line, style.headerSeparatorThickness > 0 {
+            let insets = style.headerSeparatorInsets
+            header.separatorEdges = (column.minX + insets.left, rest + insets.right)
+            header.separatorThickness = style.headerSeparatorThickness
+            header.separatorView.backgroundColor = style.resolvedHeaderSeparatorColor
+        } else {
+            header.separatorEdges = nil
+        }
     }
 
     func widths(forContentWidth contentWidth: CGFloat) -> [[CGFloat]] {
@@ -2199,9 +2628,81 @@ private extension CYLTagListView {
 
     /**
      * Each item's height; an item whose style wraps its title (`CYLMenuStyle.titleWraps`) is measured at its width in
-     * `widths`, so a long title that wraps gets a taller cell.
+     * `widths`, so a long title that wraps gets a taller cell. Each height is limited to `maxItemHeight`, then every
+     * tag of a row (rows are the ones `rows(forWidths:contentWidth:)` makes at `contentWidth`) gets the height of the
+     * row's tallest tag.
      */
-    func measureItemHeights(widths: [[CGFloat]]) -> [[CGFloat]] {
+    func measureItemHeights(widths: [[CGFloat]], contentWidth: CGFloat) -> [[CGFloat]] {
+        alignedToRows(ownItemHeights(widths: widths), widths: widths, contentWidth: contentWidth)
+    }
+
+    /**
+     * The heights of a section's visible items and, when it shows the inline (tail) fold cell, of that cell (last): the
+     * fold cell is a tag like the others, so it counts for the height of its row (limited to `maxItemHeight`) and is
+     * stretched to it. The rows are made of the visible items and the cell, as shown, not of all the section's items.
+     */
+    func displayedHeights(inSection section: Int) -> [CGFloat] {
+        displayedLayout(inSection: section).heights
+    }
+
+    /**
+     * `displayedHeights(inSection:)` and the number of items per row they were aligned in.
+     */
+    func displayedLayout(inSection section: Int) -> (heights: [CGFloat], rows: [Int]) {
+        let visible = numberOfVisibleItems(inSection: section)
+        let expanded = isSectionExpanded(section)
+        if let cached = displayedHeightCache[section], cached.visible == visible, cached.expanded == expanded {
+            return (cached.heights, cached.rows)
+        }
+        let layout = displayedLayout(widths: itemWidths.indices.contains(section) ? itemWidths[section] : [],
+                                     ownHeights: ownHeights.indices.contains(section) ? ownHeights[section] : [],
+                                     visible: visible,
+                                     fold: showsInlineFoldCell(inSection: section)
+                                        ? inlineFoldSize(inSection: section, expanded: expanded) : nil,
+                                     contentWidth: contentWidth(forWidth: measuredWidth))
+        displayedHeightCache[section] = (visible, expanded, layout.heights, layout.rows)
+        return layout
+    }
+
+    /**
+     * The displayed rows of a section at `contentWidth`: its first `visible` items and the inline fold cell (`fold`),
+     * last. The cell joins the last row when it fits, else it is the first member of the next row; each row's tags,
+     * the cell included, get the height of the row's tallest (limited to `maxItemHeight`).
+     */
+    func displayedLayout(widths: [CGFloat], ownHeights: [CGFloat], visible: Int, fold: CGSize?,
+                         contentWidth: CGFloat) -> (heights: [CGFloat], rows: [Int]) {
+        let limit = itemHeightLimit
+        var shownWidths = Array(widths.prefix(visible))
+        var heights = ownHeights.prefix(visible).map { min($0, limit) }
+        if let fold = fold {
+            shownWidths.append(fold.width)
+            heights.append(min(fold.height, limit))
+        }
+        let sectionRows = rows(forWidths: [shownWidths], contentWidth: contentWidth).first ?? []
+        return (alignedToRows(heights, rows: sectionRows), sectionRows)
+    }
+
+    /**
+     * The height of the displayed rows of a section (`displayedLayout(inSection:)`) with the spacing between them.
+     */
+    func displayedRowsHeight(inSection section: Int) -> CGFloat {
+        rowsHeight(displayedLayout(inSection: section))
+    }
+
+    func rowsHeight(_ layout: (heights: [CGFloat], rows: [Int])) -> CGFloat {
+        var total: CGFloat = 0
+        var start = 0
+        for count in layout.rows {
+            total += layout.heights.indices.contains(start) ? layout.heights[start] : cappedItemHeight
+            start += count
+        }
+        return total + CGFloat(max(0, layout.rows.count - 1)) * style.lineSpacing
+    }
+
+    /**
+     * Each tag's own height, before `maxItemHeight` and the alignment of its row.
+     */
+    func ownItemHeights(widths: [[CGFloat]]) -> [[CGFloat]] {
         let listHeight = itemHeight
         return titles.enumerated().map { section, items in
             items.enumerated().map { item, title in
@@ -2221,14 +2722,43 @@ private extension CYLTagListView {
     }
 
     /**
-     * The height of the first `rowCount` rows of a section: each row as tall as its tallest item. Rows past the
-     * measured ones (the inline fold cell on a row of its own) are the list's item height.
+     * Limits each height to `maxItemHeight` and stretches every tag of a row to the row's tallest.
+     */
+    func alignedToRows(_ heights: [[CGFloat]], widths: [[CGFloat]], contentWidth: CGFloat) -> [[CGFloat]] {
+        let limit = itemHeightLimit
+        let sectionRows = rows(forWidths: widths, contentWidth: contentWidth)
+        return heights.enumerated().map { section, sectionHeights in
+            alignedToRows(sectionHeights.map { min($0, limit) }, rows: section < sectionRows.count ? sectionRows[section] : [])
+        }
+    }
+
+    /**
+     * Stretches every height of a row (`rows` holds the items per row) to the row's tallest.
+     */
+    func alignedToRows(_ heights: [CGFloat], rows: [Int]) -> [CGFloat] {
+        var aligned = heights
+        var start = 0
+        for count in rows {
+            let end = min(start + count, aligned.count)
+            if end > start, let tallest = aligned[start..<end].max() {
+                for index in start..<end {
+                    aligned[index] = tallest
+                }
+            }
+            start = end
+        }
+        return aligned
+    }
+
+    /**
+     * The height of the first `rowCount` rows of a section: each row as tall as its tallest item. Sections with the
+     * inline fold cell use `displayedLayout` instead.
      */
     func heightOfRows(_ rowCount: Int, rows: [Int], heights: [CGFloat]) -> CGFloat {
         var total: CGFloat = 0
         var item = 0
         for row in 0..<max(0, rowCount) {
-            var rowHeight = itemHeight
+            var rowHeight = cappedItemHeight
             if row < rows.count {
                 let count = rows[row]
                 let end = min(item + count, heights.count)
@@ -2283,7 +2813,9 @@ private extension CYLTagListView {
         measuredWidth = width
         let available = contentWidth(forWidth: width)
         itemWidths = widths(forContentWidth: available)
-        itemHeights = measureItemHeights(widths: itemWidths)
+        ownHeights = ownItemHeights(widths: itemWidths)
+        itemHeights = alignedToRows(ownHeights, widths: itemWidths, contentWidth: available)
+        displayedHeightCache = [:]
         rows = rows(forWidths: itemWidths, contentWidth: available)
         contentHeightNeedsUpdate = true
         setNeedsLayout()
@@ -2397,7 +2929,7 @@ private extension CYLTagListView {
         }
         if let header = header(inSection: section), !header.foldButton.isHidden {
             configureFoldButton(header.foldButton, section: section, expanded: expanded, animated: animated)
-            header.foldSize = foldSize(expanded: expanded)
+            header.foldSize = headerFoldSize(expanded: expanded)
             header.setNeedsLayout()
         }
     }
@@ -2406,7 +2938,7 @@ private extension CYLTagListView {
      * Shows the fold control in a state, with its VoiceOver label ("<section> 更多/收起") and hint.
      */
     func configureFoldButton(_ button: CYLTagFoldButton, section: Int, expanded: Bool, animated: Bool) {
-        button.applyFoldControl(displayedFoldControl, color: style.foldControlColor, expanded: expanded,
+        button.applyFoldControl(displayedFoldControl, color: style.resolvedFoldControlColor(inHeader: foldControlIsInHeader), expanded: expanded,
                                 animated: animated)
         button.accessibilityLabel = foldAccessibilityLabel(forSection: section)
         button.accessibilityHint = expanded ? nil : CYLMenuLocalizedString("CYLMenuExpandHint")
@@ -2467,6 +2999,7 @@ private extension CYLTagListView {
     }
 
     func handleTap(at indexPath: IndexPath) {
+        dismissCallout()
         guard isEnabled(at: indexPath) else {
             return
         }
@@ -2579,6 +3112,9 @@ private extension CYLTagListView {
         cell.configure(title: titles[indexPath.section][indexPath.item], image: image(at: indexPath),
                        selectedImage: selectedImage(at: indexPath), animationURL: animationURL(at: indexPath),
                        style: style(forItemAt: indexPath), isSelected: selection.contains(indexPath), isEnabled: enabled)
+        // The badge is the tag's own (CYLAnimatedItemView.badgeValue): the icon is not drawn into an image with it, so it stays centred.
+        cell.button.badgeAttributes = badgeAttributes(at: indexPath)
+        cell.button.badgeValue = badgeValue(at: indexPath)
         cell.button.animationRestingProgress = animationRestingProgress(at: indexPath)
         cell.button.cylApplyListAnimationSpeed(animationSpeed)
         cell.button.animationLoops = animationLoops
@@ -2597,6 +3133,10 @@ private extension CYLTagListView {
         if let source = menuDataSource,
            source.responds(to: #selector(CYLMenuDataSource.menuAccessibilityHintForItem(at:))) {
             cell.accessibilityHint = source.menuAccessibilityHintForItem?(at: indexPath)
+        }
+        // A screen-reader user rarely long-presses: the subtitle is the hint when the data source gives none.
+        if cell.accessibilityHint == nil {
+            cell.accessibilityHint = subtitleForItem(at: indexPath)
         }
     }
 
@@ -2684,14 +3224,10 @@ private extension CYLTagListView {
             pressedIndexPath = indexPath
             pressMoved = false
             pressStart = point
-            if canReorder && collectionView.beginInteractiveMovementForItem(at: indexPath) {
-                isReordering = true
-                menuDelegate?.menu?(self, didChangeReordering: true)
-                if selection.contains(indexPath) {
-                    reportSelectedDrag(at: indexPath)
-                }
-            } else {
-                reportLongPress(at: indexPath)
+            dismissCallout()
+            // The long-press action decides what this does (reordering picks the item up through beginReordering).
+            let action = longPressAction
+            if !action.canBegin(host: self, at: indexPath) || !action.begin(host: self, at: indexPath) {
                 pressedIndexPath = nil
             }
         case .changed:
@@ -2702,30 +3238,11 @@ private extension CYLTagListView {
                 collectionView.updateInteractiveMovementTargetPosition(point)
             }
         case .ended:
-            if isReordering {
-                isReordering = false
-                collectionView.endInteractiveMovement()
-                menuDelegate?.menu?(self, didChangeReordering: false)
-                if !pressMoved, let pressedIndexPath {
-                    reportLongPress(at: pressedIndexPath)
-                }
-            }
+            longPressAction.end(host: self, destination: collectionView.indexPathForItem(at: point), moved: pressMoved)
             pressedIndexPath = nil
         default:
-            if isReordering {
-                isReordering = false
-                movingItem = nil
-                collectionView.cancelInteractiveMovement()
-                menuDelegate?.menu?(self, didChangeReordering: false)
-            }
+            longPressAction.cancel(host: self)
             pressedIndexPath = nil
-        }
-    }
-
-    func reportLongPress(at indexPath: IndexPath) {
-        menuDelegate?.menu?(self, didLongPressItemAt: indexPath)
-        if let tag = tag(at: indexPath) {
-            tagLongPressHandler?(indexPath.item, tag)
         }
     }
 
@@ -2858,21 +3375,22 @@ extension CYLTagListView: UICollectionViewDataSource {
      * The look of a section's icon and title: the style's header font and color, a 16 pt icon 8 pt before the title,
      * at the leading edge.
      */
-    private func headerTitleStyle() -> CYLMenuStyle {
-        let titleStyle = CYLMenuStyle.sectionTitle(textColor: style.headerTextColor)
+    func headerTitleStyle() -> CYLMenuStyle {
+        let titleStyle = CYLMenuStyle.sectionTitle(textColor: style.resolvedHeaderTextColor)
         for state in [UIControl.State.normal, .selected, .disabled] {
             titleStyle.appearance(for: state).font = style.headerFont
         }
         titleStyle.adjustsFontForContentSizeCategory = style.adjustsFontForContentSizeCategory
         titleStyle.imageSize = CGSize(width: CYLTagListHeaderView.iconSize, height: CYLTagListHeaderView.iconSize)
         titleStyle.imageTitleSpacing = 8
+        titleStyle.titleMaxLines = style.headerMaxLines
         return titleStyle
     }
 
     private func configureHeader(_ header: CYLTagListHeaderView, section: Int) {
         let source = menuDataSource
         header.section = section
-        header.horizontalInset = style.headerHorizontalInset
+        configureHeaderSectionStyle(header)
         header.indicatorView.isHidden = style.headerIndicatorColor == nil
         header.indicatorView.backgroundColor = style.headerIndicatorColor
         header.indicatorSize = style.headerIndicatorSize
@@ -2886,7 +3404,7 @@ extension CYLTagListView: UICollectionViewDataSource {
         if showsFoldButton {
             let expanded = isSectionExpanded(section)
             configureFoldButton(header.foldButton, section: section, expanded: expanded, animated: false)
-            header.foldSize = foldSize(expanded: expanded)
+            header.foldSize = headerFoldSize(expanded: expanded)
         }
         // Section titles hidden: the header only holds the fold control.
         header.titleButton.isHidden = !showsSectionHeaders
@@ -2897,9 +3415,10 @@ extension CYLTagListView: UICollectionViewDataSource {
         let showsClear = source?.menuShowsClearButton?(forSection: section) == true
         header.clearButton.isHidden = !showsClear
         if showsClear {
-            let image = style.clearButtonImage ?? CYLMenuResources.image(named: "cyl_trash") ?? UIImage(systemName: "trash")
+            // A vector by default (an SF Symbol: sharp at every scale, a template tinted with the one dynamic color); the bundled raster is the fallback.
+            let image = style.clearButtonImage ?? UIImage(systemName: "trash") ?? CYLMenuResources.image(named: "cyl_trash")
             header.clearButton.setImage(image?.withRenderingMode(.alwaysTemplate), for: .normal)
-            header.clearButton.tintColor = style.clearButtonColor ?? style.headerTextColor
+            header.clearButton.tintColor = style.resolvedClearButtonColor
             let title = source?.menuTitle(forSection: section) ?? ""
             let clear = CYLMenuLocalizedString("CYLMenuClearSection")
             header.clearButton.accessibilityLabel = title.isEmpty ? clear : "\(clear) \(title)"
@@ -2916,9 +3435,9 @@ extension CYLTagListView: UICollectionViewDataSource {
         let showsMore = showsMoreButton(inSection: section)
         header.moreButton.isHidden = !showsMore
         if showsMore {
-            let image = style.moreButtonImage ?? CYLMenuResources.image(named: "cyl_more") ?? UIImage(systemName: "ellipsis")
+            let image = style.moreButtonImage ?? UIImage(systemName: "ellipsis") ?? CYLMenuResources.image(named: "cyl_more")
             header.moreButton.setImage(image?.withRenderingMode(.alwaysTemplate), for: .normal)
-            header.moreButton.tintColor = style.moreButtonColor
+            header.moreButton.tintColor = style.resolvedMoreButtonColor
             var label = source?.menuAccessibilityLabelForMoreButton?(inSection: section) ?? ""
             if label.isEmpty {
                 let title = source?.menuTitle(forSection: section) ?? ""
@@ -2941,6 +3460,11 @@ extension CYLTagListView: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegateFlowLayout
 
 extension CYLTagListView: UICollectionViewDelegateFlowLayout {
+
+    /// A scroll hides the long-press callout.
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        dismissCallout()
+    }
 
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: false)
@@ -2979,7 +3503,9 @@ extension CYLTagListView: UICollectionViewDelegateFlowLayout {
                                sizeForItemAt indexPath: IndexPath) -> CGSize {
         measureIfNeeded()
         if isInlineFoldCell(at: indexPath) {
-            return inlineFoldSize(inSection: indexPath.section, expanded: isSectionExpanded(indexPath.section))
+            let size = inlineFoldSize(inSection: indexPath.section, expanded: isSectionExpanded(indexPath.section))
+            let heights = displayedHeights(inSection: indexPath.section)
+            return CGSize(width: size.width, height: heights.last ?? min(size.height, itemHeightLimit))
         }
         let indexPath = measuredIndexPath(for: indexPath)
         var width: CGFloat = 0
@@ -2987,17 +3513,24 @@ extension CYLTagListView: UICollectionViewDelegateFlowLayout {
            itemWidths[indexPath.section].indices.contains(indexPath.item) {
             width = itemWidths[indexPath.section][indexPath.item]
         }
-        var height = itemHeight
+        var height = cappedItemHeight
         if itemHeights.indices.contains(indexPath.section),
            itemHeights[indexPath.section].indices.contains(indexPath.item) {
             height = itemHeights[indexPath.section][indexPath.item]
+        }
+        if showsInlineFoldCell(inSection: indexPath.section) {
+            // The visible items share their rows with the fold cell: the rows are the displayed ones.
+            let heights = displayedHeights(inSection: indexPath.section)
+            if heights.indices.contains(indexPath.item) {
+                height = heights[indexPath.item]
+            }
         }
         return CGSize(width: max(1, width), height: height)
     }
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
                                insetForSectionAt section: Int) -> UIEdgeInsets {
-        style.sectionInsets
+        tagInsets(atWidth: collectionView.bounds.width)
     }
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
@@ -3012,8 +3545,9 @@ extension CYLTagListView: UICollectionViewDelegateFlowLayout {
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
                                referenceSizeForHeaderInSection section: Int) -> CGSize {
-        let height = headerHeight()
-        return height > 0 ? CGSize(width: collectionView.bounds.width, height: height) : .zero
+        let width = collectionView.bounds.width
+        let height = headerHeight(forSection: section, width: width, canFold: canFoldSection(section))
+        return height > 0 ? CGSize(width: width, height: height) : .zero
     }
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,
@@ -3437,6 +3971,7 @@ extension CYLTagListView {
         guard window == nil else {
             return
         }
+        dismissCallout()
         if isReordering {
             isReordering = false
             movingItem = nil
@@ -3449,5 +3984,121 @@ extension CYLTagListView {
             smearTouchDown = nil
             menuDelegate?.menu?(self, didChangeSmearing: false)
         }
+    }
+}
+
+// MARK: - CYLTagLongPressHost
+
+extension CYLTagListView: CYLTagLongPressHost {
+
+    public func reportLongPress(at indexPath: IndexPath) {
+        menuDelegate?.menu?(self, didLongPressItemAt: indexPath)
+        if let tag = tag(at: indexPath) {
+            tagLongPressHandler?(indexPath.item, tag)
+        }
+    }
+
+    public func subtitleForItem(at indexPath: IndexPath) -> String? {
+        guard let source = menuDataSource,
+              source.responds(to: #selector(CYLMenuDataSource.menuSubtitleForItem(at:))) else {
+            return nil
+        }
+        return source.menuSubtitleForItem?(at: indexPath) ?? nil
+    }
+
+    public func showCallout(_ text: String, at indexPath: IndexPath) {
+        dismissCallout()
+        guard let cell = collectionView.cellForItem(at: indexPath) else {
+            return
+        }
+        let callout = CYLTagCalloutView(text: text)
+        // In the window, so a list that clips its content does not clip the bubble above its first row.
+        let container: UIView = window ?? self
+        // The section header above a first-row tag stays visible: the bubble goes below the tag then, where there is room.
+        let headerFrame = header(inSection: indexPath.section).map { collectionView.convert($0.frame, to: container) }
+        callout.present(pointingAt: collectionView.convert(cell.frame, to: container), in: container, avoiding: headerFrame)
+        calloutView = callout
+        observeScrollingToDismissCallout()
+        // Added after the finger lifted: it never sees the press that opened the callout.
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissCalloutFromTap))
+        tap.cancelsTouchesInView = false
+        tap.delegate = calloutTapDelegate
+        container.addGestureRecognizer(tap)
+        calloutDismissTap = tap
+    }
+
+    /// Watches the list's own scroll view and every ancestor scroll view: any scroll hides the callout (also a programmatic one).
+    private func observeScrollingToDismissCallout() {
+        var scrollViews: [UIScrollView] = [collectionView]
+        var ancestor: UIView? = superview
+        while let view = ancestor {
+            if let scrollView = view as? UIScrollView {
+                scrollViews.append(scrollView)
+            }
+            ancestor = view.superview
+        }
+        calloutScrollObservations = scrollViews.map { scrollView in
+            let start = scrollView.contentOffset
+            return scrollView.observe(\.contentOffset, options: [.new]) { [weak self] _, change in
+                guard let offset = change.newValue,
+                      abs(offset.x - start.x) > 0.5 || abs(offset.y - start.y) > 0.5 else {
+                    return
+                }
+                self?.dismissCallout()
+            }
+        }
+    }
+
+    public func dismissCallout() {
+        calloutScrollObservations.forEach { $0.invalidate() }
+        calloutScrollObservations = []
+        calloutView?.removeFromSuperview()
+        calloutView = nil
+        if let tap = calloutDismissTap {
+            tap.view?.removeGestureRecognizer(tap)
+            calloutDismissTap = nil
+        }
+    }
+
+    @objc private func dismissCalloutFromTap() {
+        dismissCallout()
+    }
+
+    public func canReorderItem(at indexPath: IndexPath) -> Bool {
+        canReorder
+    }
+
+    public func beginReordering(at indexPath: IndexPath) -> Bool {
+        guard collectionView.beginInteractiveMovementForItem(at: indexPath) else {
+            return false
+        }
+        isReordering = true
+        menuDelegate?.menu?(self, didChangeReordering: true)
+        if selection.contains(indexPath) {
+            reportSelectedDrag(at: indexPath)
+        }
+        return true
+    }
+
+    public func endReordering(destination: IndexPath?, moved: Bool) {
+        guard isReordering else {
+            return
+        }
+        isReordering = false
+        collectionView.endInteractiveMovement()
+        menuDelegate?.menu?(self, didChangeReordering: false)
+        if !moved, let pressedIndexPath {
+            reportLongPress(at: pressedIndexPath)
+        }
+    }
+
+    public func cancelReordering() {
+        guard isReordering else {
+            return
+        }
+        isReordering = false
+        movingItem = nil
+        collectionView.cancelInteractiveMovement()
+        menuDelegate?.menu?(self, didChangeReordering: false)
     }
 }

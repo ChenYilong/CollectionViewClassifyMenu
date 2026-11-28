@@ -38,6 +38,11 @@ public final class CYLTag {
     public var title: String
 
     /**
+     * A longer description, shown in a callout on a long press (`CYLTagLongPressActions.callout`).
+     */
+    public var subtitle: String?
+
+    /**
      * The icon, as the data source's `menuImageForItem(at:)`.
      */
     public var image: UIImage?
@@ -53,6 +58,16 @@ public final class CYLTag {
     public var animationURL: URL?
 
     /**
+     * The badge on the tag's icon: nil (the default) none, "" a dot, otherwise the text; as `menuBadgeValueForItem(at:)`.
+     */
+    public var badgeValue: String?
+
+    /**
+     * The badge's style, the keys of CYLTabBarController's `CYLBadgeAttributeKey`; as `menuBadgeAttributesForItem(at:)`.
+     */
+    public var badgeAttributes: [String: Any]?
+
+    /**
      * True by default; a disabled tag is dimmed and ignores taps.
      */
     public var isEnabled = true
@@ -64,7 +79,8 @@ public final class CYLTag {
 
     /**
      * A round badge before the title with this text, e.g. "热" or "神" in a search app's hot list; drawn in
-     * `badgeColor` (the title color by default) with white text, when the tag has no `image`.
+     * `badgeColor` (the title color by default) with white text, when the tag has no `image`. An empty string (not `nil`) draws a
+     * dot instead, as `CYLTagButton.badgeValue` "": a filled circle `badgeDotDiameter` points wide in `badgeColor` (system red by default).
      */
     public var badgeText: String?
 
@@ -136,7 +152,7 @@ public final class CYLTag {
     public var backgroundImage: UIImage?
 
     /**
-     * The corner radius (android-tagview's radius); 0 is a capsule, `nil` the style's.
+     * The corner radius (android-tagview's radius); 0 is square, a large value such as 1000 a capsule, `nil` the style's.
      */
     public var cornerRadius: CGFloat?
 
@@ -287,6 +303,8 @@ public final class CYLTag {
         copy.image = image
         copy.selectedImage = selectedImage
         copy.animationURL = animationURL
+        copy.badgeValue = badgeValue
+        copy.badgeAttributes = badgeAttributes
         copy.isEnabled = isEnabled
         copy.isDeletable = isDeletable
         copy.userInfo = userInfo
@@ -310,21 +328,68 @@ public final class CYLTag {
     }
 
     /**
-     * A round badge image: `text` in white on a `color` circle `diameter` points wide (rendered as original).
+     * The diameter of a badge dot, in points: 8, as `CYLTagButton`'s dot and the other platforms' (Android `BADGE_DOT_DIAMETER`).
      */
-    public static func badgeImage(text: String, color: UIColor, diameter: CGFloat) -> UIImage {
-        let side = max(1, diameter)
+    public static let badgeDotDiameter: CGFloat = 8
+
+    /**
+     * A badge dot image: a filled `color` circle `badgeDotDiameter` points wide (at most `canvas`), centered in a `canvas` square
+     * so the tag's icon slot keeps its size (rendered as original). Its accessibility label is the localized dot text.
+     */
+    public static func badgeDotImage(color: UIColor, canvas: CGFloat) -> UIImage {
+        let side = max(1, canvas)
+        let dot = min(badgeDotDiameter, side)
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: side, height: side))
         let image = renderer.image { _ in
             color.setFill()
-            UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: side, height: side)).fill()
-            let attributes: [NSAttributedString.Key: Any] = [.font: UIFont.boldSystemFont(ofSize: side * 0.6),
-                                                             .foregroundColor: UIColor.white]
+            UIBezierPath(ovalIn: CGRect(x: (side - dot) / 2, y: (side - dot) / 2, width: dot, height: dot)).fill()
+        }.withRenderingMode(.alwaysOriginal)
+        image.accessibilityLabel = CYLMenuLocalizedString("CYLTagBadgeDot")
+        return image
+    }
+
+    /**
+     * The side padding of a badge image's text, in points: 4, as `CYLTagButton`'s corner badge and the other platforms'
+     * (`BADGE_PADDING`).
+     */
+    public static let badgeImageTextPadding: CGFloat = 4
+
+    /**
+     * The text of a badge image and its font: bold, 0.6 of the diameter.
+     */
+    private static func badgeImageAttributes(diameter: CGFloat) -> [NSAttributedString.Key: Any] {
+        [.font: UIFont.boldSystemFont(ofSize: diameter * 0.6), .foregroundColor: UIColor.white]
+    }
+
+    /**
+     * The width of a badge image: the diameter (a circle) for a short text, or the text's width and `badgeImageTextPadding`
+     * on both sides when that is more (a capsule, as `CYLTagButton`'s corner badge: width = max(height, text + 2 * padding)).
+     */
+    public static func badgeImageWidth(text: String, diameter: CGFloat) -> CGFloat {
+        let side = max(1, diameter)
+        let textWidth = ceil((text as NSString).size(withAttributes: badgeImageAttributes(diameter: side)).width)
+        return max(side, textWidth + 2 * badgeImageTextPadding)
+    }
+
+    /**
+     * A badge image: `text` in white on a `color` capsule `diameter` points high (rendered as original). A short text
+     * (a character, a digit) keeps the circle; a longer one ("new", "99+") widens the capsule so that the text is whole
+     * and centered. The tag's icon slot follows the image's width (`CYLTagButton.iconSize(for:animated:style:)`).
+     */
+    public static func badgeImage(text: String, color: UIColor, diameter: CGFloat) -> UIImage {
+        let side = max(1, diameter)
+        let width = badgeImageWidth(text: text, diameter: side)
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: width, height: side))
+        let image = renderer.image { _ in
+            color.setFill()
+            UIBezierPath(roundedRect: CGRect(x: 0, y: 0, width: width, height: side), cornerRadius: side / 2).fill()
+            let attributes = badgeImageAttributes(diameter: side)
             let size = (text as NSString).size(withAttributes: attributes)
-            (text as NSString).draw(at: CGPoint(x: (side - size.width) / 2, y: (side - size.height) / 2),
+            (text as NSString).draw(at: CGPoint(x: (width - size.width) / 2, y: (side - size.height) / 2),
                                     withAttributes: attributes)
         }.withRenderingMode(.alwaysOriginal)
         image.accessibilityLabel = text
+        image.cylIsBadgeImage = true
         return image
     }
 
@@ -336,6 +401,20 @@ public final class CYLTag {
             return nil
         }
         return value
+    }
+}
+
+extension UIImage {
+
+    private static var cylBadgeImageKey: UInt8 = 0
+
+    /**
+     * Whether this is a badge image (`CYLTag.badgeImage`), whose own width, not the style's square image size, is its
+     * icon slot's width.
+     */
+    var cylIsBadgeImage: Bool {
+        get { (objc_getAssociatedObject(self, &Self.cylBadgeImageKey) as? Bool) ?? false }
+        set { objc_setAssociatedObject(self, &Self.cylBadgeImageKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
 }
 
@@ -476,14 +555,20 @@ open class CYLTagDataSource: NSObject, CYLMenuDataSource {
         tag(at: indexPath)?.title ?? ""
     }
 
+    open func menuSubtitleForItem(at indexPath: IndexPath) -> String? {
+        tag(at: indexPath)?.subtitle
+    }
+
     open func menuImageForItem(at indexPath: IndexPath) -> UIImage? {
         guard let tag = tag(at: indexPath) else {
             return nil
         }
-        if tag.image == nil, let text = tag.badgeText, !text.isEmpty {
+        if tag.image == nil, let text = tag.badgeText {
             let side = max(baseStyleStorage.imageSize.width, baseStyleStorage.imageSize.height)
-            let image = CYLTag.badgeImage(text: text, color: tag.badgeColor ?? tag.textColor ?? .systemBlue,
-                                          diameter: side > 0 ? side : 16)
+            let canvas = side > 0 ? side : 16
+            let image = text.isEmpty
+                ? CYLTag.badgeDotImage(color: tag.badgeColor ?? .systemRed, canvas: canvas)
+                : CYLTag.badgeImage(text: text, color: tag.badgeColor ?? tag.textColor ?? .systemBlue, diameter: canvas)
             if let label = tag.badgeAccessibilityLabel, !label.isEmpty {
                 image.accessibilityLabel = label
             }
@@ -498,6 +583,14 @@ open class CYLTagDataSource: NSObject, CYLMenuDataSource {
 
     open func menuAnimationURLForItem(at indexPath: IndexPath) -> URL? {
         tag(at: indexPath)?.animationURL
+    }
+
+    open func menuBadgeValueForItem(at indexPath: IndexPath) -> String? {
+        tag(at: indexPath)?.badgeValue
+    }
+
+    open func menuBadgeAttributesForItem(at indexPath: IndexPath) -> [String: Any]? {
+        tag(at: indexPath)?.badgeAttributes
     }
 
     open func menuItemIsEnabled(at indexPath: IndexPath) -> Bool {

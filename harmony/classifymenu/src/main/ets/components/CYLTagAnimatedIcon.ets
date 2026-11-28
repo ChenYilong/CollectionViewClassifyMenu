@@ -10,10 +10,20 @@
  * `CYLAnimatedItemEngines.register(type)` and one view builder with `CYLTagAnimationBuilder.register(builder)`; the
  * builder gets a `CYLTagAnimationContext` and calls `ready(player)` once its view plays (or `onFailed()`), so that the
  * tag can drive the player (play, speed, loop, resting progress, the last frame while selected).
+ *
+ * A type whose engine module ships a builder for `CYLAnimatedItemView` itself (CYLTabBarController's
+ * `CYLRiveAnimationBuilder` in `cylanimateditemrive`) needs no app view: the app registers that builder with
+ * `CYLTagAnimationBuilder.registerItemBuilder(CYLAnimationEngine.RIVE, wrapBuilder(CYLRiveAnimationBuilder))`, the
+ * icon hands it the component's context with the file as a rawfile path, and the tag passes its playback straight to
+ * the component's `animationSpeed`, `animationLoops` and `animationRestartToken` props. The library still imports no
+ * engine module.
  */
 import { CYLAnimatedItemAnimationContext, CYLAnimatedItemView } from 'cylanimateditem';
-import { CYLAnimationPlayer, CYLAnimationSource } from './CYLAnimationPlayer';
+import {
+  CYLAnimationEngine, CYLAnimationPlayer, CYLAnimationSource, cylAnimationEngine
+} from './CYLAnimationPlayer';
 import { CYLImage, CYLImageIsSymbol } from '../core/CYLTypes';
+import { CYLUIContext } from '../core/CYLUIContext';
 
 /**
  * What the app's animation builder gets for a tag's icon: `CYLAnimatedItemView`'s context (`url`, `size`,
@@ -56,6 +66,9 @@ function cylNoTagAnimation(context: CYLTagAnimationContext) {
 
 let cylTagAnimationBuilder: WrappedBuilder<[CYLTagAnimationContext]> = wrapBuilder(cylNoTagAnimation);
 
+const cylTagItemBuilders: Map<CYLAnimationEngine, WrappedBuilder<[CYLAnimatedItemAnimationContext]>> =
+  new Map<CYLAnimationEngine, WrappedBuilder<[CYLAnimatedItemAnimationContext]>>();
+
 /**
  * The app's animation views for every tag (`CYLAnimatedItemView.animationBuilder`), registered once, as the engines
  * are registered with `CYLAnimatedItemEngines.register(type)`: tags sit deep inside the library's views, so the builder
@@ -76,6 +89,36 @@ export class CYLTagAnimationBuilder {
   static get current(): WrappedBuilder<[CYLTagAnimationContext]> {
     return cylTagAnimationBuilder;
   }
+
+  /**
+   * Registers a builder for `CYLAnimatedItemView` itself that plays every file of `engine`, instead of the app's tag
+   * builder: for Rive, `registerItemBuilder(CYLAnimationEngine.RIVE, wrapBuilder(CYLRiveAnimationBuilder))` with
+   * CYLTabBarController's `cylanimateditemrive` (register the type too, with `cylRegisterRiveEngine(context)`). It gets the
+   * component's context (`url` a rawfile path with the options after `#`, `size`, `selected`, `loops`, `restartToken`,
+   * `onLoaded`, `onFailed`, `onEnded`, `setRestartHandler`); the tag passes its playback to the component's own props.
+   */
+  static registerItemBuilder(engine: CYLAnimationEngine, builder: WrappedBuilder<[CYLAnimatedItemAnimationContext]>): void {
+    cylTagItemBuilders.set(engine, builder);
+  }
+
+  /**
+   * The component-level builder registered for `engine`, if any.
+   */
+  static itemBuilder(engine: CYLAnimationEngine): WrappedBuilder<[CYLAnimatedItemAnimationContext]> | undefined {
+    return cylTagItemBuilders.get(engine);
+  }
+}
+
+/**
+ * The URL a component-level builder gets for a tag's value: `asset:<rawfile>#options` becomes `<rawfile>#options`, with
+ * the rawfile that exists (`path`, else its last component, as `CYLAnimationSource.existingRawFilePath`).
+ */
+export function cylTagItemBuilderURL(source: CYLAnimationSource, existingPath: string): string {
+  const pairs: string[] = [];
+  source.options.forEach((value: string, key: string) => {
+    pairs.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
+  });
+  return pairs.length === 0 ? existingPath : `${existingPath}#${pairs.join('&')}`;
 }
 
 /**
@@ -142,6 +185,19 @@ export struct CYLTagAnimatedIcon {
    * `animationIconColor`); '' keeps the image's own colors.
    */
   @Prop iconColor: ResourceColor = '';
+  /**
+   * The playback speed passed to `CYLAnimatedItemView.animationSpeed` for a file drawn by a component-level builder.
+   */
+  @Prop animationSpeed: number = 1;
+  /**
+   * Whether a file drawn by a component-level builder repeats (`CYLAnimatedItemView.animationLoops`).
+   */
+  @Prop animationLoops: boolean = false;
+  /**
+   * Bumped to replay a file drawn by a component-level builder from progress 0
+   * (`CYLAnimatedItemView.animationRestartToken`).
+   */
+  @Prop animationRestartToken: number = 0;
   @Prop iconWidth: number = 0;
   /**
    * 0: `iconWidth`.
@@ -156,9 +212,37 @@ export struct CYLTagAnimatedIcon {
    */
   onTap?: () => void;
   /**
+   * A file drawn by a component-level builder has loaded.
+   */
+  onItemLoaded?: () => void;
+  /**
    * The app's animation views (`CYLTagAnimationBuilder.register`), read when the icon is made.
    */
   private animationViews: WrappedBuilder<[CYLTagAnimationContext]> = CYLTagAnimationBuilder.current;
+  /**
+   * The component-level builder for this file's type (`CYLTagAnimationBuilder.registerItemBuilder`), read when the icon
+   * is made; undefined: the app's tag builder draws it.
+   */
+  private itemBuilder?: WrappedBuilder<[CYLAnimatedItemAnimationContext]>;
+  private itemURL: string = '';
+
+  aboutToAppear(): void {
+    const source = CYLAnimationSource.parse(this.animationURL);
+    if (source.inlineJSON !== undefined) {
+      return;
+    }
+    this.itemBuilder = CYLTagAnimationBuilder.itemBuilder(cylAnimationEngine(source.path));
+    if (this.itemBuilder === undefined) {
+      return;
+    }
+    let existing = source.path;
+    try {
+      existing = source.existingRawFilePath(CYLUIContext.hostContext(this.getUIContext()));
+    } catch (e) {
+      // No host context (a host test): keep the path as written.
+    }
+    this.itemURL = cylTagItemBuilderURL(source, existing);
+  }
 
   /**
    * The icon's side in `CYLAnimatedItemView`, which draws a square icon: the larger of the two sides.
@@ -196,10 +280,37 @@ export struct CYLTagAnimatedIcon {
     return tagContext;
   }
 
+  /**
+   * The component's context for `itemBuilder`: the same values, telling the tag when the file has loaded.
+   */
+  itemContext(context: CYLAnimatedItemAnimationContext): CYLAnimatedItemAnimationContext {
+    const itemContext = new CYLAnimatedItemAnimationContext();
+    itemContext.url = context.url;
+    itemContext.size = context.size;
+    itemContext.selected = context.selected;
+    itemContext.speed = context.speed;
+    itemContext.loops = context.loops;
+    itemContext.restartToken = context.restartToken;
+    itemContext.onFailed = context.onFailed;
+    itemContext.setRestartHandler = context.setRestartHandler;
+    itemContext.onLoaded = () => {
+      context.onLoaded();
+      this.onItemLoaded?.();
+    };
+    itemContext.onEnded = () => {
+      context.onEnded();
+    };
+    return itemContext;
+  }
+
   @Builder
   tagAnimation(context: CYLAnimatedItemAnimationContext) {
     Stack() {
-      this.animationViews.builder(this.tagContext(context))
+      if (this.itemBuilder !== undefined) {
+        this.itemBuilder.builder(this.itemContext(context))
+      } else {
+        this.animationViews.builder(this.tagContext(context))
+      }
     }
     .width(this.side())
     .height(this.side())
@@ -209,13 +320,16 @@ export struct CYLTagAnimatedIcon {
   build() {
     Stack() {
       CYLAnimatedItemView({
-        animationUrl: this.animationURL,
+        animationUrl: this.itemBuilder !== undefined ? this.itemURL : this.animationURL,
         image: this.image,
         selectedImage: this.selectedImage,
         isItemSelected: this.isSelected,
         iconColor: this.iconColor,
         iconSize: this.side(),
         spacing: 0,
+        animationSpeed: this.itemBuilder !== undefined ? this.animationSpeed : 1,
+        animationLoops: this.itemBuilder !== undefined ? this.animationLoops : false,
+        animationRestartToken: this.itemBuilder !== undefined ? this.animationRestartToken : 0,
         animationBuilder: (context: CYLAnimatedItemAnimationContext): void => {
           this.tagAnimation(context)
         },

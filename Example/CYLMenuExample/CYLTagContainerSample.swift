@@ -64,6 +64,7 @@ final class CYLTagContainerSampleViewController: UIViewController {
     static func makeContainer(_ configure: (CYLTagListView, CYLMenuStyle) -> Void) -> CYLTagListView {
         let list = CYLTagListView()
         let style = CYLMenuStyle.tagContainer()
+        style.backgroundStyle = .liquidGlass
         style.sectionInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         style.backgroundColor = UIColor(red: 1, green: 0, blue: 0, alpha: 0x11 / 255.0)
         list.containerBorderWidth = 0.5

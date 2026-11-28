@@ -8,11 +8,11 @@ project 'CYLMenuExample.xcodeproj'
 
 # The revision whose API the Example uses (feat/cross-platform-components); update together.
 CYL_TAB_BAR = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                :commit => 'c4a1f8fda52aef766039893d8476f4b09493db23' }
+                :commit => '1cbb260ad9fd1ea45d1fab0edfc9d1e7b22cbe26' }
 # CYLAnimatedItem, the shared animated icon + title component: its own pod in the same repository and commit, not
 # on the trunk yet (https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md).
 CYL_ANIMATED_ITEM = { :git => 'https://github.com/ChenYilong/CYLTabBarController.git',
-                      :commit => 'c4a1f8fda52aef766039893d8476f4b09493db23' }
+                      :commit => '1cbb260ad9fd1ea45d1fab0edfc9d1e7b22cbe26' }
 
 # The search bars of the Example (CYLSearchBarView), from the sibling CYLSearchViewController repository at the
 # revision whose API the Example uses (feat/search-bar-view); update together.
@@ -24,10 +24,13 @@ target 'CYLMenuExample' do
   use_frameworks!
   pod 'CollectionViewClassifyMenu', :path => '..'
   pod 'CYLTabBarController', CYL_TAB_BAR
+  pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => '4276a6dab5a428ccc3a5f3f347eab991881fb97c' # CYLTabBarController needs ~> 1.4, not on the trunk yet (as its own Podfiles)
   # Animated tag icons, the same libraries and animators as CYLTabBarController's tab icons.
   # The engines of the animated icons the example plays (tags, the tab bar): one CYLAnimatedItem engine subspec per file
   # type (https://github.com/ChenYilong/CYLTabBarController/blob/feat/cross-platform-components/docs/Animated-Item.md).
   # The core (CollectionViewClassifyMenu) depends on the CYLAnimatedItem pod only and adds none.
+  pod 'CYLUtils', CYL_ANIMATED_ITEM
+  pod 'CYLBadge', CYL_ANIMATED_ITEM
   pod 'CYLAnimatedItem', CYL_ANIMATED_ITEM
   pod 'CYLAnimatedItem/LottieObjectiveC', CYL_ANIMATED_ITEM
   pod 'CYLAnimatedItem/PAG', CYL_ANIMATED_ITEM

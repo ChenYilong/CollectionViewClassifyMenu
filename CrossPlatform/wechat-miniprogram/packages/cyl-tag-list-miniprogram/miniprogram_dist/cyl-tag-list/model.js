@@ -432,6 +432,8 @@ function normalize(configuration = {}, options = {}) {
     allowsEmptySelection: boolValue(c.allowsEmptySelection) !== false,
     showsSectionHeaders: boolValue(c.showsSectionHeaders) !== false,
     defaultVisibleRows: Math.max(0, Math.floor(numberValue(c.defaultVisibleRows) || 0)),
+    // `CYLTagListView.maxItemHeight`: the tallest a tag may be; missing for no limit.
+    maxItemHeight: numberValue(c.maxItemHeight) === null ? Number.MAX_VALUE : Math.max(1, numberValue(c.maxItemHeight)),
     foldControl: foldControlValue(c.foldControl),
     style,
     sections,
@@ -639,6 +641,15 @@ function tagHeight(style) {
     const { font, contentInsets } = style[state];
     return Math.max(height, lineHeight(font.size) + stacked + contentInsets.top + contentInsets.bottom);
   }, style.itemHeight);
+}
+
+/**
+ * The height of every tag of a list (the iOS core's rows are as tall as their tallest tag, and every tag of a row gets
+ * that height; here each section's tags share one style, so one height): `tagHeight(style)`, limited to the list's
+ * `maxItemHeight` (`model.maxItemHeight`, at least 1).
+ */
+function listTagHeight(model, style) {
+  return Math.max(1, Math.min(tagHeight(style), model.maxItemHeight));
 }
 
 /**
@@ -884,7 +895,7 @@ module.exports = {
   DEFAULT_STYLE, EXPAND_TITLE, COLLAPSE_TITLE, NAMED_COLORS, FONT_WEIGHTS,
   DEFAULT_TAG_BACKGROUND, opaqueBackground, tagBackground, key, parseKey, imageSize, insets, normalize, sanitizeSelection, itemAt, tap, rowsFromTops, foldState, foldTitle,
   color, numberValue, boolValue, sizeValue, offsetValue, insetsValue, fontValue, fontName, defaultStyle, mergeStyle,
-  foldControlValue, animationEngine, animationKey, resolveAnimation, animationURL, animationParameters, stateOf, iconColor, tagHeight, cornerRadius,
+  foldControlValue, animationEngine, animationKey, resolveAnimation, animationURL, animationParameters, stateOf, iconColor, tagHeight, listTagHeight, cornerRadius,
   isVerticalPlacement, tagHeightForTitle, badgeLayout, BADGE_DEFAULT_COLOR, tagButtonView,
   iconContent, animatedIcon, tagLayout, sizerFonts, sectionLayout, coderString, fontCSS,
 };

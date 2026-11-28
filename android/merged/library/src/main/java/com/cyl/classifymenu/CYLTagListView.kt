@@ -80,6 +80,8 @@ open class CYLTagListView @JvmOverloads constructor(
     private var titles: List<List<String>> = emptyList()
     private var itemWidths: List<List<Float>> = emptyList()
     private var itemHeights: List<List<Float>> = emptyList()
+    /** Each item's own height (before `maxItemHeight` and the row alignment), for `displayedHeights`. */
+    private var ownHeights: List<List<Float>> = emptyList()
     private var rows: List<List<Int>> = emptyList()
     private var selection = LinkedHashSet<CYLIndexPath>()
     private val expandedSections = HashSet<Int>()
@@ -719,6 +721,22 @@ open class CYLTagListView @JvmOverloads constructor(
 
     private fun itemHeight(): Float = CYLTagButton.heightForStyle(listStyle)
 
+    /**
+     * The tallest a tag may be, for every tag of the list; `Float.MAX_VALUE` (the default) sets no limit. Rows are always
+     * as tall as their tallest tag and every other tag of the row is stretched to that height; a tag that needs more
+     * than this is cut to it. Values below 1 are treated as 1 (iOS `CYLTagListView.maxItemHeight`).
+     */
+    var maxItemHeight: Float = Float.MAX_VALUE
+        set(value) {
+            if (field == value) return
+            field = value
+            invalidateMeasurements()
+        }
+
+    private fun itemHeightLimit(): Float = max(1f, maxItemHeight)
+
+    private fun cappedItemHeight(): Float = min(itemHeight(), itemHeightLimit())
+
     private fun foldIsInHeader(): Boolean = _foldControl.position == CYLMenuFoldControlPosition.HEADER_TRAILING ||
         _foldControl.position == CYLMenuFoldControlPosition.HEADER_LEADING
 
@@ -767,7 +785,20 @@ open class CYLTagListView @JvmOverloads constructor(
         }
     }
 
-    private fun heightsForItems(): List<List<Float>> {
+    /**
+     * Each item's height (iOS `measureItemHeights(widths:contentWidth:)`): limited to `maxItemHeight`, then every tag of a
+     * row (the rows `rowsFor` makes at `contentWidth`) gets the height of the row's tallest tag.
+     */
+    private fun heightsForItems(own: List<List<Float>>, widths: List<List<Float>>, contentWidth: Float): List<List<Float>> {
+        val limit = itemHeightLimit()
+        val sectionRows = rowsFor(widths, contentWidth)
+        return own.mapIndexed { section, sectionOwn ->
+            alignRows(sectionOwn.map { min(limit, it) }, sectionRows.getOrElse(section) { emptyList() })
+        }
+    }
+
+    /** Each item's own height, before `maxItemHeight` and the alignment of its row. */
+    private fun ownItemHeights(): List<List<Float>> {
         val listHeight = itemHeight()
         return titles.mapIndexed { section, items ->
             items.indices.map { item ->
@@ -777,11 +808,61 @@ open class CYLTagListView @JvmOverloads constructor(
         }
     }
 
+    /** Stretches every height of a row (`rows` holds the items per row) to the row's tallest. */
+    private fun alignRows(heights: List<Float>, rows: List<Int>): List<Float> {
+        val aligned = heights.toMutableList()
+        var start = 0
+        for (count in rows) {
+            val end = min(start + count, aligned.size)
+            if (end > start) {
+                val tallest = aligned.subList(start, end).max()
+                for (index in start until end) aligned[index] = tallest
+            }
+            start = end
+        }
+        return aligned
+    }
+
+    /**
+     * The heights of a section's `visible` items and of the inline (tail) fold cell (last): the fold cell is a tag like
+     * the others, so it counts for the height of its row (limited to `maxItemHeight`) and is stretched to it. The rows are
+     * made of the visible items and the cell, as shown (iOS `displayedHeights(inSection:)`).
+     */
+    private fun displayedHeights(section: Int, visible: Int): List<Float> = displayedLayout(
+        itemWidths.getOrNull(section) ?: emptyList(), ownHeights.getOrNull(section) ?: emptyList(), visible,
+        inlineFoldSize(section, isSectionExpanded(section)), contentWidthFor(measuredContentWidth)).first
+
+    /**
+     * The displayed rows of a section at `contentWidth`: its first `visible` items and the inline fold cell (`fold`), last.
+     * The cell joins the last row when it fits, else it is the first member of the next row; each row's tags, the cell
+     * included, get the height of the row's tallest (limited to `maxItemHeight`). Returns the heights and the items per row.
+     */
+    private fun displayedLayout(widths: List<Float>, own: List<Float>, visible: Int, fold: CYLSize, contentWidth: Float): Pair<List<Float>, List<Int>> {
+        val limit = itemHeightLimit()
+        val shownWidths = widths.take(visible).toMutableList()
+        val heights = own.take(visible).map { min(limit, it) }.toMutableList()
+        shownWidths.add(min(fold.width, contentWidth))
+        heights.add(min(fold.height, limit))
+        val sectionRows = rowsFor(listOf(shownWidths), contentWidth).first()
+        return alignRows(heights, sectionRows) to sectionRows
+    }
+
+    /** The height of displayed rows (`displayedLayout`) with the spacing between them. */
+    private fun rowsHeight(layout: Pair<List<Float>, List<Int>>): Float {
+        var total = 0f
+        var start = 0
+        for (count in layout.second) {
+            total += layout.first.getOrElse(start) { cappedItemHeight() }
+            start += count
+        }
+        return total + max(0, layout.second.size - 1) * listStyle.lineSpacing
+    }
+
     private fun heightOfRows(rowCount: Int, sectionRows: List<Int>, heights: List<Float>): Float {
         var total = 0f
         var item = 0
         for (row in 0 until rowCount) {
-            var rowHeight = itemHeight()
+            var rowHeight = cappedItemHeight()
             if (row < sectionRows.size) {
                 val count = sectionRows[row]
                 for (index in item until min(item + count, heights.size)) rowHeight = max(rowHeight, heights[index])
@@ -825,7 +906,8 @@ open class CYLTagListView @JvmOverloads constructor(
         measuredContentWidth = width
         val contentWidth = contentWidthFor(width)
         itemWidths = widthsFor(contentWidth)
-        itemHeights = heightsForItems()
+        ownHeights = ownItemHeights()
+        itemHeights = heightsForItems(ownHeights, itemWidths, contentWidth)
         rows = rowsFor(itemWidths, contentWidth)
     }
 
@@ -847,21 +929,26 @@ open class CYLTagListView @JvmOverloads constructor(
         val same = width == measuredContentWidth
         val widths = if (same) itemWidths else widthsFor(contentWidth)
         val sectionRows = if (same) rows else rowsFor(widths, contentWidth)
-        val heights = if (same) itemHeights else heightsForItems()
+        val own = if (same) ownHeights else ownItemHeights()
+        val heights = if (same) itemHeights else heightsForItems(own, widths, contentWidth)
         val header = headerHeight()
         val insets = listStyle.sectionInsets
         var height = 0f
         for (section in sectionRows.indices) {
             var rowCount = sectionRows[section].size
             val foldable = canFoldRowCount(rowCount)
-            if (foldable && section !in expandedSections) {
-                rowCount = defaultVisibleRows
-            } else if (foldable && foldIsInline()) {
-                val withFold = widths[section] + inlineFoldSize(section, true).width
-                rowCount = rowsFor(listOf(withFold), contentWidth).first().size
-            }
+            if (foldable && section !in expandedSections) rowCount = defaultVisibleRows
             height += header + insets.top + insets.bottom
-            height += heightOfRows(rowCount, sectionRows[section], heights.getOrElse(section) { emptyList() })
+            if (foldable && foldIsInline()) {
+                // The fold cell is a tag of its row: the displayed rows (visible items and the cell) set the height.
+                val expanded = section in expandedSections
+                val fold = inlineFoldSize(section, expanded)
+                val total = widths[section].size
+                val visible = if (expanded) total else collapsedItemCount(widths[section], sectionRows[section], total, contentWidth, fold.width)
+                height += rowsHeight(displayedLayout(widths[section], own.getOrElse(section) { emptyList() }, visible, fold, contentWidth))
+            } else {
+                height += heightOfRows(rowCount, sectionRows[section], heights.getOrElse(section) { emptyList() })
+            }
             if (foldable && foldIsInFooter()) height += footerHeight()
         }
         height += addItemViewHeight()
@@ -1470,19 +1557,25 @@ open class CYLTagListView @JvmOverloads constructor(
         if (section !in titles.indices) return 0
         val total = titles[section].size
         if (section !in rows.indices || !canFoldSection(section) || isSectionExpanded(section)) return total
+        val foldWidth = if (foldIsInline() && section in itemWidths.indices) inlineFoldSize(section, false).width else null
+        return collapsedItemCount(itemWidths.getOrNull(section) ?: emptyList(), rows[section], total, contentWidthFor(measuredContentWidth), foldWidth)
+    }
+
+    /**
+     * The items a collapsed section shows: its first `defaultVisibleRows` rows; with the inline fold cell (`foldWidth`), the
+     * last of those rows keeps only the items that leave the cell the room (it joins that row first), so the hidden items
+     * are no members of any displayed row.
+     */
+    private fun collapsedItemCount(widths: List<Float>, sectionRows: List<Int>, total: Int, contentWidth: Float, foldWidth: Float?): Int {
         var visible = 0
-        val sectionRows = rows[section]
         var lastRowCount = 0
         for (row in 0 until min(defaultVisibleRows, sectionRows.size)) {
             lastRowCount = sectionRows[row]
             visible += lastRowCount
         }
         visible = min(visible, total)
-        if (foldIsInline() && lastRowCount > 0 && section in itemWidths.indices) {
-            val widths = itemWidths[section]
+        if (foldWidth != null && lastRowCount > 0) {
             val spacing = listStyle.interitemSpacing
-            val contentWidth = contentWidthFor(measuredContentWidth)
-            val foldWidth = inlineFoldSize(section, false).width
             var used = 0f
             for (item in visible - lastRowCount until visible) used += (if (item > visible - lastRowCount) spacing else 0f) + widths[item]
             while (lastRowCount > 1 && used + spacing + foldWidth > contentWidth) {
@@ -1666,17 +1759,20 @@ open class CYLTagListView @JvmOverloads constructor(
                 val visible = numberOfVisibleItemsInSection(section)
                 val views = ArrayList<View>()
                 val sizes = ArrayList<CYLSize>()
+                // With the inline fold cell the rows are the displayed ones: the cell is a tag of its row.
+                val displayed = if (showsInlineFoldCell(section)) displayedHeights(section, visible) else null
                 for (item in 0 until visible) {
                     val indexPath = CYLIndexPath(item, section)
                     val cell = cells[indexPath] ?: continue
                     views.add(cell)
                     val itemWidth = itemWidths.getOrNull(section)?.getOrNull(item) ?: 0f
-                    val itemHeight = itemHeights.getOrNull(section)?.getOrNull(item) ?: itemHeight()
+                    val itemHeight = displayed?.getOrNull(item) ?: itemHeights.getOrNull(section)?.getOrNull(item) ?: cappedItemHeight()
                     sizes.add(CYLSize(max(1f, itemWidth), itemHeight))
                 }
                 foldCells[section]?.let {
                     views.add(it)
-                    sizes.add(inlineFoldSize(section, isSectionExpanded(section)))
+                    val fold = inlineFoldSize(section, isSectionExpanded(section))
+                    sizes.add(CYLSize(fold.width, displayed?.lastOrNull() ?: min(fold.height, itemHeightLimit())))
                 }
                 val (itemFrames, bottom) = layout.frames(sizes, y, width, insets, listStyle.interitemSpacing, listStyle.lineSpacing, rtl)
                 views.forEachIndexed { index, view -> frames[view] = itemFrames[index] }

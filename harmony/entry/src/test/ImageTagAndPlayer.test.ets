@@ -1,9 +1,10 @@
 import { describe, it, expect } from '@ohos/hypium';
 import {
-  CYLAnimationSource, CYLImageTagDirection, CYLImageTagDirections, CYLImageTagGeometry, CYLImageTagGroup,
+  CYLAnimationSource, cylTagItemBuilderURL,
+  CYLImageTagDirection, CYLImageTagDirections, CYLImageTagGeometry, CYLImageTagGroup,
   CYLImageTagMetrics, CYLImageTagPlacement, CYLPoint, CYLRect, CYLSize, CYLTagListState
 } from '@cyl/classifymenu';
-import { CYLRivePlayer, CYLRiveIconHost, CYLSVGAPlayer } from '../main/ets/animation/CYLExampleAnimationPlayers';
+import { CYLSVGAPlayer } from '../main/ets/animation/CYLExampleAnimationPlayers';
 import { CYLSVGAMovie } from '../main/ets/animation/svga/CYLSVGAMovie';
 
 function movie(frames: number, fps: number): CYLSVGAMovie {
@@ -111,22 +112,12 @@ export default function imageTagAndPlayerTest() {
     });
   });
 
-  describe('CYLRivePlayer', () => {
-    it('followsTheLoopSwitchThroughItsView', 0, () => {
-      const calls: string[] = [];
-      const host: CYLRiveIconHost = {
-        replay: () => { calls.push('replay'); },
-        select: (selected: boolean) => { calls.push(`select:${selected}`); },
-        setLoops: (loops: boolean) => { calls.push(`loops:${loops}`); }
-      };
-      const player = new CYLRivePlayer(CYLAnimationSource.parse('asset:rive/house.riv?stateMachine=State%20Machine%201'),
-        host);
-      expect(player.supportsLoops).assertTrue();
-      player.loops = true;
-      player.play();
-      player.stopAtProgress(1);
-      player.loops = false;
-      expect(calls.join(',')).assertEqual('loops:true,replay,select:true,loops:false');
+  describe('cylTagItemBuilderURL', () => {
+    it('givesTheBuilderARawfilePathWithItsOptions', 0, () => {
+      const source = CYLAnimationSource.parse('asset:Rive/house.riv#stateMachine=State%20Machine%201');
+      expect(cylTagItemBuilderURL(source, 'house.riv')).assertEqual('house.riv#stateMachine=State%20Machine%201');
+      expect(cylTagItemBuilderURL(CYLAnimationSource.parse('asset:rive/truck.riv'), 'rive/truck.riv'))
+        .assertEqual('rive/truck.riv');
     });
   });
 

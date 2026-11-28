@@ -89,7 +89,7 @@ Component({
         const fold = rows && !remeasure ? model.foldState(m, rows, expanded) : { canFold: false, visible: [] };
         const layout = model.sectionLayout(style);
         const tailStyle = model.tagLayout(style, { title: 'x', enabled: true }, 'normal', { kind: 'none' },
-          style.interitemSpacing, style.lineSpacing).cellStyle;
+          style.interitemSpacing, style.lineSpacing, model.listTagHeight(m, style)).cellStyle;
         return {
           index: section.index,
           title: section.title,
@@ -104,7 +104,8 @@ Component({
             const state = model.stateOf(item, selected);
             const url = animations.url(item.animation, item.animationOptions, item.animationRestingProgress);
             const icon = model.animatedIcon({ ...item, ...animations.gifOptions(item.animation, item) }, state, style, url);
-            const tag = model.tagLayout(style, item, state, { kind: icon.iconKind }, style.interitemSpacing, style.lineSpacing);
+            const tag = model.tagLayout(style, item, state, { kind: icon.iconKind }, style.interitemSpacing, style.lineSpacing,
+              model.listTagHeight(m, style));
             this.itemPaths[item.key] = `sections[${sectionPosition}].items[${i}]`;
             return {
               key: item.key,

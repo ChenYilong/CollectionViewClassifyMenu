@@ -707,16 +707,19 @@ static NSArray<NSString *> *CYLTestAllTags(void) {
     XCTAssertEqualObjects(button.title, @"Home");
     XCTAssertTrue(button.isAccessibilityElement);
     XCTAssertTrue(CGSizeEqualToSize(button.bounds.size, button.intrinsicContentSize));
+    // The badge is CYLAnimatedItemView's (CYLBadge on badgeAnchorView), which the tag keeps on its icon.
     XCTAssertNil(button.badgeValue);
-    XCTAssertTrue(button.badgeLabel.hidden);
+    XCTAssertFalse(button.isShowingBadge);
     button.badgeValue = @"3";
-    button.badgeColor = UIColor.orangeColor;
     [button layoutIfNeeded];
-    XCTAssertFalse(button.badgeLabel.hidden);
-    XCTAssertEqualObjects(button.badgeLabel.text, @"3");
-    XCTAssertEqualObjects(button.accessibilityValue, @"3");
-    button.badgeColor = nil;
-    XCTAssertEqualObjects(button.badgeColor, UIColor.systemRedColor);
+    // CYLBadge shows the badge on a later run loop turn while its host is not laid out yet (cyl_isReady), so wait for it.
+    NSDate *deadline = [NSDate dateWithTimeIntervalSinceNow:5];
+    while (!button.isShowingBadge && deadline.timeIntervalSinceNow > 0) {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    }
+    XCTAssertTrue(button.isShowingBadge);
+    // The value is the badge description CYLUtils localizes ("3 new messages" in English), not the bare number.
+    XCTAssertTrue([button.accessibilityValue containsString:@"3"], @"%@", button.accessibilityValue);
 
     NSURL *url = [NSURL fileURLWithPath:@"/no/such/file.json"];
     CYLTagButton *animated = [[CYLTagButton alloc] initWithTitle:nil image:image animationURL:url];

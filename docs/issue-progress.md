@@ -35,6 +35,191 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
+### TODO (2026-11-29, `feat/harmony`, macOS session): bring the iOS tag list style API from `44f226c4`
+
+- **Prompt (verbatim):** "yes, and fix SwiftPM" (answering: "Should I add the missing iOS style settings for the tag list (`TagList`) to `feat/harmony` in your `CollectionViewClassifyMenu` repo, then point both demos here to that commit?")
+- **Context:** CYLTabBarController's root demo and `Example-Swift-04` use `CYLMenuStyleKey.titleMaxLines`, `backgroundStyle`, `sectionStyle` and `sectionBackgroundStyle`, which `feat/harmony` lacks. The SwiftPM half of the prompt belongs to CYLTabBarController.
+- **Requirement:** port the iOS files only, as one ordinary commit (3-way merge per file, base `bb15d93a`, theirs `44f226c4`, no branch merge); keep `feat/harmony`'s engine badge.
+- **任务（中文）：** 只移植 `44f226c4` 的 iOS 文件（逐文件三方合并，不合并分支），保留 `feat/harmony` 的引擎角标；让 CYLTabBarController 的两个 Demo 可以编译。
+- **Score (pass 60):** the library builds 35; the iOS unit tests pass 35; both CYLTabBarController demos build 25; docs and checks 5.
+- **Done (2026-11-29, macOS 27.3, Xcode 27.2, iOS 27.2 simulator):** 3-way merge of the iOS core files (5 conflict hunks; `feat/harmony`'s engine badge kept). Test suites `menu`, `example` (121 + 11), `swift` (23) and `tag` (6) pass with 0 failures; the pods stay at their pins. **Score 75 / 100** (library 35, tests 35, docs and checks 5; at the time of that commit). **Final 100 / 100:** CYLTabBarController's root demo and `Example-Swift-04` build with 6bb6e2b8 ([8f3ede07](https://github.com/ChenYilong/CYLTabBarController/commit/8f3ede07), local builds, Xcode 27.2). The Mini Program data check failed on 6bb6e2b8 because `strings.js` was not regenerated; fixed in the next commit. The iOS CI of 6bb6e2b8 was still queued when this was written.
+- **Behavior changes that come with the style API** (as on the `44f226c4` line): `CYLTagCornerRadiusSquare` is removed (0 is square, 1000 is a capsule); the default section style is a card (`sectionStyle = .insetGrouped`; `.plain` for the flat list); default tag and text colors follow light and dark mode; a text badge image wider than its diameter is a capsule. Six Example demo pages, their two strings and seven tests follow.
+  Other public declaration changes: `CYLTagAppearance.backgroundColor` and `textColor` are `UIColor!` (resettable with nil) and `iconColor` changes from `UIColor?` to `UIColor!`; `CYLMenuStyle.backgroundColor` defaults to `systemBackground` instead of white; `titleWraps` is now computed from `titleMaxLines` (same name and type); `CYLTagButton` no longer overrides `playAnimation()` and `animationRestingProgress` (both stay inherited). `scripts/swift-api-check.sh` did not run to a result locally (its module dump fails in the pinned CYLBadge headers).
+- **TODO:** Android, HarmonyOS, the mini program, Flutter and React Native are not ported; their copy of the corner radius row string still says 0 is a capsule (the old key stays in the iOS tables for them). The about 20 test classes of the `44f226c4` line that cover the new style API are not ported.
+
+### TODO (2026-11-28, `claude/bold-planck-flioee`, Linux session): tag list rows as tall as their tallest tag, `maxItemHeight`
+
+- **Prompt (verbatim):** "切换最新提交所在分支阅读agent文档/ 修改taglist 布局逻辑，所有修改应在core中实现自动适应以下布局，bug截图已经附上，强制调整自适应每一行的最高高度为其中最大的一个tag的高度。此场景适应需求场景如下：当用户设置允许换行场景，以及用户自定义tag高度。比如icon高度自定义导致tag高度变高后，应调整所在行所有其他元素对齐，适应最高元素的高度。同时暴露接口允许用户设置taglist所有tag最大高度，默认为MAX 不限高度。"
+- **Prompt (English):** switch to the branch of the latest commit and read the agent documents; change the tag list layout
+  in the core so that every row adapts: all tags of a row get the height of the row's tallest tag (wrapping titles, custom
+  tag or icon heights); expose a list-wide maximum tag height, default MAX (no limit).
+- **Scope (owner, 2026-11-28, second message):** all platforms: iOS, Android, Flutter, React Native, mini program,
+  HarmonyOS.
+- **Done, per platform** (the key `maxItemHeight` in the configuration map/JSON, missing = no limit; values below 1 count as 1):
+
+  | Platform | Change | Test | Status |
+  | --- | --- | --- | --- |
+  | iOS core | `CYLTagListView.maxItemHeight` (default `CGFloat.greatestFiniteMagnitude`); `measureItemHeights(widths:contentWidth:)` limits each height, then every tag of a row gets the row's tallest; `heightOfRows` and `sizeForItemAt` use the same limit; `CYLTagListKey.maxItemHeight` | `CYLTagListLayoutTests.testEveryRowIsAsTallAsItsTallestTagAndMaxItemHeightLimitsIt` | not compiled (Linux) |
+  | Android core | `CYLTagListView.maxItemHeight` (default `Float.MAX_VALUE`); `heightsForItems(widths, contentWidth)` same algorithm; `CYLTagListViewMaxItemHeight` | `CYLTagListRowHeightTest` (Robolectric) | not compiled (no Android SDK here) |
+  | HarmonyOS core | `CYLTagListState.maxItemHeight` (default `Number.MAX_VALUE`); `measureItemHeights(widths, contentWidth)` same algorithm; `CYLTagListKey.maxItemHeight` | `TagListRowHeight.test.ets` (in `List.test.ets`) | not compiled (no DevEco here) |
+  | Mini program | `model.normalize` reads `maxItemHeight`; `model.listTagHeight(model, style)` limits the tag height; the list passes it to `tagLayout`. Tags of a section share one style, so rows already had one height (no wrapping, `nowrap`) | `tag-list-model.test.js` | new test passes under `node --test` (22 of 24 in the copied files pass; the 2 failures come from the relative path of the scratch copy, not from this change) |
+  | Flutter, React Native | No code of their own: they pass the configuration map/JSON to the iOS, Android and HarmonyOS cores, which the wrappers reference by local path (`Package.swift`, the local Maven repo of `android/merged`, `file:../../../harmony/classifymenu`), so the key works there once the cores are rebuilt | none yet | TODO: a Dart and a TS example/test that sets `maxItemHeight` |
+
+- **Follow-up (owner, 2026-11-28, third message): the tail (inline) fold control is a tag like the others.** The fold
+  cell now counts for the height of its row (limited to `maxItemHeight`) and is stretched to it; the rows are the
+  displayed ones (visible items + fold cell), which also fixes the edge case below. `heightThatFitsWidth` counts the
+  cell's height for the last row. iOS: `displayedHeights(inSection:)` / `displayedRowsHeight(inSection:)`, test
+  `CYLTagListFoldingTests.testInlineFoldCellIsAsTallAsItsRowLikeAnyOtherTag`; Android: `displayedHeights`, test
+  `CYLTagListRowHeightTest.theTailFoldCellIsAsTallAsItsRow`; HarmonyOS: `layoutSections` stretches every cell of a row,
+  test `TagListRowHeight.test.ets`; mini program: the tail fold item already uses the list's tag height
+  (`listTagHeight`). The header and footer fold buttons are outside the rows and keep their own size. Not compiled
+  (Linux), same status as above.
+- **CI fix (2026-11-28, iOS run 46094815978, also red at `9f6f8073` before this task):** (1) `CYLTagButton` declared its own
+  `badgeValue`, `badgeLabel`, `badgeColor` and `isAnimationEngineAvailable`, which `CYLAnimatedItemView` has since
+  `ed39c20b` (non-`open`, so "overriding non-open property"); the tag now uses the inherited badge (CYLBadge on
+  `badgeAnchorView`, which the tag keeps on its icon, or on its title without an icon), `testTagButtonBadge` follows it.
+  (2) `CYLUtils` needs `CYLDeallocBlockExecutor ~> 1.4` (not on the trunk): `TagCollectionView/Podfile` names its source like the
+  other Podfiles, and `scripts/pod-lint.sh lib` includes the CYLBadge, CYLUtils and CYLDeallocBlockExecutor podspecs.
+  Not run locally (no Xcode); the next CI run is the check.
+- **Re-pin CYLTabBarController (2026-11-28, owner: "repin cyltab 最新commit"):** newest commit over every branch is `1cbb260a`
+  (`feat/harmony-animated-item-engines`, moved from `c5a18088` while this was done; was `ed39c20b`; `edeb11e6` on the other platforms). Moved: the four Podfiles and
+  `Package.swift`, the React Native and Flutter examples (Podfiles, `fetch-cyltabbar.sh`, `pubspec.yaml`), Android
+  `gradle.properties`, the mini program (`fetch-cyltabbar.js`, vendored copies; `cyl-badge` and `cyl-utils` are new in the
+  vendored list because `cyl-animated-item` requires them), `.gitignore`. `scripts/cyl-tabbar-latest-commit.sh --check` passes.
+  Mini program: upstream renamed the component methods to `cylFoo` (370d5eb5) but its engine packages still spell them
+  `cyl_foo`, so the example's `cyl-tag-animation-view` follows the new contract and calls either spelling of the engine;
+  `npm test` 171 / 171. **Not moved: HarmonyOS** `harmony/cylanimateditem` (vendored at `3074c51d`; the upstream folder changed by
+  about 6,700 lines, so it is re-vendored and built by the Windows session, as at the previous pin). TODO Windows: re-vendor,
+  build, update `VENDORED.md`; Mac: `pod install` and the iOS build; Android, Flutter, RN: build.
+- **Score: 65 / 100 (pass 60).** Missing 35: no platform compiled or run except the mini program (Linux session, no Swift,
+  Android SDK or DevEco), no before/after screenshots (the bug screenshot named in the prompt was not attached to the
+  conversation), Flutter and RN have no test of their own.
+- **TODO (next sessions):** macOS: build, run `CYLTagListLayoutTests`, screenshots, regenerate the Swift API baseline and
+  parity tables with their scripts (generated tables are never edited by hand); Windows: run the Android Robolectric test
+  and the HarmonyOS `TagListRowHeight.test.ets`, rebuild the Maven repo for Flutter and RN; docs: list `maxItemHeight` in
+  the API documents under `docs/` (not read here: docs-lookup rule). (Fourth message, 2026-11-28: the fold cell joins the last
+  visible row first; a tag it pushes out is no member of that row, and a cell pushed to the next row is a member of that
+  row. Fixed on iOS, Android and HarmonyOS for the laid-out rows and for `heightThatFitsWidth` at any width, through
+  `collapsedItemCount` and `displayedLayout(widths:ownHeights:visible:fold:contentWidth:)`; tests
+  `testTagsPushedOutByTheInlineFoldCellDoNotSetTheRowHeight`, `tagsPushedOutByTheTailFoldCellDoNotSetTheRowHeight`
+  (Android, HarmonyOS). The mini program has one height for every tag, so it has no such edge.)
+
+### TODO (2026-11-24, `feat/harmony`, Mac session chenyilong-68): advisor scores the all-platform API implementation, Sonnet implements, other sessions test
+
+- **Prompt (verbatim):** "continue TODO (missing points): advisor opus advisor点评目前全平台接口实现得分 以及下一步计划与建议。并立即让默认模型sonnet按照建议去实现。将得分优化到100转发合适任务给其他session 直接使用本机环境进行测试，iOS在macos机器，其余在windows机器。转发任务给相应session无需等待ci结果。"
+- **Prompt (English):** continue the TODO (missing points): the Opus advisor reviews the current score of the API
+  implementation on every platform and gives the next plan and advice; Sonnet implements the advice right away; bring the
+  score to 100; forward the right tasks to the other sessions, which test on their own machines (iOS on the macOS machine,
+  the rest on the Windows machine); do not wait for CI before forwarding.
+- **Scoreboard (advisor, 2026-11-24, from the docs at `7ce5ef7e`):**
+
+  | Platform | API parity | Below 100 because | Owner |
+  | --- | --- | --- | --- |
+  | iOS | Swift migration 100 | the labeled simulator screenshots of the current pins are not in `screenshots.md` | Mac |
+  | Android | 895 / 895 (iOS → Android), 736 / 736 (Android → iOS) | menu.riv with Loop off (Rive Loop entry, 87) | CYLTabBarController |
+  | HarmonyOS | 807 / 807 | verification 96.2 counts 38 deferred rows as N/A and has 2 defect rows; `86d085c7` and `4b491046` never compiled (90); Rive Loop 87 (menu.riv, one stalled launch, libpag `eglMakeCurrent` freeze) | Windows |
+  | Mini program | 1:1 port | npm publish needs `! npm login` (owner); Animations BUG 1 / 2 headings (2026-11-15) to re-check; CYLAnimatedItem migration 90 | owner, Windows |
+  | Flutter, React Native | shared pins | not run on an Android device; default tab bar height TODO (`cross-platform.md`) | Windows |
+
+  The HarmonyOS parity score is not its verified score: report both. Items blocked on the owner (npm login, PR #824,
+  issues #11, #9, #2) cap the score and are not marked N/A.
+- **Plan:** (1) this TODO, pushed; (2) one batch message to the Windows session (HarmonyOS build + emulator for `86d085c7` /
+  `4b491046`, the two verification defect rows, the stalled launch, the libpag freeze, Flutter / React Native on an Android
+  device, the mini program bugs), no CI wait; (3) menu.riv's input restart to the CYLTabBarController session; (4) Sonnet:
+  Mac static work (stale TODO headings in docs, the iOS side of the tab bar height item) and one iOS screenshot batch on the
+  ClassifyMenu simulator; never `harmony/` (Windows owns it).
+- **Windows test batch (hand-over, 2026-11-24, one batch, no CI wait):** no `Win*` session is reachable from the Mac
+  (`ListAgents` lists local sessions only), so the batch is here for the Windows session's next pull. Pull `feat/harmony`,
+  then on the Windows machine:
+  1. HarmonyOS: `ohpm install --all`, `hvigorw assembleHap`, host tests for `86d085c7` and `4b491046` (never compiled).
+  2. HarmonyOS arm64 emulator: Play all twice, speed slider, Loop on / off, select a tag, on Rive and on Lottie / PAG / GIF /
+     SVGA tags; the UI suite (14 tests); the two defect rows of `harmony-verification.md`.
+  3. HarmonyOS: the launch with six still icons (repeat 5 fresh launches), the libpag `eglMakeCurrent` freeze after about
+     80 s of Loop on (PAG tags).
+  4. Flutter and React Native examples on the Android emulator: Rive Loop on / off, Play all.
+  5. Mini program: re-check BUG 1 (icons drift after scrolling while playing) and BUG 2 (Rive icons) of
+     `cross-platform.md`; mark them DONE or keep them TODO with the evidence.
+  6. (added 2026-11-25) Re-vendor `harmony/` `cylanimateditem` + `cylanimateditemrive` at CYLTabBarController `edeb11e6` (the Mac session did every other pin in `b4a0c575`;
+     the mini program `miniprogram_dist` is done there too, including the new `cyl-dealloc-block-executor`), then verify menu.riv with Loop OFF (Play all: one
+     pass, then rest) and Loop ON on Android, HarmonyOS, Flutter, React Native and the mini program. Android `gradle.properties` already names `edeb11e6`.
+  Report back with the results and screenshots in `screenshots.md`, scored in this entry.
+- **Status (2026-11-24, Mac session chenyilong-68, Sonnet, plan step 4): still TODO, iOS row now 100.**
+  - Done on the Mac: (a) the stale-heading sweep (`220368c5`): `animated-item-migration.md` "TODO (in order)" and the 41660d24 pin move are DONE; the
+    other five TODO headings stay TODO with a "Blocked on" line; (b) iOS side of the default tab bar height (`4737201e`): the
+    core has no tab bar, the examples set no height, a test pins CYLTabBarController's default; (c) one iOS batch on the own
+    simulator "CYL cm-harmony2" (8BDE43C1, iOS 27.2, Xcode 27.2): empty derived data, `pod install` in Example and Example-Swift
+    (Podfile / pbxproj leftovers restored, Podfile.lock unchanged), Example 118 / 118 and Example-Swift 23 / 23, both apps built,
+    seven screens in `docs/assets/ios-27-2-iphone18pro-example-main-tabs.png` (listed in `screenshots.md` with platform, OS, simulator,
+    Xcode, commit URL and time). README test counts updated (115 → 118, 22 → 23).
+  - Notes: the first Swift suite run failed for an environment reason (a flaky HTTPS clone of CYLTabBarController during
+    `pod install`) and passed on the retry; the first test runs needed the sandbox off (testmanagerd socket); the host load average was
+    500-950 but the runs finished in about 5 minutes each. My first height test compared with `UITabBar.sizeThatFits` (83, safe area
+    included) and failed: fixed in the test, not in the core (49 is CYLTabBarController's documented default). Pins are behind
+    the newest CYLTabBarController commit (`6ef9760c` vs `c4a1f8fd`); moving them touches `harmony/`, so it is one commit for the Windows session.
+  - Scoreboard after this work: iOS 100 (screenshots of the current pins are in `screenshots.md`; the test height item is done);
+    Android 895 / 895 and 736 / 736, unchanged (menu.riv with Loop off: CYLTabBarController); HarmonyOS 807 / 807 parity, verified 96.2
+    / 90 unchanged (Windows); mini program unchanged (owner: npm login; Windows: BUG 1 / 2 re-check); Flutter / React Native unchanged
+    (Windows: Android device run, default tab bar height re-measure).
+  - **Left for the Windows session:** the five-item hand-over above plus the pin move. **Left for the owner:** npm login, PR #824,
+    issues #11 / #9 / #2, a real AppID for the phone check. Not marked N/A.
+
+### DONE (2026-11-22, `feat/harmony`, 90/100, not compiled): no wrapper over CYLAnimatedItemView's playback API (advisor decides, Sonnet implements)
+
+- **Prompt (verbatim)**: "上游 CYLTabBarController 的 CYLAnimationView 已有同名的 animationSpeed、animationLoops、animationRestartToken 和 restart()。在本仓库新建包装，请不要重复实现 直接调用上游接口即可。并请advisor评估 直接调用上游还是新建包装，哪一个方案更有利于本项目，sonnet实现。"
+- **Prompt (English)**: "Upstream CYLTabBarController's animated item view already has animationSpeed, animationLoops,
+  animationRestartToken and restart() with the same names. Do not reimplement them in a new wrapper in this repository; call
+  the upstream API directly. Have an advisor evaluate which is better for this project, calling upstream directly or a new
+  wrapper; Sonnet implements."
+- **Context**: iOS and Android `CYLTagButton` subclass `CYLAnimatedItemView` and only override its properties. On HarmonyOS
+  (ArkTS structs cannot subclass) the tag drives a `CYLAnimationPlayer` handle, and `86d085c7` added
+  `CYLAnimatedItemPlayer`, which wraps the component's `animationLoops` / `animationRestartToken` for Rive.
+- **Acceptance (100, pass 60)**: advisor's written recommendation (20); no playback wrapper left that duplicates the
+  component's props where they can be called directly (40); behavior kept: Play all, speed, Loop switch, selected state on
+  every engine (20); docs and task log updated, static checks pass (20).
+- **Advisor (20/20)**: iOS, Android and the mini program already call the component directly (`CYLTagButton` subclasses
+  `CYLAnimatedItemView`, or passes `speed` / `loop` and calls `playAnimation()`); only HarmonyOS had a wrapper,
+  `CYLAnimatedItemPlayer` plus copies of the component's state in `CYLTagAnimatedIcon`, which also dropped the speed.
+  Recommendation: call upstream directly; keep `CYLAnimationPlayer` only for what the HarmonyOS component lacks (resting
+  progress and the last frame while selected, the app's Lottie / PAG / GIF / SVGA players).
+- **Result (Sonnet implementation, reviewed)**: `CYLAnimatedItemPlayer` and `CYLAnimatedItemPlaybackHost` deleted (and their
+  exports); `CYLTagAnimatedIcon` takes `animationSpeed`, `animationLoops`, `animationRestartToken` and passes them straight to
+  `CYLAnimatedItemView` for builder-drawn types (Rive); `CYLTagButtonComponent` passes `resolvedAnimationSpeed`,
+  `animationLoops` and `playToken`; `CYLTagButton.itemDidLoad()` replays a play made before the load. `animationView` is
+  undefined for builder-drawn types. Tests: the adapter tests became `cylTagItemBuilderURL` and
+  `replaysABuilderDrawnIconOnceItHasLoaded`. Checks: accessibility, native strings OK, parity 100. **Score 90/100**: behavior
+  (20) only reviewed statically (10): not compiled here. **TODO (owner, DevEco)**: ArkTS build, host tests, emulator (arm64)
+  Play all twice, speed, Loop on/off, select on Rive and on Lottie / PAG / GIF / SVGA tags. **TODO (upstream)**: an
+  `animationRestingProgress` prop on HarmonyOS `CYLAnimatedItemView` (docs/animated-item-migration.md) would let the
+  app-engine path drop `stopAtProgress` too.
+
+
+### DONE (2026-11-22, `feat/harmony`, static code; build and emulator test by the owner): HarmonyOS tags play Rive through `CYLRiveAnimationBuilder`, no app-side Rive view
+
+- **Prompt (verbatim)**: "searchbar反馈TODO (50 points): ClassifyMenu 会话把 Rive 接到 CYLTagAnimatedIcon 的 CYLRiveAnimationBuilder 上并推送。
+  TODO (30 points): 我重新 pin ClassifyMenu,并删掉 harmonyos/entry 里那三个适配类。
+  TODO (20 points): 你在 HarmonyOS 模拟器上编译和测试。"
+- **Prompt (English)**: the CYLSearchViewController session's list: (50) this session routes Rive in `CYLTagAnimatedIcon` to
+  `CYLRiveAnimationBuilder` and pushes; (30) it re-pins ClassifyMenu and deletes its three adapter classes; (20) the owner
+  builds and tests on the HarmonyOS emulator.
+- **Context**: CYLTabBarController's `cylanimateditemrive` (vendored at `3074c51d`, `669ab5e5`) offers `CYLRiveAnimationBuilder`,
+  an `animationBuilder` for `CYLAnimatedItemView` driven by its `animationLoops` / `animationRestartToken`. The example still
+  wraps `CYLRiveIcon` in its own `CYLRiveIconView`, `CYLRiveIconHost` and `CYLRivePlayer` (`653452e6`), because the core's
+  `CYLTagAnimatedIcon` only takes the app's tag builder and a `CYLAnimationPlayer`.
+- **Requirements**: the core (`harmony/classifymenu`) still depends on no animation library (no `cylanimateditemrive`, no
+  `@ohos/rive`); the app registers upstream's builder for the Rive type, the tag drives loops and replay through the
+  component's props; the example drops its Rive view and adapter; static code only (no DevEco here), the owner builds and tests.
+- **Result** (`86d085c7`): core `harmony/classifymenu`: `CYLTagAnimationBuilder.registerItemBuilder(engine, builder)` /
+  `itemBuilder(engine)`; `CYLTagAnimatedIcon` hands a registered builder `CYLAnimatedItemView`'s context, with the file as a
+  rawfile path (`cylTagItemBuilderURL`: `asset:` removed, the rawfile that exists, options after `#`), and drives
+  `animationLoops` / `animationRestartToken` through `CYLAnimatedItemPlayer` (removed later the same day, see above) (play restarts, loops, the pass end from
+  `onEnded`; no speed, no progress), handed to the tag when the file loads. Example: `cylRegisterExampleAnimationEngines`
+  registers `CYLRiveAnimationBuilder` for `CYLAnimationEngine.RIVE` (behind `CYL_RIVE_ENABLED`); `CYLRiveIconView`,
+  `CYLRiveIconHost` and `CYLRivePlayer` are deleted. The adapter's host test became two tests of `CYLAnimatedItemPlayer` and
+  `cylTagItemBuilderURL`. Checks here: accessibility and native strings OK, parity 100, licenses OK. Not compiled (no DevEco
+  in this container). **TODO (owner)**: ArkTS build (`hvigorw assembleHap`), host tests, and the Rive tags on the emulator
+  (Play all, Loop switch, selected state, `icons.riv` artboards).
+
+
 ### TODO → DONE (2026-11-21, `docs/todo-reconcile`, Windows session): fix every TODO in docs/ (heading pass)
 
 - Context: `docs/` held 49 `TODO` / `Open` headings. Most recorded finished work (DONE results, 100 / 100) under a
@@ -67,6 +252,8 @@ tags: [issues, ui, cocoapods, progress]
   - Issues #11, #9 and #2 in the table above stay blocked (the owner, a real device, an old Xcode).
 
 ### TODO (2026-11-20, `docs/readme-swift-refresh`): README refresh, Swift only, every platform's setup
+
+- **Blocked on: Windows session** (compile the Kotlin, ArkTS, Dart and TSX snippets), see the 2026-11-24 hand-over. The other deduction, the stale counts of the README's "Test screenshots" paragraph, was a Mac item and is done (README counts 118 / 23, 2026-11-24 TODO above).
 
 - Context: README.md has outdated descriptions (the core was Objective-C until the migration finished on 2026-11-14,
   the README still shows Objective-C code and says "the core stays Objective-C"). Reference: the current API
@@ -1808,6 +1995,8 @@ tags: [issues, ui, cocoapods, progress]
 
 ### TODO (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): HarmonyOS Rive tags ignore the Loop switch; one shared Rive engine
 
+- **Blocked on: Windows session** (HarmonyOS emulator, Flutter and React Native on an Android device, libpag freeze) **and the owner** (CYLTabBarController PR #824); menu.riv with Loop off waits for CYLTabBarController's input restart. See the 2026-11-24 hand-over.
+
 - **Requests (verbatim):**
   1. "NO，   NOT All suites are now green on feat/harmony: 鸿蒙os 在rive时候还是有问题， 出现了和之前小程序上一模一样的问题， 不响应loop事件。 pag是可以的，是不是之前只修复了小程序，没修复其他端的， 这次鸿蒙os测试出来了， 请排查Android， flutter React native，有没有这个问题， 先修复鸿蒙os上出现的该问题。"
      (English: not all suites are green: on HarmonyOS Rive still has the same problem the mini program had, it ignores
@@ -1869,3 +2058,34 @@ tags: [issues, ui, cocoapods, progress]
     a libpag `eglMakeCurrent` main-thread freeze (THREAD_BLOCK_6S) after about 80 s of Loop on (PAG, not Rive); CYLTabBarController
     PR #824 (`feat/harmony-animated-item-engines`, another session) adds `cylanimateditem_rive` with the same goal: when it lands,
     `cylanimateditemrive` folds into it and every dependent re-pins once.
+
+- **TODO (2026-11-23, `feat/harmony`, Mac session chenyilong-e4): fix the open items, score to 100.**
+  - Prompt, verbatim: "fix to do and score to 100". English: fix the open items of this entry and bring the score to 100.
+  - Items: (1) menu.riv with Loop off stays at the hamburger (frames from 2 s; Android the same); (2) the one launch with six
+    still icons; (3) the libpag `eglMakeCurrent` freeze after about 80 s of Loop on; (4) Flutter and React Native on Android
+    run on a device; (5) PR #824 convergence (owner's call, recorded, not scored here).
+  - Note: host load average 638-897 at the start (other sessions' emulators and builds); device checks wait for it to drop.
+  - **DONE (2026-11-25, chenyilong-68; iOS verified, Android / HarmonyOS / Flutter / React Native / mini program pending the Windows session): re-pin CYLTabBarController c4a1f8fd -> edeb11e6 (menu.riv Loop-off fix 19f689e2).**
+    **Result:** one commit, `b4a0c575`, moves every pin except `harmony/` (Podfiles, `Package.swift`, Android `gradle.properties`, Flutter pubspec and iOS Podfile,
+    React Native Podfile and `fetch-cyltabbar.sh`, mini program fetch script and test). New in the range: CYLTabBarController needs
+    CYLDeallocBlockExecutor ~> 1.4, which is not on the trunk, so the five Podfiles that use CYLTabBarController name its pod source
+    (commit `4276a6da`) as upstream's Podfiles do; the mini program's `cyl-animated-item` requires `cyl-dealloc-block-executor`, so the fetch script
+    vendors it too (and takes its LICENSE from `src/LICENSE` like the others); `miniprogram_dist` regenerated by the fetch script (`--check` OK,
+    `npm test` 168 / 168, `check-licenses.sh` OK). `Podfile.lock` is git-ignored. iOS at the new pin: Example 118 / 118, Example-Swift 23 / 23, both build with
+    empty derived data. **menu.riv on iOS 27.2** (own simulator 8BDE43C1, screens `animations-rive-once` / `-loop` added in `f8a9a952`, 60 fps recording, pixel
+    difference of the Menu icon per frame): Loop OFF, Play all: the Menu tag changes once (X to hamburger, done about 0.6 s after the press), then rests with a
+    difference of 0.1 or less for the next 11 s while Done plays its single pass to the check; Loop ON: Menu alternates X and hamburger about every 1.5 s through
+    19 s. Before the fix the entry recorded no change at all with Loop off. Screenshot: `docs/assets/ios-27-2-iphone18pro-menu-riv-loop-off-on.png` ([f8a9a952](https://github.com/ChenYilong/CollectionViewClassifyMenu/commit/f8a9a9529a3dd5281d0be93bcccba2ad6a3875eb)). Note:
+    the rest pose before Play all is the X, so one Loop-off pass ends on the hamburger; that is upstream's choice of the file's pass, not a defect seen here.
+    Score of item 1 (menu.riv): iOS verified; Android and HarmonyOS unchanged (Windows item 6 below); the entry stays 87 / 100 until then. Steps: (1) this entry; (2) pins; (3) iOS batch;
+    (4) this result and Windows item 6.
+    Prompt (verbatim): "continue". English: continue. Context: upstream fixed the menu.riv Loop-off bug (fix `19f689e2`, merge head
+    `edeb11e63ae4ecd37433642a118dc43ffb11387d` on `feat/harmony-animated-item-engines`, PR #824). Plan: (1) this entry; (2) every pin except
+    `harmony/` in one commit, Podfile.lock by `pod install`, mini program dist by its fetch script; (3) one iOS batch (Example, Example-Swift,
+    both suites) and menu.riv with Loop off / on on the animation screen; (4) DONE with evidence, Windows item 6 in the hand-over.
+  - **Claimed (2026-11-24) by Mac session chenyilong-68:** chenyilong-e4 is no longer running, so this entry is taken over.
+    Routing: (1) menu.riv with Loop off goes to CYLTabBarController (Mac-CYLTabBarController session reproduced it on iOS too,
+    logged in its `docs/Animated-Item.md` on PR #824 at `74505404`: `menu_button.riv`, boolean `isOpen`; a longer off window
+    did not fix it; cause not established); this repository re-pins once when it sends the fixing SHA. (2) the stalled launch,
+    (3) the libpag freeze and (4) Flutter / React Native on an Android device are in the 2026-11-24 Windows test batch at the
+    top of this file. (5) PR #824: owner's call.

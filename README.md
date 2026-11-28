@@ -778,7 +778,7 @@ open CYLTagEditorExample.xcworkspace
 
 | 中文 | English |
 |:---|:---|
-| 两个示例的测试（`Example/CYLMenuExampleTests`：115 个，`Example-Swift/CYLTagEditorExampleTests`：22 个）按**面向协议**组织：每个功能一个测试类、一个文件，测试之间共享的能力是带默认实现的协议，放在 `Example-Shared/TestSupport/`，同时编译进两个测试 target。 | The tests of the two examples (`Example/CYLMenuExampleTests`: 115, `Example-Swift/CYLTagEditorExampleTests`: 22) are organized around protocols: one test case class and one file per feature, and the capabilities they share are protocols with default implementations in `Example-Shared/TestSupport/`, compiled into both test targets. |
+| 两个示例的测试（`Example/CYLMenuExampleTests`：118 个，`Example-Swift/CYLTagEditorExampleTests`：23 个）按**面向协议**组织：每个功能一个测试类、一个文件，测试之间共享的能力是带默认实现的协议，放在 `Example-Shared/TestSupport/`，同时编译进两个测试 target。 | The tests of the two examples (`Example/CYLMenuExampleTests`: 118, `Example-Swift/CYLTagEditorExampleTests`: 23) are organized around protocols: one test case class and one file per feature, and the capabilities they share are protocols with default implementations in `Example-Shared/TestSupport/`, compiled into both test targets. |
 
 | 协议 | 作用 |
 | --- | --- |
@@ -830,8 +830,8 @@ open CYLTagEditorExample.xcworkspace
 | `CYLTagStoreTests` · `CYLTagEditorTests` · `CYLFoldStylesTests` · `CYLTagEditorAccessibilityTests` | The Swift example: tag data, tag editing, fold styles, accessibility |
 
 ```sh
-scripts/unit-tests.sh example   # 115 tests; screenshots in build/test-screenshots/example/
-scripts/unit-tests.sh swift     # 22 tests; screenshots in build/test-screenshots/swift/
+scripts/unit-tests.sh example   # 118 tests; screenshots in build/test-screenshots/example/
+scripts/unit-tests.sh swift     # 23 tests; screenshots in build/test-screenshots/swift/
 ```
 
 | 中文 | English |

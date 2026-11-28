@@ -23,7 +23,7 @@ const fs = require('fs');
 const path = require('path');
 
 // CYL_TAB_BAR: the same commit as the React Native example (fetch-cyltabbar.sh, example/ios/Podfile).
-const COMMIT = 'c4a1f8fda52aef766039893d8476f4b09493db23';
+const COMMIT = '1cbb260ad9fd1ea45d1fab0edfc9d1e7b22cbe26';
 const REPOSITORY = 'https://github.com/ChenYilong/CYLTabBarController.git';
 const ROOT = path.resolve(__dirname, '..');
 const CHECKOUT = path.join(ROOT, '.deps', 'CYLTabBarController');
@@ -60,7 +60,10 @@ const PAG_HINT = 'run python3 scripts/fetch-animation-resources.py PAGResources 
  */
 const LIBRARY = path.join(ROOT, 'packages', 'cyl-tag-list-miniprogram', 'miniprogram_dist');
 const VENDORED_SOURCE = 'CrossPlatform/wechat-miniprogram-cyltabbar';
-const VENDORED = ['cyl-animated-item', 'cyl-animation-placeholder'];
+// cyl-dealloc-block-executor: required by cyl-animated-item since CYLTabBarController edeb11e6 (the moment bus).
+// cyl-badge and cyl-utils (which needs cyl-dealloc-block-executor): required by cyl-animated-item since CYLTabBarController
+// bc4b94c1 (the item badge).
+const VENDORED = ['cyl-animated-item', 'cyl-animation-placeholder', 'cyl-dealloc-block-executor', 'cyl-badge', 'cyl-utils'];
 const VENDORED_TEST = {
   from: 'test/cyl_animated_item.test.js',
   to: path.join(ROOT, 'test', 'cyl-animated-item.upstream.test.js'),
@@ -73,7 +76,7 @@ function vendoredFiles() {
   const license = fs.readFileSync(path.join(base, 'src', 'LICENSE'));
   const entries = VENDORED.flatMap((folder) => {
     const source = path.join(base, 'src', folder);
-    return files(source).map((file) => ({ target: path.join(LIBRARY, folder, file), content: fs.readFileSync(path.join(source, file)) }))
+    return files(source).filter((file) => file !== 'LICENSE').map((file) => ({ target: path.join(LIBRARY, folder, file), content: fs.readFileSync(path.join(source, file)) }))
       .concat([
         { target: path.join(LIBRARY, folder, 'LICENSE'), content: license },
         { target: path.join(LIBRARY, folder, 'COMMIT'), content: Buffer.from(`${COMMIT}\n`) },

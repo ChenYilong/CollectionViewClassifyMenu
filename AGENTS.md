@@ -37,6 +37,8 @@ verify the behavior and update the applicable documentation.
 | `accessibility` | accessibility everywhere | [accessibility.md](docs/instructions/accessibility.md) |
 | `docs` | documentation assets, bilingual documents | [docs.md](docs/instructions/docs.md) |
 | `git` | branches, pull requests, repository hygiene | [git.md](docs/instructions/git.md) |
+| `docs-lookup` | finding the document a prompt refers to | [docs-lookup.md](docs/instructions/docs-lookup.md) |
+| `reply-greeting` | greeting at the start of every reply | [reply-greeting.md](docs/instructions/reply-greeting.md) |
 
 ## [workflow] Tasks and workflow
 
@@ -158,3 +160,17 @@ verify the behavior and update the applicable documentation.
 - At the end of every answer on a branch other than `master` / `main`, commit and push.
 - Never commit `._*`, `.DS_Store` or doubled-dot copies; never rewrite published history without approval.
 - Sections: [Branches and pull requests](docs/instructions/git.md#branches-and-pull-requests) · [Repository hygiene](docs/instructions/git.md#repository-hygiene).
+
+## [docs-lookup] Finding the document a prompt refers to
+
+- When a prompt mentions a related document without naming it, find it in memory and the conversation context first:
+  prefer the file mentioned most often and most recently. Still unclear: create a new document instead of searching.
+- Never scan the contents of every file under `docs/`, and never read a document under `docs/` in full unless the owner
+  names it and asks for a full read, or authorizes it.
+- Details: [docs-lookup.md](docs/instructions/docs-lookup.md).
+
+## [reply-greeting] Reply greeting
+
+- Start every reply with `Hi, <OS>/<folder>:`, then answer (`<OS>`: the session's operating system; `<folder>`: the
+  name of the session's working folder), e.g. `Hi, macOS/CYL CollectionView Classify Menu:`.
+- Details: [reply-greeting.md](docs/instructions/reply-greeting.md).

@@ -66,7 +66,19 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 | 24 | Pins: newest CYLTabBarController commit, by `:commit` | All | Done | `57a527e` everywhere; `scripts/cyl-tabbar-latest-commit.sh` now lists PR #815's tip (unmerged, CI only warns): move to its merge commit |
 | 25 | No regression: Play all, speed, loop on every animation screen | All | Done (iOS, Android) | docs/example-demo-rules.md; mini program GIF waits for row 19; **mini program Rive section TODO (bug B20, below)**: some Rive tags play once, then neither loop nor Play all plays them; React Native (Android) too, some never play |
 
-## TODO (in order)
+## DONE (2026-11-24, stale-heading sweep, logged as TODO): the open items, in order
+
+> **DONE (2026-11-24, Mac session chenyilong-68):** every numbered item below is resolved: 1 and 4 by the CI and toolchain
+> entries (rows 20 and 22 of the table above; the HarmonyOS emulator runs in `harmony-verification.md`), 2 and 3 as the
+> 2026-11-19 status says, 5 by "DONE (2026-11-22 ...) HarmonyOS `CYLTagButton` tints through `CYLAnimatedItemView.iconColor`"
+> (below, `harmony/classifymenu/.../CYLTagButton.ets`), 6 (B20) by `074285a6`. What stays open is the CYLTabBarController
+> request in the first block quote below (`animationRestingProgress`), which is upstream's and is tracked there.
+
+> **TODO (2026-11-22, CYLTabBarController request)**: HarmonyOS `CYLAnimatedItemView` has `animationSpeed`, `animationLoops` and
+> `animationRestartToken`, which the HarmonyOS tags now pass straight through for builder-drawn types (Rive), but no
+> `animationRestingProgress` (iOS and the mini program have one). Until it has, `CYLTagButton` keeps driving the app's
+> Lottie / PAG / GIF / SVGA players through `CYLAnimationPlayer.stopAtProgress` for the resting frame and the last frame while
+> selected (docs/issue-progress.md, "no wrapper over CYLAnimatedItemView's playback API").
 
 > **Status (2026-11-19, `feat/harmony`, re-read for the "every TODO to 100" request):** item 3 is DONE (`Package.swift`
 > depends on CYLTabBarController's `CYLAnimatedItem` product, which ships the Swift view as `CYLAnimatedItemViews`
@@ -728,7 +740,12 @@ Related logs: [component-architecture.md](component-architecture.md) (the task e
 - **Closed (2026-11-21), superseded:** iOS 90 + the Windows share 10 = 100 for the pins; every platform then moved on
   to `41660d24` (next entry), which carries the open "commit sent" point.
 
-### TODO (2026-11-20, `feat/harmony`): pins move to CYLTabBarController 41660d24 (mini program tab switch fix)
+### DONE (2026-11-24, superseded, logged as TODO 2026-11-20, `feat/harmony`): pins move to CYLTabBarController 41660d24 (mini program tab switch fix)
+
+- **DONE (2026-11-24, stale-heading sweep, Mac session chenyilong-68):** the pin move itself shipped (PR #26 green, 11 passed;
+  `b623f498` iOS, the Windows commits below). The one open deduction (-5, "pushed commit sent to a session that is no longer
+  active") is moot: pins moved on many times since (`602c8727`, `9dc1f761`, ... `04b39e26`); `Example/Podfile` pins
+  CYLTabBarController `c4a1f8fd` today.
 
 - Context: 41660d24 (origin/feat/cross-platform-components) fixes the WeChat mini program tab bar: tapping the next tab
   mid-animation left the previous tab playing (two tab items looked selected); `cyl-tab-bar` now stops and rests every

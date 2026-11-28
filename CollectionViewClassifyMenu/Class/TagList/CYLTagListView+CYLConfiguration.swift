@@ -22,6 +22,15 @@
 //
 
 import UIKit
+// CYLAnimationSource (the engine's shared source parser): in Swift Package Manager it is the `CYLAnimatedItemSwift`
+// target, in CocoaPods and the framework the `CYLAnimatedItem` module (as CYLTagButton.swift imports it).
+#if canImport(CYLAnimatedItemSwift)
+import CYLAnimatedItemSwift
+#elseif canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#else
+import CYLTabBarController
+#endif
 
 // MARK: - Keys
 
@@ -59,6 +68,12 @@ public enum CYLTagListKey {
      * A Boolean, or "true" / "false".
      */
     public static let showsSectionHeaders = "showsSectionHeaders"
+
+    /**
+     * What a long press does: "reorder", "callout", "report" or "none", or an array of them (the first that can begin
+     * wins). A list without "none" and without "report" also reports the long press where no listed action takes it.
+     */
+    public static let longPressAction = "longPressAction"
 
     /**
      * A Boolean, or "true" / "false".
@@ -107,6 +122,11 @@ public enum CYLTagListKey {
      * (title, image, id, deletable, enabled, style…). Replaces the list's tags (`addTags(_:)`, `tagDataSource`).
      */
     public static let tags = "tags"
+
+    /**
+     * A number: `CYLTagListView.maxItemHeight`, the tallest a tag may be; missing for no limit.
+     */
+    public static let maxItemHeight = "maxItemHeight"
 }
 
 /**
@@ -121,7 +141,8 @@ public enum CYLMenuFoldControlKey {
     public static let position = "position"
 
     /**
-     * A `CYLMenuFoldControlContent` raw value, or "iconAndTitle" ("titleAndIcon"), "title", "icon".
+     * A `CYLMenuFoldControlContent` raw value, or "iconAndTitle" ("titleAndIcon"), "title", "icon",
+     * "titleAndIconAlways" (`.titleAndIcon`: the title and the icon in both states).
      */
     public static let content = "content"
 
@@ -194,6 +215,11 @@ public enum CYLTagItemKey {
     public static let title = "title"
 
     /**
+     * A string: a longer description, shown in a callout on a long press (`longPressAction` "callout").
+     */
+    public static let subtitle = "subtitle"
+
+    /**
      * A `UIImage`, or an image name, "system:<SF Symbol>" or a file path.
      */
     public static let image = "image"
@@ -220,6 +246,18 @@ public enum CYLTagItemKey {
      * A number 0...1: the frame shown while not selected (see `menuAnimationRestingProgressForItem(at:)`).
      */
     public static let animationRestingProgress = "animationRestingProgress"
+
+    /**
+     * A string: the badge on the item's icon (CYLTabBarController's `CYLAnimatedItemView.badgeValue`). Absent (the default) no badge, "" a
+     * dot, otherwise the text. The tag draws it on its icon itself: pass the plain icon, never an image with a badge drawn into it.
+     */
+    public static let badgeValue = "badgeValue"
+
+    /**
+     * A dictionary: the badge's style, the keys of CYLTabBarController's `CYLBadgeAttributeKey` (`animation`, `color`, `radius`,
+     * `centerOffset`, `textColor`...).
+     */
+    public static let badgeAttributes = "badgeAttributes"
 
     /**
      * A Boolean, or "true" / "false". True by default.
@@ -284,6 +322,11 @@ public enum CYLMenuStyleKey {
     public static let itemHeight = "itemHeight"
 
     /**
+     * The most lines a title may take: a whole number, or "unlimited". Default 1.
+     */
+    public static let titleMaxLines = "titleMaxLines"
+
+    /**
      * The grid's items per row (`CYLMenuStyle.numberOfItemsPerRow`); 0 for the flow layout.
      */
     public static let numberOfItemsPerRow = "itemsPerRow"
@@ -302,6 +345,11 @@ public enum CYLMenuStyleKey {
      * A number.
      */
     public static let headerHeight = "headerHeight"
+
+    /**
+     * The most lines a section header's title may take: a whole number, or "unlimited". Default 1.
+     */
+    public static let headerMaxLines = "headerMaxLines"
 
     /**
      * A number.
@@ -327,6 +375,71 @@ public enum CYLMenuStyleKey {
      * Insets: an `NSValue`, "{top, left, bottom, right}", [t, l, b, r] or {top:, left:, bottom:, right:}.
      */
     public static let sectionInsets = "sectionInsets"
+
+    /**
+     * A `CYLSectionStyle` raw value, or "plain" / "insetGrouped" (case-insensitive).
+     */
+    public static let sectionStyle = "sectionStyle"
+
+    /**
+     * A color; absent keeps the system card color.
+     */
+    public static let sectionBackgroundColor = "sectionBackgroundColor"
+
+    /**
+     * A `CYLTagBackgroundStyle` raw value, or "flat" / "liquidGlass" (case-insensitive); anything else is "flat".
+     */
+    public static let sectionBackgroundStyle = "sectionBackgroundStyle"
+
+    /**
+     * A number.
+     */
+    public static let sectionCornerRadius = "sectionCornerRadius"
+
+    /**
+     * Insets: an `NSValue`, "{top, left, bottom, right}", [t, l, b, r] or {top:, left:, bottom:, right:}.
+     */
+    public static let sectionContentInsets = "sectionContentInsets"
+
+    /**
+     * A number: how far the board extends beyond the tags, left and right. Absent: `sectionContentInsets` leading / trailing.
+     */
+    public static let sectionBoardInset = "sectionBoardInset"
+
+    /**
+     * A color; absent: no band.
+     */
+    public static let headerBackgroundColor = "headerBackgroundColor"
+
+    /**
+     * A number.
+     */
+    public static let headerCornerRadius = "headerCornerRadius"
+
+    /**
+     * Insets (left and right are used; absent: 0).
+     */
+    public static let headerContentInsets = "headerContentInsets"
+
+    /**
+     * A `CYLHeaderSeparatorStyle` raw value, or "none" / "line" (case-insensitive).
+     */
+    public static let headerSeparatorStyle = "headerSeparatorStyle"
+
+    /**
+     * A color; absent keeps the system separator color.
+     */
+    public static let headerSeparatorColor = "headerSeparatorColor"
+
+    /**
+     * A number.
+     */
+    public static let headerSeparatorThickness = "headerSeparatorThickness"
+
+    /**
+     * Insets (left and right are used; absent: 0).
+     */
+    public static let headerSeparatorInsets = "headerSeparatorInsets"
 
     /**
      * An offset: an `NSValue`, "{horizontal, vertical}", [h, v] or {horizontal:, vertical:}.
@@ -355,6 +468,16 @@ public enum CYLMenuStyleKey {
     public static let contentAlignment = "contentAlignment"
 
     /**
+     * A `CYLTagBackgroundStyle` raw value, or "flat" / "liquidGlass"; anything else is "flat".
+     */
+    public static let backgroundStyle = "backgroundStyle"
+
+    /**
+     * A size "{width, height}" in points, or `CYLMenuStyle.minimumTagSize`'s `{"width": 69, "height": 29}`.
+     */
+    public static let minimumTagSize = "minimumTagSize"
+
+    /**
      * A Boolean, or "true" / "false".
      */
     public static let adjustsFontForContentSizeCategory = "adjustsFontForContentSizeCategory"
@@ -368,6 +491,11 @@ public enum CYLMenuStyleKey {
      * A color.
      */
     public static let headerTextColor = "headerTextColor"
+
+    /**
+     * A color: the one tint of the header title, the section icon and the fold and More controls; absent resolves against the background.
+     */
+    public static let tintColor = "tintColor"
 
     /**
      * A color.
@@ -649,15 +777,15 @@ enum CYLConfigurationValue {
         guard let string = value as? String, !string.isEmpty else {
             return nil
         }
-        // "file.riv#artboard=HOME": resolve the file, then keep the options.
-        if let hash = string.firstIndex(of: "#"), hash > string.startIndex,
+        // "file.riv#artboard=HOME" or "file.riv?artboard=HOME": the engine's shared source rules (CYLAnimationSource,
+        // the same as HarmonyOS, Android and the mini program) split the file from its options; resolve the file, then
+        // keep the options in its fragment, as CYLTabBarController writes them.
+        if string.contains(where: { $0 == "#" || $0 == "?" }),
            (URL(string: string)?.scheme?.count ?? 0) <= 1 {
-            let file = fileURL(String(string[..<hash]), baseURL: baseURL)
-            guard let file, var components = URLComponents(url: file, resolvingAgainstBaseURL: true) else {
-                return file
+            let source = CYLAnimationSource(parsing: string)
+            if !source.file.isEmpty {
+                return fileURL(source.file, baseURL: baseURL)?.cylAddingAnimationOptions(source.options)
             }
-            components.percentEncodedFragment = String(string[string.index(after: hash)...])
-            return components.url ?? file
         }
         if let url = URL(string: string), (url.scheme?.count ?? 0) > 1 {
             return url
@@ -861,6 +989,10 @@ final class CYLTagListConfigurationSource: NSObject, CYLMenuDataSource {
         item(at: indexPath)[CYLTagItemKey.title].map { "\($0)" } ?? ""
     }
 
+    func menuSubtitleForItem(at indexPath: IndexPath) -> String? {
+        item(at: indexPath)[CYLTagItemKey.subtitle].map { "\($0)" }
+    }
+
     func menuImageForItem(at indexPath: IndexPath) -> UIImage? {
         CYLConfigurationValue.image(item(at: indexPath)[CYLTagItemKey.image], baseURL: baseURL)
     }
@@ -881,6 +1013,14 @@ final class CYLTagListConfigurationSource: NSObject, CYLMenuDataSource {
             return nil
         }
         return CYLConfigurationValue.image(sections[section][CYLTagSectionKey.image], baseURL: baseURL)
+    }
+
+    func menuBadgeValueForItem(at indexPath: IndexPath) -> String? {
+        item(at: indexPath)[CYLTagItemKey.badgeValue].map { "\($0)" }
+    }
+
+    func menuBadgeAttributesForItem(at indexPath: IndexPath) -> [String: Any]? {
+        item(at: indexPath)[CYLTagItemKey.badgeAttributes] as? [String: Any]
     }
 
     func menuAnimationRestingProgressForItem(at indexPath: IndexPath) -> NSNumber? {
@@ -996,6 +1136,7 @@ extension CYLMenuFoldControl {
         }
         let contents = ["iconandtitle": CYLMenuFoldControlContent.iconAndTitle.rawValue,
                         "titleandicon": CYLMenuFoldControlContent.iconAndTitle.rawValue,
+                        "titleandiconalways": CYLMenuFoldControlContent.titleAndIcon.rawValue,
                         "title": CYLMenuFoldControlContent.title.rawValue,
                         "icon": CYLMenuFoldControlContent.icon.rawValue]
         if let raw = Value.rawValue(configuration[CYLMenuFoldControlKey.content], names: contents),
@@ -1036,10 +1177,10 @@ extension CYLTagAppearance {
         typealias Key = CYLTagAppearanceKey
         let baseURL = Value.baseURL(of: configuration)
         if let value = configuration[Key.backgroundColor] {
-            backgroundColor = Value.color(value) ?? CYLTagAppearance.defaultBackgroundColor
+            backgroundColor = Value.color(value)
         }
         if let value = configuration[Key.textColor] {
-            textColor = Value.color(value) ?? CYLTagAppearance.defaultTextColor
+            textColor = Value.color(value)
         }
         if let value = configuration[Key.font] {
             font = Value.font(value) ?? CYLTagAppearance.defaultFont
@@ -1098,6 +1239,13 @@ extension CYLMenuStyle {
         if let value = Value.double(configuration[Key.itemHeight]) {
             itemHeight = value
         }
+        if let value = configuration[Key.titleMaxLines] {
+            if let text = value as? String, text == "unlimited" {
+                titleMaxLines = CYLTagTitleMaxLines.unlimited
+            } else if let number = Value.number(value) {
+                titleMaxLines = number.intValue
+            }
+        }
         if let value = Value.number(configuration[Key.numberOfItemsPerRow]) {
             numberOfItemsPerRow = max(0, value.intValue)
         }
@@ -1106,6 +1254,13 @@ extension CYLMenuStyle {
         }
         if let value = Value.double(configuration[Key.lineSpacing]) {
             lineSpacing = value
+        }
+        if let value = configuration[Key.headerMaxLines] {
+            if let text = value as? String, text == "unlimited" {
+                headerMaxLines = CYLHeaderTitleMaxLines.unlimited
+            } else if let number = Value.number(value) {
+                headerMaxLines = number.intValue
+            }
         }
         if let value = Value.double(configuration[Key.headerHeight]) {
             headerHeight = value
@@ -1131,6 +1286,15 @@ extension CYLMenuStyle {
            let alignment = CYLTagContentAlignment(rawValue: raw) {
             contentAlignment = alignment
         }
+        let backgroundStyles = ["flat": CYLTagBackgroundStyle.flat.rawValue,
+                                "liquidglass": CYLTagBackgroundStyle.liquidGlass.rawValue]
+        if let raw = Value.rawValue(configuration[Key.backgroundStyle], names: backgroundStyles),
+           let style = CYLTagBackgroundStyle(rawValue: raw) {
+            backgroundStyle = style
+        }
+        if let value = Value.size(configuration[Key.minimumTagSize]) {
+            minimumTagSize = value
+        }
         if let value = Value.bool(configuration[Key.adjustsFontForContentSizeCategory]) {
             adjustsFontForContentSizeCategory = value
         }
@@ -1146,6 +1310,7 @@ extension CYLMenuStyle {
         if let value = Value.insets(configuration[Key.sectionInsets]) {
             sectionInsets = value
         }
+        applySectionStyle(configuration)
         if let value = Value.offset(configuration[Key.titlePositionAdjustment]) {
             titlePositionAdjustment = value
         }
@@ -1157,6 +1322,9 @@ extension CYLMenuStyle {
         }
         if let value = Value.color(configuration[Key.headerTextColor]) {
             headerTextColor = value
+        }
+        if let value = configuration[Key.tintColor] {
+            tintColor = Value.color(value)
         }
         if let value = Value.color(configuration[Key.foldControlColor]) {
             foldControlColor = value
@@ -1182,6 +1350,63 @@ extension CYLMenuStyle {
     }
 }
 
+private extension CYLMenuStyle {
+
+    /**
+     * The section card, header band and header divider keys of `applyConfiguration(_:)`.
+     */
+    func applySectionStyle(_ configuration: [String: Any]) {
+        typealias Value = CYLConfigurationValue
+        typealias Key = CYLMenuStyleKey
+        let sectionStyles = ["plain": CYLSectionStyle.plain.rawValue, "insetgrouped": CYLSectionStyle.insetGrouped.rawValue]
+        if let raw = Value.rawValue(configuration[Key.sectionStyle], names: sectionStyles),
+           let value = CYLSectionStyle(rawValue: raw) {
+            sectionStyle = value
+        }
+        if let value = configuration[Key.sectionBackgroundColor] {
+            sectionBackgroundColor = Value.color(value)
+        }
+        let backgroundStyles = ["flat": CYLTagBackgroundStyle.flat.rawValue,
+                                "liquidglass": CYLTagBackgroundStyle.liquidGlass.rawValue]
+        if let raw = Value.rawValue(configuration[Key.sectionBackgroundStyle], names: backgroundStyles),
+           let value = CYLTagBackgroundStyle(rawValue: raw) {
+            sectionBackgroundStyle = value
+        }
+        if let value = Value.double(configuration[Key.sectionCornerRadius]) {
+            sectionCornerRadius = max(0, value)
+        }
+        if let value = Value.insets(configuration[Key.sectionContentInsets]) {
+            sectionContentInsets = value
+        }
+        if let value = Value.double(configuration[Key.sectionBoardInset]) {
+            sectionBoardInset = max(0, value)
+        }
+        if let value = configuration[Key.headerBackgroundColor] {
+            headerBackgroundColor = Value.color(value)
+        }
+        if let value = Value.double(configuration[Key.headerCornerRadius]) {
+            headerCornerRadius = max(0, value)
+        }
+        if let value = Value.insets(configuration[Key.headerContentInsets]) {
+            headerContentInsets = value
+        }
+        let separatorStyles = ["none": CYLHeaderSeparatorStyle.none.rawValue, "line": CYLHeaderSeparatorStyle.line.rawValue]
+        if let raw = Value.rawValue(configuration[Key.headerSeparatorStyle], names: separatorStyles),
+           let value = CYLHeaderSeparatorStyle(rawValue: raw) {
+            headerSeparatorStyle = value
+        }
+        if let value = configuration[Key.headerSeparatorColor] {
+            headerSeparatorColor = Value.color(value)
+        }
+        if let value = Value.double(configuration[Key.headerSeparatorThickness]) {
+            headerSeparatorThickness = max(0, value)
+        }
+        if let value = Value.insets(configuration[Key.headerSeparatorInsets]) {
+            headerSeparatorInsets = value
+        }
+    }
+}
+
 // MARK: - Tag
 
 extension CYLTag {
@@ -1200,6 +1425,8 @@ extension CYLTag {
         let options = configuration[CYLTagItemKey.animationOptions] as? [String: Any] ?? [:]
         animationURL = Value.fileURL(configuration[CYLTagItemKey.animation], baseURL: baseURL)?
             .cylAddingAnimationOptions(options)
+        badgeValue = configuration[CYLTagItemKey.badgeValue].map { "\($0)" }
+        badgeAttributes = configuration[CYLTagItemKey.badgeAttributes] as? [String: Any]
         isEnabled = Value.bool(configuration[CYLTagItemKey.enabled]) ?? true
         isDeletable = Value.bool(configuration[CYLTagItemKey.deletable]) ?? false
         if let style = configuration[CYLTagItemKey.style] as? CYLMenuStyle {
@@ -1360,11 +1587,17 @@ extension CYLTagListView {
         if let value = Value.bool(configuration[Key.allowsEmptySelection]) {
             allowsEmptySelection = value
         }
+        if let action = Self.longPressAction(fromConfiguration: configuration[Key.longPressAction]) {
+            longPressAction = action
+        }
         if let value = Value.bool(configuration[Key.showsSectionHeaders]) {
             showsSectionHeaders = value
         }
         if let value = Value.bool(configuration[Key.scrollEnabled]) {
             isScrollEnabled = value
+        }
+        if let value = Value.double(configuration[Key.maxItemHeight]) {
+            maxItemHeight = value
         }
         if let value = Value.number(configuration[Key.defaultVisibleRows]) {
             defaultVisibleRows = max(0, value.intValue)
@@ -1437,5 +1670,36 @@ extension CYLTagListView {
         let copy = style.cylCopy()
         copy.applyConfiguration(configuration)
         style = copy
+    }
+}
+
+extension CYLTagListView {
+
+    /// A configuration's `longPressAction` (a name or an array of names) as an action; `nil` when absent or unknown.
+    static func longPressAction(fromConfiguration value: Any?) -> CYLTagLongPressAction? {
+        guard let value else {
+            return nil
+        }
+        let names: [Any] = (value as? [Any]) ?? [value]
+        var actions = [CYLTagLongPressAction]()
+        for name in names {
+            switch name as? String {
+            case "reorder": actions.append(CYLTagLongPressActions.reorder)
+            case "callout": actions.append(CYLTagLongPressActions.callout)
+            case "report": actions.append(CYLTagLongPressActions.report)
+            case "none": actions.append(CYLTagLongPressActions.none)
+            default: return nil
+            }
+        }
+        guard !actions.isEmpty else {
+            return nil
+        }
+        // The long press is still reported where no listed action takes it (a tag without a subtitle), unless "none".
+        let hasNone = actions.contains { $0 === CYLTagLongPressActions.none }
+        let hasReport = actions.contains { $0 === CYLTagLongPressActions.report }
+        if !hasNone && !hasReport {
+            actions.append(CYLTagLongPressActions.report)
+        }
+        return actions.count == 1 ? actions[0] : CYLTagLongPressActions.first(actions)
     }
 }

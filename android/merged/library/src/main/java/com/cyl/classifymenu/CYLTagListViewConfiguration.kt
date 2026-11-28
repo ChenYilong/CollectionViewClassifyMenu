@@ -51,6 +51,10 @@ const val CYLTagListViewScrollEnabled = "scrollEnabled"
  */
 const val CYLTagListViewDefaultVisibleRows = "defaultVisibleRows"
 /**
+ * Tag list key: a number, `CYLTagListView.maxItemHeight` (dp), the tallest a tag may be; missing for no limit.
+ */
+const val CYLTagListViewMaxItemHeight = "maxItemHeight"
+/**
  * Tag list key: index paths as "section-item" strings or [section, item] arrays.
  */
 const val CYLTagListViewSelectedItems = "selectedItems"
@@ -842,6 +846,7 @@ fun CYLTagListView.applyConfiguration(configuration: Map<String, Any?>) {
     bool(configuration[CYLTagListViewShowsSectionHeaders])?.let { showsSectionHeaders = it }
     bool(configuration[CYLTagListViewScrollEnabled])?.let { isScrollEnabled = it }
     number(configuration[CYLTagListViewDefaultVisibleRows])?.let { defaultVisibleRows = maxOf(0, it.toInt()) }
+    number(configuration[CYLTagListViewMaxItemHeight])?.let { maxItemHeight = it.toFloat() }
     (configuration[CYLTagListViewSections] as? List<*>)?.let { list ->
         val source = CYLTagListConfigurationSource(list.mapNotNull { map(it) }, baseURL, this)
         configurationSources[this] = source

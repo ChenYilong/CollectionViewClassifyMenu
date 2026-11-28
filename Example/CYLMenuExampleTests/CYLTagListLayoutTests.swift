@@ -142,4 +142,39 @@ final class CYLTagListLayoutTests: CYLMenuExampleTestCase {
         // The default stays centered.
         XCTAssertEqual(CYLMenuStyle().contentAlignment, .center)
     }
+
+    func testEveryRowIsAsTallAsItsTallestTagAndMaxItemHeightLimitsIt() {
+        // A tag of its own, taller style (a custom tag or icon height). A wrapping title (`titleWraps`) is as wide as the
+        // content, so it never shares a row: the tall style is what makes row-mates differ.
+        let view = CYLTagListView(frame: .zero)
+        view.addTags((0..<12).map { CYLTag(title: "Tag \(String(format: "%02d", $0))") })
+        let tall = CYLMenuStyle()
+        tall.itemHeight = 80
+        view.tags[1].style = tall
+        show(view, size: CGSize(width: 240, height: 700))
+        view.layoutIfNeeded()
+        let tags = view.probe
+        tags.layOut()
+        XCTAssertEqual(view.maxItemHeight, CGFloat.greatestFiniteMagnitude, "No limit by default")
+
+        func rowHeights() -> [CGFloat: Set<CGFloat>] {
+            var heights: [CGFloat: Set<CGFloat>] = [:]
+            for item in 0..<12 {
+                if let frame = tags.itemFrame(at: ip(item, 0)) {
+                    heights[frame.minY, default: []].insert(frame.height)
+                }
+            }
+            return heights
+        }
+        XCTAssertTrue(rowHeights().values.allSatisfy { $0.count == 1 }, "Tags of a row share one height")
+        let tallest = tags.itemFrame(at: ip(1, 0))?.height ?? 0
+        XCTAssertGreaterThanOrEqual(tallest, 80, "The own style makes its tag taller")
+        XCTAssertEqual(tags.itemFrame(at: ip(0, 0))?.height ?? 0, tallest, accuracy: 0.5,
+                       "A short tag beside it is stretched")
+
+        view.maxItemHeight = view.style.itemHeight
+        view.layoutIfNeeded()
+        tags.layOut()
+        XCTAssertTrue(rowHeights().values.allSatisfy { $0 == [view.style.itemHeight] }, "Limited to maxItemHeight")
+    }
 }
