@@ -44,6 +44,7 @@ tags: [issues, ui, cocoapods, progress]
 - Decisions (the owner asked the advisor to decide): the watch root is a dedicated worktree, `<home>/Developer/cvcm-learn-codebase`; commit on `fix/shared-contrast-ios` (PR #42) although 10 pull requests are open; continue the export's own TODO (run the tests, check the findings) instead of a new export.
 - `.gitignore`: compared with CYLTabBarController d55c3cf6; the only rules missing name that project's own Xcode user-state files, so nothing changed.
 - V1 and V4 are HarmonyOS and V2 is the mini program: for a Windows session. The Mac part is the iOS tests and findings 3, 8, 9 and 10.
+- Setup DONE (2026-11-29, this Mac): watch root added with the other entries kept, claude-mem 17.0.2 worker restarted and healthy; ingestion check: 61 Markdown files, 61 ingested, all under `CollectionViewClassifyMenu`. Not done yet: tests and findings.
 - Blocker for builds: `scripts/cyl-tabbar-latest-commit.sh --check` fails (the pins are older than d55c3cf6). Waiting for the owner: build at the current pins, or move the pins first.
 
 ### TODO → DONE (2026-11-29, `fix/shared-contrast-ios`, Windows session): commit the three appendix files of the learn-codebase export
