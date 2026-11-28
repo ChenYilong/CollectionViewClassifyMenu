@@ -64,7 +64,7 @@ open class CYLTagButton @JvmOverloads constructor(
         includeFontPadding = false
         visibility = GONE
     }
-    /** `badgeLabel`: draws the badge (hidden while `badgeValue` is null), at the top trailing corner of the icon. */
+    /** `badgeLabel`: draws the badge (hidden while `tagBadgeValue` is null), at the top trailing corner of the icon. */
     val badgeLabel: TextView = TextView(context).apply {
         gravity = Gravity.CENTER
         includeFontPadding = false
@@ -140,11 +140,12 @@ open class CYLTagButton @JvmOverloads constructor(
     }
 
     /**
-     * `badgeValue`, as `UITabBarItem.badgeValue`: null (the default) hides the badge, "" shows a dot, any other text
+     * `tagBadgeValue`, as `UITabBarItem.badgeValue` (named `tagBadgeValue` here because CYLAnimatedItemView has a final `badgeValue` of its own,
+     * the item badge of `:cylbadge`, which a property of that name would hide): null (the default) hides the badge, "" shows a dot, any other text
      * ("3", "99+") a capsule with it, at the top trailing corner of the icon (of the title when there is no icon).
      * TalkBack reads it after the title.
      */
-    var badgeValue: String? = null
+    var tagBadgeValue: String? = null
         set(value) {
             if (field == value) return
             field = value
@@ -463,7 +464,7 @@ open class CYLTagButton @JvmOverloads constructor(
         // At least one pixel, as before; CYLAnimatedItemView draws the border.
         itemBorderWidth = if (borderWidth > 0) max(1f / density, borderWidth) else 0f
         itemBorderColor = borderColor
-        val badge = badgeValue
+        val badge = tagBadgeValue
         badgeLabel.visibility = if (badge == null) GONE else VISIBLE
         badgeLabel.text = if (badge.isNullOrEmpty()) null else badge
         badgeBox.setColor(badgeColor ?: CYLTagBadgeDefaultColor)
@@ -633,7 +634,7 @@ open class CYLTagButton @JvmOverloads constructor(
      * the tag (which clips its content).
      */
     private fun layOutBadge(anchor: CYLRect, boundsWidth: Float, boundsHeight: Float) {
-        val badge = badgeValue
+        val badge = tagBadgeValue
         if (badge == null) {
             badgeFrame = CYLRect()
             place(badgeLabel, badgeFrame)
@@ -653,7 +654,7 @@ open class CYLTagButton @JvmOverloads constructor(
 
     /** What TalkBack reads for the badge: its text, or "New" (localized) for a dot; null without a badge. */
     private fun badgeAccessibilityValue(): String? {
-        val badge = badgeValue ?: return null
+        val badge = tagBadgeValue ?: return null
         return if (badge.isEmpty()) CYLMenuLocalizedString("CYLTagBadgeDot", "A badge shown as a dot") else badge
     }
 
