@@ -62,6 +62,13 @@ tags: [issues, ui, cocoapods, progress]
   test `TagListRowHeight.test.ets`; mini program: the tail fold item already uses the list's tag height
   (`listTagHeight`). The header and footer fold buttons are outside the rows and keep their own size. Not compiled
   (Linux), same status as above.
+- **CI fix (2026-11-28, iOS run 46094815978, also red at `9f6f8073` before this task):** (1) `CYLTagButton` declared its own
+  `badgeValue`, `badgeLabel`, `badgeColor` and `isAnimationEngineAvailable`, which `CYLAnimatedItemView` has since
+  `ed39c20b` (non-`open`, so "overriding non-open property"); the tag now uses the inherited badge (CYLBadge on
+  `badgeAnchorView`, which the tag keeps on its icon, or on its title without an icon), `testTagButtonBadge` follows it.
+  (2) `CYLUtils` needs `CYLDeallocBlockExecutor ~> 1.4` (not on the trunk): `TagCollectionView/Podfile` names its source like the
+  other Podfiles, and `scripts/pod-lint.sh lib` includes the CYLBadge, CYLUtils and CYLDeallocBlockExecutor podspecs.
+  Not run locally (no Xcode); the next CI run is the check.
 - **Score: 65 / 100 (pass 60).** Missing 35: no platform compiled or run except the mini program (Linux session, no Swift,
   Android SDK or DevEco), no before/after screenshots (the bug screenshot named in the prompt was not attached to the
   conversation), Flutter and RN have no test of their own.

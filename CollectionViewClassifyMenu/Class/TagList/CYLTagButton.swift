@@ -50,50 +50,12 @@ open class CYLTagButton: CYLAnimatedItemView {
 
     private static let states: [UIControl.State] = [.normal, .selected, .disabled]
     private static let disabledAnimationAlpha: CGFloat = 0.4
-    /**
-     * The badge's size: a dot's diameter, the minimum height of a badge with text, its text's side padding.
-     */
-    private static let badgeDotDiameter: CGFloat = 8
-    private static let badgeMinimumHeight: CGFloat = 16
-    private static let badgePadding: CGFloat = 4
-    private static let badgeFontSize: CGFloat = 11
 
     /**
      * The label that draws the delete indicator (hidden unless `showsDeleteIndicator`). It is the base class's
      * `accessoryView`: a tap on it calls `CYLAnimatedItemViewDelegate.animatedItemViewDidTapAccessory(_:)`.
      */
     @objc public let deleteIndicatorLabel = UILabel()
-
-    /**
-     * The label that draws the badge (hidden while `badgeValue` is `nil`), at the top trailing corner of the icon.
-     */
-    @objc public let badgeLabel = UILabel()
-
-    /**
-     * The badge's text, as `UITabBarItem.badgeValue`: `nil` (the default) hides the badge, an empty string shows a dot,
-     * any other text ("3", "99+", "New") a capsule with it. It sits at the top trailing corner of the icon, or of the
-     * title when there is no icon, and VoiceOver reads it as the tag's value.
-     */
-    @objc open var badgeValue: String? {
-        didSet {
-            if oldValue != badgeValue {
-                updateAppearance()
-            }
-        }
-    }
-
-    /**
-     * The badge's background color. Setting `nil` restores the default, `UIColor.systemRed`; the text is white.
-     */
-    @objc open var badgeColor: UIColor? {
-        get {
-            badgeColorStorage
-        }
-        set {
-            badgeColorStorage = newValue ?? .systemRed
-            updateAppearance()
-        }
-    }
 
     /**
      * The title (the base class's), shown through the style (`CYLMenuStyle.displayedTitle(forTitle:)`).
@@ -254,17 +216,7 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
     }
 
-    /**
-     * Whether an animation engine is in the app (CYLTabBarController's `CYLTabBarItemAnimationFactory`, brought by an
-     * engine subspec such as `CYLAnimatedItem/LottieSwift`). The core links none: without one, tags
-     * show their static images.
-     */
-    @objc public static var isAnimationEngineAvailable: Bool {
-        NSClassFromString("CYLTabBarItemAnimationFactory") != nil
-    }
-
     private var styleStorage = CYLMenuStyle()
-    private var badgeColorStorage: UIColor = .systemRed
     /**
      * True for a tag made with a convenience initializer: on its own, it is an accessibility element whose traits
      * follow its state (selected, not enabled).
@@ -335,12 +287,6 @@ open class CYLTagButton: CYLAnimatedItemView {
         deleteIndicatorLabel.addSubview(deleteIndicatorImageView)
         // The accessory once: the base class adds its tap recognizer each time an accessory is set.
         accessoryView = deleteIndicatorLabel
-        badgeLabel.textAlignment = .center
-        badgeLabel.textColor = .white
-        badgeLabel.isHidden = true
-        badgeLabel.isAccessibilityElement = false
-        badgeLabel.layer.masksToBounds = true
-        addSubview(badgeLabel)
         crossLayer.fillColor = nil
         crossLayer.lineCap = .round
         layer.addSublayer(crossLayer)
@@ -989,24 +935,11 @@ open class CYLTagButton: CYLAnimatedItemView {
     }
 
     /**
-     * The badge at the top trailing corner of `anchor` (the icon, or the title): the center of its leading cap on the
-     * corner, kept inside the tag (which clips its content).
+     * The base class's badge (CYLBadge, on `badgeAnchorView`) sits at the top trailing corner of `anchor`: the icon, or
+     * the title when there is no icon.
      */
     private func layOutBadge(anchor: CGRect) {
-        guard let badgeValue else {
-            badgeLabel.frame = .zero
-            return
-        }
-        let isDot = badgeValue.isEmpty
-        let lineHeight = ceil(badgeLabel.font.lineHeight)
-        let badgeHeight = isDot ? Self.badgeDotDiameter : max(Self.badgeMinimumHeight, lineHeight + 2)
-        let textWidth = isDot ? 0 : ceil((badgeValue as NSString).size(withAttributes: [.font: badgeLabel.font as Any]).width)
-        let badgeWidth = isDot ? badgeHeight : max(badgeHeight, textWidth + 2 * Self.badgePadding)
-        let x = max(0, min(anchor.maxX - badgeHeight / 2, bounds.width - badgeWidth))
-        let y = max(0, min(anchor.minY - badgeHeight / 2, bounds.height - badgeHeight))
-        badgeLabel.frame = CGRect(x: x, y: y, width: badgeWidth, height: badgeHeight)
-        badgeLabel.layer.cornerRadius = badgeHeight / 2
-        bringSubviewToFront(badgeLabel)
+        badgeAnchorView.frame = anchor
     }
 
 
@@ -1108,14 +1041,6 @@ open class CYLTagButton: CYLAnimatedItemView {
         }
         layer.borderColor = borderColor?.cgColor
         layer.borderWidth = borderWidth
-        badgeLabel.isHidden = badgeValue == nil
-        badgeLabel.text = badgeValue?.isEmpty == false ? badgeValue : nil
-        badgeLabel.backgroundColor = badgeColorStorage
-        let badgeFont = UIFont.boldSystemFont(ofSize: Self.badgeFontSize)
-        badgeLabel.font = style.adjustsFontForContentSizeCategory
-            ? UIFontMetrics(forTextStyle: .caption2).scaledFont(for: badgeFont, maximumPointSize: 2 * Self.badgeFontSize,
-                                                                compatibleWith: traitCollection)
-            : badgeFont
         invalidateIntrinsicContentSize()
         setNeedsLayout()
     }

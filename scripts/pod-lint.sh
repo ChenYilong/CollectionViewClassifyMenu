@@ -60,7 +60,20 @@ case "$command" in
     git -C "$dir" init --quiet
     git -C "$dir" fetch --quiet --depth 1 https://github.com/ChenYilong/CYLTabBarController.git "$sha"
     git -C "$dir" checkout --quiet --force FETCH_HEAD
-    pod lib lint "$PODSPEC" --allow-warnings --include-podspecs="$dir/CYLAnimatedItem.podspec" "$@"
+    # CYLAnimatedItem brings CYLBadge and CYLUtils (same checkout), and CYLUtils needs CYLDeallocBlockExecutor ~> 1.4, also
+    # not on the trunk: its commit is the one Example/Podfile pins.
+    dealloc=$(sed -n "s/.*CYLDeallocBlockExecutor.*:commit => '\([0-9a-f]\{40\}\)'.*/\1/p" Example/Podfile | head -n 1)
+    if [ -z "$dealloc" ]; then
+      echo "error: no CYLDeallocBlockExecutor commit in Example/Podfile" >&2
+      exit 1
+    fi
+    dealloc_dir=$(mktemp -d "${TMPDIR:-/tmp}/cyl-pod-lint-dealloc.XXXXXX")
+    trap 'rm -rf "$dir" "$dealloc_dir"' EXIT HUP INT TERM
+    git -C "$dealloc_dir" init --quiet
+    git -C "$dealloc_dir" fetch --quiet --depth 1 https://github.com/ChenYilong/CYLDeallocBlockExecutor.git "$dealloc"
+    git -C "$dealloc_dir" checkout --quiet --force FETCH_HEAD
+    pod lib lint "$PODSPEC" --allow-warnings \
+      --include-podspecs="{$dir/CYLAnimatedItem.podspec,$dir/CYLBadge.podspec,$dir/CYLUtils.podspec,$dealloc_dir/CYLDeallocBlockExecutor.podspec}" "$@"
     ;;
   push)
     if ! git ls-remote --exit-code --tags origin "refs/tags/$version" >/dev/null; then
