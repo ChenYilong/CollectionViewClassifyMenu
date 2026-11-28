@@ -412,6 +412,17 @@ export class CYLTagCreateItem {
 
 // MARK: - Layout
 
+/** The displayed rows of a section: each tag's height (aligned per row) and the number of tags per row. */
+class CYLDisplayedRows {
+  heights: number[];
+  rows: number[];
+
+  constructor(heights: number[], rows: number[]) {
+    this.heights = heights;
+    this.rows = rows;
+  }
+}
+
 /** Where an item (or the inline fold control) is, in the list's content (below the title). */
 export class CYLTagListItemFrame {
   section: number = 0;
@@ -1733,7 +1744,8 @@ export class CYLTagListState {
     const measured = width === this.measuredWidth;
     const sectionWidths = measured ? this.itemWidths : this.widths(available);
     const sectionRows = measured ? this.rows : this.rowsFor(sectionWidths, available);
-    const sectionHeights = measured ? this.itemHeights : this.measureItemHeights(sectionWidths, available);
+    const sectionOwn = measured ? this.ownHeights : this.ownItemHeights(sectionWidths);
+    const sectionHeights = measured ? this.itemHeights : this.alignedToRows(sectionOwn, sectionRows);
     const header = this.headerHeight();
     const insets = this.styleStorage.sectionInsets;
     let height = 0;
@@ -1742,16 +1754,21 @@ export class CYLTagListState {
       const foldable = this.canFold(rowCount);
       if (foldable && !this.expandedSections.has(section)) {
         rowCount = this.defaultVisibleRowsStorage;
-      } else if (foldable && this.foldControlIsInline) {
-        const withFold = sectionWidths[section].concat([this.inlineFoldSize(section, true).width]);
-        const r = this.rowsFor([withFold], available);
-        rowCount = r.length > 0 ? r[0].length : 0;
       }
       height += header + insets.top + insets.bottom;
-      const foldHeight = foldable && this.foldControlIsInline ?
-      Math.min(this.inlineFoldSize(section, this.expandedSections.has(section)).height, this.itemHeightLimit) : 0;
-      height += this.heightOfRows(rowCount, sectionRows[section],
-        section < sectionHeights.length ? sectionHeights[section] : [], foldHeight);
+      if (foldable && this.foldControlIsInline) {
+        // The fold cell is a tag of its row: the displayed rows (visible items and the cell) set the height.
+        const expanded = this.expandedSections.has(section);
+        const fold = this.inlineFoldSize(section, expanded);
+        const total = sectionWidths[section].length;
+        const visible = expanded ? total :
+        this.collapsedItemCount(sectionWidths[section], sectionRows[section], total, available, fold.width);
+        height += this.rowsHeight(this.displayedLayout(sectionWidths[section], sectionOwn[section] ?? [], visible, fold,
+          available));
+      } else {
+        height += this.heightOfRows(rowCount, sectionRows[section],
+          section < sectionHeights.length ? sectionHeights[section] : []);
+      }
       if (foldable && this.foldControlIsInFooter) {
         height += this.footerHeight;
       }
@@ -2132,23 +2149,33 @@ export class CYLTagListState {
     if (section >= this.rows.length || !this.canFoldSection(section) || this.isSectionExpanded(section)) {
       return total;
     }
+    const foldWidth = this.foldControlIsInline && section < this.itemWidths.length ?
+    this.inlineFoldSize(section, false).width : undefined;
+    return this.collapsedItemCount(this.itemWidths[section] ?? [], this.rows[section], total,
+      this.contentWidth(this.measuredWidth), foldWidth);
+  }
+
+  /**
+   * The items a collapsed section shows: its first `defaultVisibleRows` rows; with the inline fold cell (`foldWidth`),
+   * the last of those rows keeps only the items that leave the cell the room (it joins that row first), so the hidden
+   * items are no members of any displayed row.
+   */
+  private collapsedItemCount(widths: number[], rows: number[], total: number, contentWidth: number,
+    foldWidth: number | undefined): number {
     let visible = 0;
     let lastRowCount = 0;
-    this.rows[section].slice(0, this.defaultVisibleRowsStorage).forEach((count: number) => {
+    rows.slice(0, this.defaultVisibleRowsStorage).forEach((count: number) => {
       lastRowCount = count;
       visible += count;
     });
     visible = Math.min(visible, total);
-    if (this.foldControlIsInline && lastRowCount > 0 && section < this.itemWidths.length) {
-      const widths = this.itemWidths[section];
+    if (foldWidth !== undefined && lastRowCount > 0) {
       const spacing = this.styleStorage.interitemSpacing;
-      const available = this.contentWidth(this.measuredWidth);
-      const foldWidth = this.inlineFoldSize(section, false).width;
       let used = 0;
       for (let item = visible - lastRowCount; item < visible; item++) {
         used += (item > visible - lastRowCount ? spacing : 0) + widths[item];
       }
-      while (lastRowCount > 1 && used + spacing + foldWidth > available) {
+      while (lastRowCount > 1 && used + spacing + foldWidth > contentWidth) {
         used -= widths[visible - 1] + spacing;
         lastRowCount -= 1;
         visible -= 1;
@@ -2687,23 +2714,57 @@ export class CYLTagListState {
    * of the row's tallest tag.
    */
   private measureItemHeights(widths: number[][], contentWidth: number): number[][] {
-    const limit = this.itemHeightLimit;
-    const sectionRows = this.rowsFor(widths, contentWidth);
-    return this.ownItemHeights(widths).map((own: number[], section: number): number[] => {
-      const aligned = own.map((height: number): number => Math.min(height, limit));
-      let start = 0;
-      (sectionRows[section] ?? []).forEach((count: number) => {
-        const end = Math.min(start + count, aligned.length);
-        if (end > start) {
-          const tallest = Math.max(...aligned.slice(start, end));
-          for (let i = start; i < end; i++) {
-            aligned[i] = tallest;
-          }
+    return this.alignedToRows(this.ownItemHeights(widths), this.rowsFor(widths, contentWidth));
+  }
+
+  /** Limits each height to `maxItemHeight` and stretches every tag of a row (`sectionRows`: items per row) to the row's tallest. */
+  private alignedToRows(own: number[][], sectionRows: number[][]): number[][] {
+    return own.map((heights: number[], section: number): number[] =>
+    this.alignRows(heights.map((height: number): number => Math.min(height, this.itemHeightLimit)),
+      sectionRows[section] ?? []));
+  }
+
+  /** Stretches every height of a row (`rows`: items per row) to the row's tallest. */
+  private alignRows(heights: number[], rows: number[]): number[] {
+    const aligned = heights.slice();
+    let start = 0;
+    rows.forEach((count: number) => {
+      const end = Math.min(start + count, aligned.length);
+      if (end > start) {
+        const tallest = Math.max(...aligned.slice(start, end));
+        for (let i = start; i < end; i++) {
+          aligned[i] = tallest;
         }
-        start = end;
-      });
-      return aligned;
+      }
+      start = end;
     });
+    return aligned;
+  }
+
+  /**
+   * The displayed rows of a section at `contentWidth`: its first `visible` items and the inline fold cell (`fold`), last.
+   * The cell joins the last row when it fits, else it is the first member of the next row; each row's tags, the cell
+   * included, get the height of the row's tallest (limited to `maxItemHeight`).
+   */
+  private displayedLayout(widths: number[], own: number[], visible: number, fold: CYLSize,
+    contentWidth: number): CYLDisplayedRows {
+    const shownWidths = widths.slice(0, visible);
+    const heights = own.slice(0, visible).map((height: number): number => Math.min(height, this.itemHeightLimit));
+    shownWidths.push(fold.width);
+    heights.push(Math.min(fold.height, this.itemHeightLimit));
+    const sectionRows = this.rowsFor([shownWidths], contentWidth)[0] ?? [];
+    return new CYLDisplayedRows(this.alignRows(heights, sectionRows), sectionRows);
+  }
+
+  /** The height of displayed rows with the spacing between them. */
+  private rowsHeight(layout: CYLDisplayedRows): number {
+    let total = 0;
+    let start = 0;
+    layout.rows.forEach((count: number) => {
+      total += layout.heights[start] ?? this.cappedItemHeight;
+      start += count;
+    });
+    return total + Math.max(0, layout.rows.length - 1) * this.styleStorage.lineSpacing;
   }
 
   /** Each tag's own height, before `maxItemHeight` and the alignment of its row. */
@@ -2724,15 +2785,11 @@ export class CYLTagListState {
     }));
   }
 
-  /**
-   * `foldHeight`, the inline fold cell's height (limited to `maxItemHeight`; 0 for none), counts for the last row, and a
-   * row past the measured ones (the cell on a row of its own) is that tall, else the list's item height.
-   */
-  private heightOfRows(rowCount: number, rows: number[], heights: number[], foldHeight: number = 0): number {
+  private heightOfRows(rowCount: number, rows: number[], heights: number[]): number {
     let total = 0;
     let item = 0;
     for (let row = 0; row < Math.max(0, rowCount); row++) {
-      let rowHeight = row >= rows.length && foldHeight > 0 ? foldHeight : this.cappedItemHeight;
+      let rowHeight = this.cappedItemHeight;
       if (row < rows.length) {
         const count = rows[row];
         const end = Math.min(item + count, heights.length);
@@ -2740,9 +2797,6 @@ export class CYLTagListState {
           rowHeight = Math.max(rowHeight, heights[i]);
         }
         item += count;
-      }
-      if (row === rowCount - 1) {
-        rowHeight = Math.max(rowHeight, foldHeight);
       }
       total += rowHeight;
     }

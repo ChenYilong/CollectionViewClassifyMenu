@@ -68,8 +68,12 @@ tags: [issues, ui, cocoapods, progress]
 - **TODO (next sessions):** macOS: build, run `CYLTagListLayoutTests`, screenshots, regenerate the Swift API baseline and
   parity tables with their scripts (generated tables are never edited by hand); Windows: run the Android Robolectric test
   and the HarmonyOS `TagListRowHeight.test.ets`, rebuild the Maven repo for Flutter and RN; docs: list `maxItemHeight` in
-  the API documents under `docs/` (not read here: docs-lookup rule). (The earlier edge case, a folded section whose inline fold
-  cell pushed a tag off the last visible row, is fixed by the follow-up above for the laid-out rows.)
+  the API documents under `docs/` (not read here: docs-lookup rule). (Fourth message, 2026-11-28: the fold cell joins the last
+  visible row first; a tag it pushes out is no member of that row, and a cell pushed to the next row is a member of that
+  row. Fixed on iOS, Android and HarmonyOS for the laid-out rows and for `heightThatFitsWidth` at any width, through
+  `collapsedItemCount` and `displayedLayout(widths:ownHeights:visible:fold:contentWidth:)`; tests
+  `testTagsPushedOutByTheInlineFoldCellDoNotSetTheRowHeight`, `tagsPushedOutByTheTailFoldCellDoNotSetTheRowHeight`
+  (Android, HarmonyOS). The mini program has one height for every tag, so it has no such edge.)
 
 ### TODO (2026-11-24, `feat/harmony`, Mac session chenyilong-68): advisor scores the all-platform API implementation, Sonnet implements, other sessions test
 

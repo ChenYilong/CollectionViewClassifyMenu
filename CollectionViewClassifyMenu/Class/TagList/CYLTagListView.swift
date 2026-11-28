@@ -1421,7 +1421,9 @@ open class CYLTagListView: UIView {
         let measured = width == measuredWidth
         let sectionWidths = measured ? itemWidths : widths(forContentWidth: available)
         let sectionRows = measured ? rows : rows(forWidths: sectionWidths, contentWidth: available)
-        let sectionHeights = measured ? itemHeights : measureItemHeights(widths: sectionWidths, contentWidth: available)
+        let sectionOwnHeights = measured ? ownHeights : ownItemHeights(widths: sectionWidths)
+        let sectionHeights = measured ? itemHeights
+            : alignedToRows(sectionOwnHeights, widths: sectionWidths, contentWidth: available)
         let header = headerHeight()
         let insets = style.sectionInsets
         var height: CGFloat = 0
@@ -1430,21 +1432,22 @@ open class CYLTagListView: UIView {
             let foldable = canFold(rowCount: rowCount)
             if foldable && !expandedSections.contains(section) {
                 rowCount = defaultVisibleRows
-            } else if foldable && foldControlIsInline {
-                // Expanded, the inline fold cell follows the last item and may start a row of its own.
-                let withFold = sectionWidths[section] + [inlineFoldSize(inSection: section, expanded: true).width]
-                rowCount = rows(forWidths: [withFold], contentWidth: available).first?.count ?? 0
             }
             height += header + insets.top + insets.bottom
-            if measured && foldable && foldControlIsInline {
-                height += displayedRowsHeight(inSection: section)
+            if foldable && foldControlIsInline {
+                // The fold cell is a tag of its row: the displayed rows (visible items and the cell) set the height.
+                let expanded = expandedSections.contains(section)
+                let fold = inlineFoldSize(inSection: section, expanded: expanded)
+                let total = sectionWidths[section].count
+                let visible = expanded ? total
+                    : collapsedItemCount(widths: sectionWidths[section], rows: sectionRows[section], total: total,
+                                         contentWidth: available, foldWidth: fold.width)
+                height += rowsHeight(displayedLayout(widths: sectionWidths[section],
+                                                     ownHeights: section < sectionOwnHeights.count ? sectionOwnHeights[section] : [],
+                                                     visible: visible, fold: fold, contentWidth: available))
             } else {
-                let foldHeight = foldable && foldControlIsInline
-                    ? min(inlineFoldSize(inSection: section, expanded: expandedSections.contains(section)).height,
-                          itemHeightLimit) : 0
                 height += heightOfRows(rowCount, rows: sectionRows[section],
-                                       heights: section < sectionHeights.count ? sectionHeights[section] : [],
-                                       foldHeight: foldHeight)
+                                       heights: section < sectionHeights.count ? sectionHeights[section] : [])
             }
             if foldable && foldControlIsInFooter {
                 height += footerHeight
@@ -1796,24 +1799,33 @@ open class CYLTagListView: UIView {
         guard rows.indices.contains(section), canFoldSection(section), !isSectionExpanded(section) else {
             return total
         }
+        let foldWidth = foldControlIsInline && itemWidths.indices.contains(section)
+            ? inlineFoldSize(inSection: section, expanded: false).width : nil
+        return collapsedItemCount(widths: itemWidths.indices.contains(section) ? itemWidths[section] : [],
+                                  rows: rows[section], total: total, contentWidth: contentWidth(forWidth: measuredWidth),
+                                  foldWidth: foldWidth)
+    }
+
+    /**
+     * The items a collapsed section shows: its first `defaultVisibleRows` rows; with the inline fold cell (`foldWidth`),
+     * the last of those rows keeps only the items that leave the cell the room (it joins that row first), so the hidden
+     * items are no members of any displayed row.
+     */
+    func collapsedItemCount(widths: [CGFloat], rows: [Int], total: Int, contentWidth: CGFloat, foldWidth: CGFloat?) -> Int {
         var visible = 0
         var lastRowCount = 0
-        for count in rows[section].prefix(defaultVisibleRows) {
+        for count in rows.prefix(defaultVisibleRows) {
             lastRowCount = count
             visible += count
         }
         visible = min(visible, total)
-        if foldControlIsInline && lastRowCount > 0 && itemWidths.indices.contains(section) {
-            // The inline fold cell ends the last visible row: hide the items it needs the room of.
-            let widths = itemWidths[section]
+        if let foldWidth = foldWidth, lastRowCount > 0 {
             let spacing = style.interitemSpacing
-            let available = contentWidth(forWidth: measuredWidth)
-            let foldWidth = inlineFoldSize(inSection: section, expanded: false).width
             var used: CGFloat = 0
             for item in (visible - lastRowCount)..<visible {
                 used += (item > visible - lastRowCount ? spacing : 0) + widths[item]
             }
-            while lastRowCount > 1 && used + spacing + foldWidth > available {
+            while lastRowCount > 1 && used + spacing + foldWidth > contentWidth {
                 used -= widths[visible - 1] + spacing
                 lastRowCount -= 1
                 visible -= 1
@@ -2281,26 +2293,42 @@ private extension CYLTagListView {
         if let cached = displayedHeightCache[section], cached.visible == visible, cached.expanded == expanded {
             return (cached.heights, cached.rows)
         }
+        let layout = displayedLayout(widths: itemWidths.indices.contains(section) ? itemWidths[section] : [],
+                                     ownHeights: ownHeights.indices.contains(section) ? ownHeights[section] : [],
+                                     visible: visible,
+                                     fold: showsInlineFoldCell(inSection: section)
+                                        ? inlineFoldSize(inSection: section, expanded: expanded) : nil,
+                                     contentWidth: contentWidth(forWidth: measuredWidth))
+        displayedHeightCache[section] = (visible, expanded, layout.heights, layout.rows)
+        return layout
+    }
+
+    /**
+     * The displayed rows of a section at `contentWidth`: its first `visible` items and the inline fold cell (`fold`),
+     * last. The cell joins the last row when it fits, else it is the first member of the next row; each row's tags,
+     * the cell included, get the height of the row's tallest (limited to `maxItemHeight`).
+     */
+    func displayedLayout(widths: [CGFloat], ownHeights: [CGFloat], visible: Int, fold: CGSize?,
+                         contentWidth: CGFloat) -> (heights: [CGFloat], rows: [Int]) {
         let limit = itemHeightLimit
-        var widths = itemWidths.indices.contains(section) ? Array(itemWidths[section].prefix(visible)) : []
-        var heights = (ownHeights.indices.contains(section) ? Array(ownHeights[section].prefix(visible)) : [])
-            .map { min($0, limit) }
-        if showsInlineFoldCell(inSection: section) {
-            let fold = inlineFoldSize(inSection: section, expanded: expanded)
-            widths.append(fold.width)
+        var shownWidths = Array(widths.prefix(visible))
+        var heights = ownHeights.prefix(visible).map { min($0, limit) }
+        if let fold = fold {
+            shownWidths.append(fold.width)
             heights.append(min(fold.height, limit))
         }
-        let sectionRows = rows(forWidths: [widths], contentWidth: contentWidth(forWidth: measuredWidth)).first ?? []
-        heights = alignedToRows(heights, rows: sectionRows)
-        displayedHeightCache[section] = (visible, expanded, heights, sectionRows)
-        return (heights, sectionRows)
+        let sectionRows = rows(forWidths: [shownWidths], contentWidth: contentWidth).first ?? []
+        return (alignedToRows(heights, rows: sectionRows), sectionRows)
     }
 
     /**
      * The height of the displayed rows of a section (`displayedLayout(inSection:)`) with the spacing between them.
      */
     func displayedRowsHeight(inSection section: Int) -> CGFloat {
-        let layout = displayedLayout(inSection: section)
+        rowsHeight(displayedLayout(inSection: section))
+    }
+
+    func rowsHeight(_ layout: (heights: [CGFloat], rows: [Int])) -> CGFloat {
         var total: CGFloat = 0
         var start = 0
         for count in layout.rows {
@@ -2362,18 +2390,14 @@ private extension CYLTagListView {
     }
 
     /**
-     * The height of the first `rowCount` rows of a section: each row as tall as its tallest item. `foldHeight`, the
-     * inline fold cell's height (limited to `maxItemHeight`; 0 for none), counts for the last row, and a row past the
-     * measured ones (the inline fold cell on a row of its own) is that tall, else the list's item height.
+     * The height of the first `rowCount` rows of a section: each row as tall as its tallest item. Sections with the
+     * inline fold cell use `displayedLayout` instead.
      */
-    func heightOfRows(_ rowCount: Int, rows: [Int], heights: [CGFloat], foldHeight: CGFloat = 0) -> CGFloat {
+    func heightOfRows(_ rowCount: Int, rows: [Int], heights: [CGFloat]) -> CGFloat {
         var total: CGFloat = 0
         var item = 0
         for row in 0..<max(0, rowCount) {
             var rowHeight = cappedItemHeight
-            if row >= rows.count && foldHeight > 0 {
-                rowHeight = foldHeight
-            }
             if row < rows.count {
                 let count = rows[row]
                 let end = min(item + count, heights.count)
@@ -2381,9 +2405,6 @@ private extension CYLTagListView {
                     rowHeight = heights[item..<end].reduce(rowHeight, max)
                 }
                 item += count
-            }
-            if row == rowCount - 1 {
-                rowHeight = max(rowHeight, foldHeight)
             }
             total += rowHeight
         }

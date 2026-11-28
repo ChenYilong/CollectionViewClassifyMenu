@@ -28,6 +28,23 @@ class CYLRowHeightSource implements CYLMenuDataSource {
     indexPath.item === TALL_ITEM ? this.tall : undefined;
 }
 
+/** 40 tags; every tag from `tallFrom` on has its own, taller style. */
+class CYLTallFromSource implements CYLMenuDataSource {
+  tallFrom: number = Number.MAX_VALUE;
+  tall: CYLMenuStyle = new CYLMenuStyle();
+
+  constructor() {
+    this.tall.itemHeight = 80;
+  }
+
+  numberOfSectionsInMenu = (): number => 1;
+  menuNumberOfItemsInSection = (section: number): number => 40;
+  menuTitleForSection = (section: number): string => 'Section';
+  menuTitleForItem = (indexPath: CYLIndexPath): string => `Tag ${indexPath.item < 10 ? '0' : ''}${indexPath.item}`;
+  menuStyleForItem = (indexPath: CYLIndexPath): CYLMenuStyle | undefined =>
+    indexPath.item >= this.tallFrom ? this.tall : undefined;
+}
+
 function makeList(): CYLTagListState {
   TAGS = 12;
   TALL_ITEM = 1;
@@ -99,6 +116,32 @@ export default function tagListRowHeightTest() {
       list.maxItemHeight = 30;
       const limited = list.layoutSections()[0].items;
       expect(limited.filter((c) => c.isFoldCell)[0].height <= 30).assertTrue();
+    });
+
+    it('tagsPushedOutByTheTailFoldCellDoNotSetTheRowHeight', 0, () => {
+      for (let width = 120; width <= 400; width += 7) {
+        const source = new CYLTallFromSource();
+        const list = new CYLTagListState();
+        list.menuDataSource = source;
+        list.setLayoutWidth(width);
+        list.showsSectionHeaders = false;
+        list.foldControl = new CYLMenuFoldControl(CYLMenuFoldControlPosition.tail, CYLMenuFoldControlContent.icon);
+        list.defaultVisibleRows = 1;
+        list.reloadMenuData();
+        const visible = list.numberOfVisibleItems(0);
+        if (visible >= 40) {
+          continue;
+        }
+        const before = list.heightThatFitsWidth(width);
+        // Every hidden tag taller: none is shown, so no shown row changes its height.
+        source.tallFrom = visible;
+        list.reloadMenuData();
+        expect(list.numberOfVisibleItems(0)).assertEqual(visible);
+        expect(list.heightThatFitsWidth(width)).assertEqual(before);
+        const cells = list.layoutSections()[0].items;
+        const fold = cells.filter((c) => c.isFoldCell)[0];
+        cells.forEach((c) => expect(c.height).assertEqual(fold.height));
+      }
     });
   });
 }

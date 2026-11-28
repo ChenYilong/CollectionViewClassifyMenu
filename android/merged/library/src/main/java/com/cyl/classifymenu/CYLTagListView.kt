@@ -828,32 +828,46 @@ open class CYLTagListView @JvmOverloads constructor(
      * the others, so it counts for the height of its row (limited to `maxItemHeight`) and is stretched to it. The rows are
      * made of the visible items and the cell, as shown (iOS `displayedHeights(inSection:)`).
      */
-    private fun displayedHeights(section: Int, visible: Int): List<Float> {
-        val limit = itemHeightLimit()
-        val contentWidth = contentWidthFor(measuredContentWidth)
-        val widths = (itemWidths.getOrNull(section) ?: emptyList()).take(visible).toMutableList()
-        val heights = (ownHeights.getOrNull(section) ?: emptyList()).take(visible).map { min(limit, it) }.toMutableList()
-        val fold = inlineFoldSize(section, isSectionExpanded(section))
-        widths.add(min(fold.width, contentWidth))
-        heights.add(min(fold.height, limit))
-        return alignRows(heights, rowsFor(listOf(widths), contentWidth).first())
-    }
+    private fun displayedHeights(section: Int, visible: Int): List<Float> = displayedLayout(
+        itemWidths.getOrNull(section) ?: emptyList(), ownHeights.getOrNull(section) ?: emptyList(), visible,
+        inlineFoldSize(section, isSectionExpanded(section)), contentWidthFor(measuredContentWidth)).first
 
     /**
-     * `foldHeight`, the inline fold cell's height (limited to `maxItemHeight`; 0 for none), counts for the last row, and a
-     * row past the measured ones (the cell on a row of its own) is that tall, else the list's item height.
+     * The displayed rows of a section at `contentWidth`: its first `visible` items and the inline fold cell (`fold`), last.
+     * The cell joins the last row when it fits, else it is the first member of the next row; each row's tags, the cell
+     * included, get the height of the row's tallest (limited to `maxItemHeight`). Returns the heights and the items per row.
      */
-    private fun heightOfRows(rowCount: Int, sectionRows: List<Int>, heights: List<Float>, foldHeight: Float = 0f): Float {
+    private fun displayedLayout(widths: List<Float>, own: List<Float>, visible: Int, fold: CYLSize, contentWidth: Float): Pair<List<Float>, List<Int>> {
+        val limit = itemHeightLimit()
+        val shownWidths = widths.take(visible).toMutableList()
+        val heights = own.take(visible).map { min(limit, it) }.toMutableList()
+        shownWidths.add(min(fold.width, contentWidth))
+        heights.add(min(fold.height, limit))
+        val sectionRows = rowsFor(listOf(shownWidths), contentWidth).first()
+        return alignRows(heights, sectionRows) to sectionRows
+    }
+
+    /** The height of displayed rows (`displayedLayout`) with the spacing between them. */
+    private fun rowsHeight(layout: Pair<List<Float>, List<Int>>): Float {
+        var total = 0f
+        var start = 0
+        for (count in layout.second) {
+            total += layout.first.getOrElse(start) { cappedItemHeight() }
+            start += count
+        }
+        return total + max(0, layout.second.size - 1) * listStyle.lineSpacing
+    }
+
+    private fun heightOfRows(rowCount: Int, sectionRows: List<Int>, heights: List<Float>): Float {
         var total = 0f
         var item = 0
         for (row in 0 until rowCount) {
-            var rowHeight = if (row >= sectionRows.size && foldHeight > 0f) foldHeight else cappedItemHeight()
+            var rowHeight = cappedItemHeight()
             if (row < sectionRows.size) {
                 val count = sectionRows[row]
                 for (index in item until min(item + count, heights.size)) rowHeight = max(rowHeight, heights[index])
                 item += count
             }
-            if (row == rowCount - 1) rowHeight = max(rowHeight, foldHeight)
             total += rowHeight
         }
         return total + if (rowCount > 0) (rowCount - 1) * listStyle.lineSpacing else 0f
@@ -915,23 +929,26 @@ open class CYLTagListView @JvmOverloads constructor(
         val same = width == measuredContentWidth
         val widths = if (same) itemWidths else widthsFor(contentWidth)
         val sectionRows = if (same) rows else rowsFor(widths, contentWidth)
-        val heights = if (same) itemHeights else heightsForItems(ownItemHeights(), widths, contentWidth)
+        val own = if (same) ownHeights else ownItemHeights()
+        val heights = if (same) itemHeights else heightsForItems(own, widths, contentWidth)
         val header = headerHeight()
         val insets = listStyle.sectionInsets
         var height = 0f
         for (section in sectionRows.indices) {
             var rowCount = sectionRows[section].size
             val foldable = canFoldRowCount(rowCount)
-            if (foldable && section !in expandedSections) {
-                rowCount = defaultVisibleRows
-            } else if (foldable && foldIsInline()) {
-                val withFold = widths[section] + inlineFoldSize(section, true).width
-                rowCount = rowsFor(listOf(withFold), contentWidth).first().size
-            }
+            if (foldable && section !in expandedSections) rowCount = defaultVisibleRows
             height += header + insets.top + insets.bottom
-            val foldHeight = if (foldable && foldIsInline())
-                min(inlineFoldSize(section, section in expandedSections).height, itemHeightLimit()) else 0f
-            height += heightOfRows(rowCount, sectionRows[section], heights.getOrElse(section) { emptyList() }, foldHeight)
+            if (foldable && foldIsInline()) {
+                // The fold cell is a tag of its row: the displayed rows (visible items and the cell) set the height.
+                val expanded = section in expandedSections
+                val fold = inlineFoldSize(section, expanded)
+                val total = widths[section].size
+                val visible = if (expanded) total else collapsedItemCount(widths[section], sectionRows[section], total, contentWidth, fold.width)
+                height += rowsHeight(displayedLayout(widths[section], own.getOrElse(section) { emptyList() }, visible, fold, contentWidth))
+            } else {
+                height += heightOfRows(rowCount, sectionRows[section], heights.getOrElse(section) { emptyList() })
+            }
             if (foldable && foldIsInFooter()) height += footerHeight()
         }
         height += addItemViewHeight()
@@ -1540,19 +1557,25 @@ open class CYLTagListView @JvmOverloads constructor(
         if (section !in titles.indices) return 0
         val total = titles[section].size
         if (section !in rows.indices || !canFoldSection(section) || isSectionExpanded(section)) return total
+        val foldWidth = if (foldIsInline() && section in itemWidths.indices) inlineFoldSize(section, false).width else null
+        return collapsedItemCount(itemWidths.getOrNull(section) ?: emptyList(), rows[section], total, contentWidthFor(measuredContentWidth), foldWidth)
+    }
+
+    /**
+     * The items a collapsed section shows: its first `defaultVisibleRows` rows; with the inline fold cell (`foldWidth`), the
+     * last of those rows keeps only the items that leave the cell the room (it joins that row first), so the hidden items
+     * are no members of any displayed row.
+     */
+    private fun collapsedItemCount(widths: List<Float>, sectionRows: List<Int>, total: Int, contentWidth: Float, foldWidth: Float?): Int {
         var visible = 0
-        val sectionRows = rows[section]
         var lastRowCount = 0
         for (row in 0 until min(defaultVisibleRows, sectionRows.size)) {
             lastRowCount = sectionRows[row]
             visible += lastRowCount
         }
         visible = min(visible, total)
-        if (foldIsInline() && lastRowCount > 0 && section in itemWidths.indices) {
-            val widths = itemWidths[section]
+        if (foldWidth != null && lastRowCount > 0) {
             val spacing = listStyle.interitemSpacing
-            val contentWidth = contentWidthFor(measuredContentWidth)
-            val foldWidth = inlineFoldSize(section, false).width
             var used = 0f
             for (item in visible - lastRowCount until visible) used += (if (item > visible - lastRowCount) spacing else 0f) + widths[item]
             while (lastRowCount > 1 && used + spacing + foldWidth > contentWidth) {

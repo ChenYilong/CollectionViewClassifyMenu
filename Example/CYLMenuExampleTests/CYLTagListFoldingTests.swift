@@ -127,6 +127,42 @@ final class CYLTagListFoldingTests: CYLMenuExampleTestCase {
         withExtendedLifetime(source) {}
     }
 
+    /// The fold cell joins the last visible row first; a tag it pushes out is no member of that row, so its (taller)
+    /// height no longer counts for the tags that stay, and a fold cell pushed to the next row is a member of that row.
+    func testTagsPushedOutByTheInlineFoldCellDoNotSetTheRowHeight() {
+        for width in stride(from: 240, through: 400, by: 7) {
+            let view = CYLTagListView(frame: .zero)
+            view.foldControl = CYLMenuFoldControl(position: .tail, content: .icon)
+            view.defaultVisibleRows = 1
+            view.addTags((0..<30).map { CYLTag(title: "Tag \(String(format: "%02d", $0))") })
+            show(view, size: CGSize(width: CGFloat(width), height: 700))
+            view.layoutIfNeeded()
+            let visible = view.numberOfVisibleItems(inSection: 0)
+            guard visible < 30 else {
+                continue
+            }
+            // Make every hidden tag taller: none of them is shown, so no shown row may change its height.
+            let tall = CYLMenuStyle()
+            tall.itemHeight = 80
+            let before = view.heightThatFitsWidth(CGFloat(width))
+            for index in visible..<30 {
+                view.tags[index].style = tall
+            }
+            view.reloadMenuData()
+            view.layoutIfNeeded()
+            XCTAssertEqual(view.numberOfVisibleItems(inSection: 0), visible, "width \(width)")
+            XCTAssertEqual(view.heightThatFitsWidth(CGFloat(width)), before, accuracy: 0.5,
+                           "A hidden tag sets no row height, width \(width)")
+            let tags = view.probe
+            tags.layOut()
+            let fold = tags.itemFrame(at: ip(visible, 0))
+            for item in 0..<visible {
+                XCTAssertEqual(tags.itemFrame(at: ip(item, 0))?.height ?? 0, fold?.height ?? -1, accuracy: 0.5,
+                               "Shown tags and the fold cell share their row's height, width \(width)")
+            }
+        }
+    }
+
     func testInlineFoldCellIsTheLastTagAndTogglesTheSection() {
         let source = CYLMenuFixtures.source(itemCount: 14, sections: 1)
         let view = showTagList(source, width: 320)

@@ -24,6 +24,16 @@ private class CYLRowHeightSource(count: Int, private val tallItem: Int, private 
     override fun menuStyleForItemAtIndexPath(indexPath: CYLIndexPath): CYLMenuStyle? = if (indexPath.item == tallItem) tallStyle else null
 }
 
+/** 40 tags; every tag from `tallFrom` on has its own, taller style. */
+private class CYLTallFromSource(var tallFrom: Int = Int.MAX_VALUE) : CYLMenuDataSource {
+    val tall = CYLMenuStyle().apply { itemHeight = 80f }
+    override fun numberOfSectionsInMenu() = 1
+    override fun menuNumberOfItemsInSection(section: Int) = 40
+    override fun menuTitleForSection(section: Int) = "Section"
+    override fun menuTitleForItemAtIndexPath(indexPath: CYLIndexPath) = "Tag %02d".format(indexPath.item)
+    override fun menuStyleForItemAtIndexPath(indexPath: CYLIndexPath): CYLMenuStyle? = if (indexPath.item >= tallFrom) tall else null
+}
+
 /** Every row is as tall as its tallest tag, and `maxItemHeight` limits it (iOS CYLTagListLayoutTests). */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -86,5 +96,38 @@ class CYLTagListRowHeightTest {
         shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(100))
         val limited = descendants(list).filterIsInstance<CYLTagFoldCell>().single()
         assertTrue("maxItemHeight limits the fold cell too", limited.height <= 30)
+    }
+
+    /**
+     * The fold cell joins the last visible row first; a tag it pushes out is no member of that row, so its taller height
+     * no longer counts for the tags that stay, nor for the content height.
+     */
+    @Test
+    fun tagsPushedOutByTheTailFoldCellDoNotSetTheRowHeight() {
+        for (width in 150..400 step 7) {
+            val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+            val source = CYLTallFromSource()
+            val list = CYLTagListView(activity)
+            list.menuDataSource = source
+            list.showsSectionHeaders = false
+            list.foldControl = CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.TAIL, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon)
+            list.defaultVisibleRows = 1
+            activity.setContentView(FrameLayout(activity).apply { addView(list, FrameLayout.LayoutParams(width, FrameLayout.LayoutParams.WRAP_CONTENT)) })
+            list.reloadMenuData()
+            shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(100))
+            val visible = list.numberOfVisibleItemsInSection(0)
+            if (visible >= 40) continue
+            val before = list.heightThatFitsWidth(width.toFloat())
+            source.tallFrom = visible
+            list.reloadMenuData()
+            shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(100))
+            assertEquals("width $width", visible, list.numberOfVisibleItemsInSection(0))
+            assertEquals("a hidden tag sets no row height, width $width", before, list.heightThatFitsWidth(width.toFloat()), 0.5f)
+            val fold = descendants(list).filterIsInstance<CYLTagFoldCell>().single()
+            for (item in 0 until visible) {
+                val cell = list.tagButtonAtIndexPath(CYLIndexPath(item, 0))!!.parent as View
+                if (cell.top == fold.top) assertEquals("shown tags share their row's height with the fold cell, width $width", fold.height, cell.height)
+            }
+        }
     }
 }
