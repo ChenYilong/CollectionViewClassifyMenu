@@ -64,6 +64,19 @@ tags: [issues, ui, cocoapods, progress]
   re-adapted to the highlight, and the fold tag draws no `backgroundImage`, elevation shadow or touch ripple; -15, not
   seen on an emulator, light and dark (the CYLTabBarController session checks it after moving its pin).
 
+### TODO (2026-11-29, `fix/shared-contrast-ios`, Mac session): set up claude-mem ingestion of the learn-codebase export on this Mac and continue learn-codebase
+
+- Context: the vault checkout is paused mid-rebase on `feat/harmony`, so this work uses a separate worktree of `fix/shared-contrast-ios` (pulled to 2ee1c10e). The export describes commit 03707ba2.
+- Requirements: pull; follow `docs/learn-codebase/README.md` to finish the setup (steps 4 and 5 on this computer); continue learn-codebase.
+- Prompt (verbatim): "GIT PULL THEN follow docs/learn-codebase/readme to finish setup, and continue
+  to do  learn-codebase"
+- Decisions (the owner asked the advisor to decide): the watch root is a dedicated worktree, `<home>/Developer/cvcm-learn-codebase`; commit on `fix/shared-contrast-ios` (PR #42) although 10 pull requests are open; continue the export's own TODO (run the tests, check the findings) instead of a new export.
+- `.gitignore`: compared with CYLTabBarController d55c3cf6; the only rules missing name that project's own Xcode user-state files, so nothing changed.
+- V1 and V4 are HarmonyOS and V2 is the mini program: for a Windows session. The Mac part is the iOS tests and findings 3, 8, 9 and 10.
+- Setup DONE (2026-11-29, this Mac): watch root added with the other entries kept, claude-mem 17.0.2 worker restarted and healthy; ingestion check: 61 Markdown files, 61 ingested, all under `CollectionViewClassifyMenu`. Not done yet: tests and findings.
+- iOS tests at the export commit: GitHub CI run [45918046261](https://github.com/ChenYilong/CollectionViewClassifyMenu/actions/runs/45918046261) on 03707ba2 passed (unit tests menu, tag, example and swift; library build and analyze; pod lib lint; Example screenshots). Code outside docs and Markdown is unchanged from 03707ba2 to this branch. Not a local run; it does not by itself confirm or reject any finding.
+- Blocker for builds: `scripts/cyl-tabbar-latest-commit.sh --check` fails (the pins are older than d55c3cf6). Waiting for the owner: build at the current pins, or move the pins first.
+
 
 ### TODO → DONE (2026-11-29, `fix/shared-contrast-ios`, Windows session): commit the three appendix files of the learn-codebase export
 
