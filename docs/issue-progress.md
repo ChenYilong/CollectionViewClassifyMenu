@@ -35,7 +35,7 @@ tags: [issues, ui, cocoapods, progress]
 
 ## 待办 / TODO
 
-### TODO (2026-11-29, `fix/shared-contrast-ios`, Windows session): HarmonyOS tail fold tag does not look like the other tags
+### TODO → DONE (2026-11-29, `fix/shared-contrast-ios`, Windows session): HarmonyOS tail fold tag does not look like the other tags
 
 - **Context:** relayed by the CYLTabBarController session (its PR #824). Its example, pinned at `9b62c229`
   (`origin/claude/android-tag-badge-rename`), on a Mate 70 Pro emulator with Liquid Glass tags and an icon-only tail fold
@@ -63,6 +63,14 @@ tags: [issues, ui, cocoapods, progress]
   Missing: -10, not yet equal to a tag in every state: while pressed on dark glass the icon and title are not
   re-adapted to the highlight, and the fold tag draws no `backgroundImage`, elevation shadow or touch ripple; -15, not
   seen on an emulator, light and dark (the CYLTabBarController session checks it after moving its pin).
+- **Emulator result (2026-11-29), score now 90/100:** the CYLTabBarController session moved its pin to `9a4c1908`
+  (`5f4ee8aa` on its `feat/harmony-animated-item-engines`) and reports: HarmonyOS builds with its own
+  `cylanimateditem`; on the Mate 70 Pro emulator the fold tag matches the tags in light and dark and expands and
+  collapses; Android `testDebugUnitTest`, `lintDebug` and assemble pass (515 tests, 0 failures) and the fold tag matches
+  in light and dark on API 37; mini program `npm test` 273 of 273, not seen in DevTools. This session ran none of these;
+  it looked at the comparison screenshot in that repository
+  (`docs/assets/harmonyos-android-taglist-fold-tag-pin-9a4c1908.png`), which shows the match. The -15 above is gone; the
+  -10 stays. The pressed background was not checked on a device.
 
 ### TODO (2026-11-29, `fix/shared-contrast-ios`, Mac session): set up claude-mem ingestion of the learn-codebase export on this Mac and continue learn-codebase
 
