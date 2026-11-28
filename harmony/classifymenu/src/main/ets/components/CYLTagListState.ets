@@ -554,6 +554,8 @@ export class CYLTagListState {
   private titles: string[][] = [];
   private itemWidths: number[][] = [];
   private itemHeights: number[][] = [];
+  /** Each item's own height (before `maxItemHeight` and the row alignment): the displayed rows align these. */
+  private ownHeights: number[][] = [];
   private rows: number[][] = [];
   private selection: Map<string, CYLIndexPath> = new Map<string, CYLIndexPath>();
   private expandedSections: Set<number> = new Set<number>();
@@ -1746,8 +1748,10 @@ export class CYLTagListState {
         rowCount = r.length > 0 ? r[0].length : 0;
       }
       height += header + insets.top + insets.bottom;
+      const foldHeight = foldable && this.foldControlIsInline ?
+      Math.min(this.inlineFoldSize(section, this.expandedSections.has(section)).height, this.itemHeightLimit) : 0;
       height += this.heightOfRows(rowCount, sectionRows[section],
-        section < sectionHeights.length ? sectionHeights[section] : []);
+        section < sectionHeights.length ? sectionHeights[section] : [], foldHeight);
       if (foldable && this.foldControlIsInFooter) {
         height += this.footerHeight;
       }
@@ -2720,11 +2724,15 @@ export class CYLTagListState {
     }));
   }
 
-  private heightOfRows(rowCount: number, rows: number[], heights: number[]): number {
+  /**
+   * `foldHeight`, the inline fold cell's height (limited to `maxItemHeight`; 0 for none), counts for the last row, and a
+   * row past the measured ones (the cell on a row of its own) is that tall, else the list's item height.
+   */
+  private heightOfRows(rowCount: number, rows: number[], heights: number[], foldHeight: number = 0): number {
     let total = 0;
     let item = 0;
     for (let row = 0; row < Math.max(0, rowCount); row++) {
-      let rowHeight = this.cappedItemHeight;
+      let rowHeight = row >= rows.length && foldHeight > 0 ? foldHeight : this.cappedItemHeight;
       if (row < rows.length) {
         const count = rows[row];
         const end = Math.min(item + count, heights.length);
@@ -2732,6 +2740,9 @@ export class CYLTagListState {
           rowHeight = Math.max(rowHeight, heights[i]);
         }
         item += count;
+      }
+      if (row === rowCount - 1) {
+        rowHeight = Math.max(rowHeight, foldHeight);
       }
       total += rowHeight;
     }
@@ -2775,6 +2786,7 @@ export class CYLTagListState {
     this.measuredWidth = width > 0 ? width : -1;
     const available = this.contentWidth(width);
     this.itemWidths = this.widths(available);
+    this.ownHeights = this.ownItemHeights(this.itemWidths);
     this.itemHeights = this.measureItemHeights(this.itemWidths, available);
     this.rows = this.rowsFor(this.itemWidths, available);
   }
@@ -2848,7 +2860,8 @@ export class CYLTagListState {
         cell.section = section;
         cell.item = item;
         cell.width = Math.max(1, this.itemWidths[section]?.[item] ?? 0);
-        cell.height = this.itemHeights[section]?.[item] ?? this.cappedItemHeight;
+        // The displayed rows (the visible items and the inline fold cell) align the own heights below.
+        cell.height = Math.min(this.ownHeights[section]?.[item] ?? this.itemHeight, this.itemHeightLimit);
         cells.push(cell);
       }
       if (this.showsInlineFoldCell(section)) {
@@ -2857,7 +2870,7 @@ export class CYLTagListState {
         cell.section = section;
         cell.item = visible;
         cell.width = size.width;
-        cell.height = size.height;
+        cell.height = Math.min(size.height, this.itemHeightLimit);
         cell.isFoldCell = true;
         cells.push(cell);
       }
@@ -2872,6 +2885,10 @@ export class CYLTagListState {
         rowCells.forEach((c: CYLTagListItemFrame, i: number) => {
           rowWidth += (i > 0 ? spacing : 0) + c.width;
           rowHeight = Math.max(rowHeight, c.height);
+        });
+        // Every tag of a row, the inline fold cell included, is as tall as the row's tallest.
+        rowCells.forEach((c: CYLTagListItemFrame) => {
+          c.height = rowHeight;
         });
         let x = insets.left;
         if (style.rowAlignment === CYLTagRowAlignment.center) {

@@ -1,11 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach } from '@ohos/hypium';
 import {
-  CYLFont, CYLIndexPath, CYLMenuDataSource, CYLMenuStyle, CYLTagButtonMetrics, CYLTagListState, CYLTextMeasurer
+  CYLFont, CYLIndexPath, CYLMenuDataSource, CYLMenuFoldControl, CYLMenuFoldControlContent, CYLMenuFoldControlPosition,
+  CYLMenuStyle, CYLTagButtonMetrics, CYLTagListState, CYLTextMeasurer
 } from '@cyl/classifymenu';
 
 const FIXED: CYLTextMeasurer = (text: string, font: CYLFont): number => Array.from(text).length * 10;
-const TAGS: number = 12;
-const TALL_ITEM: number = 1;
+let TAGS: number = 12;
+let TALL_ITEM: number = 1;
 
 /** Tags "Tag 00"…; the tag at `TALL_ITEM` has its own, taller style (a custom tag or icon height). */
 class CYLRowHeightSource implements CYLMenuDataSource {
@@ -28,6 +29,8 @@ class CYLRowHeightSource implements CYLMenuDataSource {
 }
 
 function makeList(): CYLTagListState {
+  TAGS = 12;
+  TALL_ITEM = 1;
   const list = new CYLTagListState();
   list.menuDataSource = new CYLRowHeightSource();
   list.setLayoutWidth(320);
@@ -77,6 +80,25 @@ export default function tagListRowHeightTest() {
         expect(heights.size).assertEqual(1);
         expect(heights.has(30)).assertTrue();
       });
+    });
+
+    it('theTailFoldCellIsAsTallAsItsRowAndLimitedByMaxItemHeight', 0, () => {
+      TAGS = 40;
+      TALL_ITEM = 0;
+      const list = new CYLTagListState();
+      list.menuDataSource = new CYLRowHeightSource();
+      list.setLayoutWidth(320);
+      list.showsSectionHeaders = false;
+      list.foldControl = new CYLMenuFoldControl(CYLMenuFoldControlPosition.tail, CYLMenuFoldControlContent.icon);
+      list.defaultVisibleRows = 1;
+      list.reloadMenuData();
+      const cells = list.layoutSections()[0].items;
+      const fold = cells.filter((c) => c.isFoldCell)[0];
+      expect(fold !== undefined).assertTrue();
+      expect(fold.height).assertEqual(cells[0].height);
+      list.maxItemHeight = 30;
+      const limited = list.layoutSections()[0].items;
+      expect(limited.filter((c) => c.isFoldCell)[0].height <= 30).assertTrue();
     });
   });
 }

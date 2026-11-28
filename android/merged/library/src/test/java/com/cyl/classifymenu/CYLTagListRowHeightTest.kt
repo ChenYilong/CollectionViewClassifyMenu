@@ -29,11 +29,11 @@ private class CYLRowHeightSource(count: Int, private val tallItem: Int, private 
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class CYLTagListRowHeightTest {
 
-    private fun makeList(): CYLTagListView {
+    private fun makeList(count: Int = 12, tallItem: Int = 1): CYLTagListView {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
         val tall = CYLMenuStyle().apply { itemHeight = 80f }
         val list = CYLTagListView(activity)
-        list.menuDataSource = CYLRowHeightSource(12, 1, tall)
+        list.menuDataSource = CYLRowHeightSource(count, tallItem, tall)
         list.showsSectionHeaders = false
         activity.setContentView(FrameLayout(activity).apply { addView(list, FrameLayout.LayoutParams(600, FrameLayout.LayoutParams.WRAP_CONTENT)) })
         list.reloadMenuData()
@@ -65,5 +65,26 @@ class CYLTagListRowHeightTest {
         assertTrue(heights(list).values.all { it.size == 1 && it.first() == limit })
         val unlimited = makeList()
         assertTrue("the limit made the tags shorter", limit < (unlimited.tagButtonAtIndexPath(CYLIndexPath(0, 0))!!.parent as View).height)
+    }
+
+    private fun descendants(view: View): List<View> =
+        if (view is android.view.ViewGroup) (0 until view.childCount).flatMap { val child = view.getChildAt(it); listOf(child) + descendants(child) } else emptyList()
+
+    /** The tail fold control is a tag like the others: it counts for the height of its row and is stretched to it. */
+    @Test
+    fun theTailFoldCellIsAsTallAsItsRow() {
+        val list = makeList(count = 40, tallItem = 0)
+        list.foldControl = CYLMenuFoldControl.foldControlWithPosition(CYLMenuFoldControlPosition.TAIL, CYLMenuFoldControlContent.CYLMenuFoldControlContentIcon)
+        list.defaultVisibleRows = 1
+        list.reloadMenuData()
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(100))
+        val fold = descendants(list).filterIsInstance<CYLTagFoldCell>().single()
+        val first = list.tagButtonAtIndexPath(CYLIndexPath(0, 0))!!.parent as View
+        assertTrue(fold.height > 0)
+        assertEquals("the fold cell is as tall as its row", first.height, fold.height)
+        list.maxItemHeight = 30f
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(100))
+        val limited = descendants(list).filterIsInstance<CYLTagFoldCell>().single()
+        assertTrue("maxItemHeight limits the fold cell too", limited.height <= 30)
     }
 }

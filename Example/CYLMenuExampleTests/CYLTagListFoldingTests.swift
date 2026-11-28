@@ -96,6 +96,37 @@ final class CYLTagListFoldingTests: CYLMenuExampleTestCase {
 
     // MARK: Inline fold cell
 
+    func testInlineFoldCellIsAsTallAsItsRowLikeAnyOtherTag() {
+        let source = CYLMenuFixtures.source(itemCount: 14, sections: 1)
+        source.sections[0].items[1].title = "一个很长很长很长很长很长很长很长很长的标题,换行后比同一行的其他标签更高"
+        let view = showTagList(source, width: 320)
+        let style = CYLMenuStyle()
+        style.titleWraps = true
+        view.style = style
+        view.foldControl = CYLMenuFoldControl(position: .tail, content: .icon)
+        view.defaultVisibleRows = 2
+        view.reloadMenuData()
+        view.layoutIfNeeded()
+        let tags = view.probe
+        tags.layOut()
+        let visible = view.numberOfVisibleItems(inSection: 0)
+        let fold = tags.itemFrame(at: ip(visible, 0))
+        let tallest = tags.itemFrame(at: ip(1, 0))?.height ?? 0
+        XCTAssertGreaterThan(tallest, view.style.itemHeight, "The wrapping title makes its row taller")
+        XCTAssertEqual(fold?.height ?? 0, tallest, accuracy: 0.5, "The fold cell is stretched like any tag of its row")
+        for item in 0..<visible {
+            if let frame = tags.itemFrame(at: ip(item, 0)), frame.minY == fold?.minY {
+                XCTAssertEqual(frame.height, tallest, accuracy: 0.5, "The fold cell's row is as tall as the row's tallest")
+            }
+        }
+        view.maxItemHeight = view.style.itemHeight
+        view.layoutIfNeeded()
+        tags.layOut()
+        XCTAssertEqual(tags.itemFrame(at: ip(view.numberOfVisibleItems(inSection: 0), 0))?.height ?? 0,
+                       view.style.itemHeight, accuracy: 0.5, "maxItemHeight limits the fold cell too")
+        withExtendedLifetime(source) {}
+    }
+
     func testInlineFoldCellIsTheLastTagAndTogglesTheSection() {
         let source = CYLMenuFixtures.source(itemCount: 14, sections: 1)
         let view = showTagList(source, width: 320)

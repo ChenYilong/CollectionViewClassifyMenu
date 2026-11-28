@@ -53,15 +53,23 @@ tags: [issues, ui, cocoapods, progress]
   | Mini program | `model.normalize` reads `maxItemHeight`; `model.listTagHeight(model, style)` limits the tag height; the list passes it to `tagLayout`. Tags of a section share one style, so rows already had one height (no wrapping, `nowrap`) | `tag-list-model.test.js` | new test passes under `node --test` (22 of 24 in the copied files pass; the 2 failures come from the relative path of the scratch copy, not from this change) |
   | Flutter, React Native | No code of their own: they pass the configuration map/JSON to the iOS, Android and HarmonyOS cores, which the wrappers reference by local path (`Package.swift`, the local Maven repo of `android/merged`, `file:../../../harmony/classifymenu`), so the key works there once the cores are rebuilt | none yet | TODO: a Dart and a TS example/test that sets `maxItemHeight` |
 
+- **Follow-up (owner, 2026-11-28, third message): the tail (inline) fold control is a tag like the others.** The fold
+  cell now counts for the height of its row (limited to `maxItemHeight`) and is stretched to it; the rows are the
+  displayed ones (visible items + fold cell), which also fixes the edge case below. `heightThatFitsWidth` counts the
+  cell's height for the last row. iOS: `displayedHeights(inSection:)` / `displayedRowsHeight(inSection:)`, test
+  `CYLTagListFoldingTests.testInlineFoldCellIsAsTallAsItsRowLikeAnyOtherTag`; Android: `displayedHeights`, test
+  `CYLTagListRowHeightTest.theTailFoldCellIsAsTallAsItsRow`; HarmonyOS: `layoutSections` stretches every cell of a row,
+  test `TagListRowHeight.test.ets`; mini program: the tail fold item already uses the list's tag height
+  (`listTagHeight`). The header and footer fold buttons are outside the rows and keep their own size. Not compiled
+  (Linux), same status as above.
 - **Score: 65 / 100 (pass 60).** Missing 35: no platform compiled or run except the mini program (Linux session, no Swift,
   Android SDK or DevEco), no before/after screenshots (the bug screenshot named in the prompt was not attached to the
   conversation), Flutter and RN have no test of their own.
 - **TODO (next sessions):** macOS: build, run `CYLTagListLayoutTests`, screenshots, regenerate the Swift API baseline and
   parity tables with their scripts (generated tables are never edited by hand); Windows: run the Android Robolectric test
   and the HarmonyOS `TagListRowHeight.test.ets`, rebuild the Maven repo for Flutter and RN; docs: list `maxItemHeight` in
-  the API documents under `docs/` (not read here: docs-lookup rule). Known edge case, same on all platforms: in a folded
-  section whose inline fold cell pushes a tag off the last visible row, the remaining tags keep the hidden tag's height;
-  `heightOfRows` agrees with it, so nothing overlaps.
+  the API documents under `docs/` (not read here: docs-lookup rule). (The earlier edge case, a folded section whose inline fold
+  cell pushed a tag off the last visible row, is fixed by the follow-up above for the laid-out rows.)
 
 ### TODO (2026-11-24, `feat/harmony`, Mac session chenyilong-68): advisor scores the all-platform API implementation, Sonnet implements, other sessions test
 
